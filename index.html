@@ -10,6 +10,8 @@
     <link rel="icon" href="logo.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- Calendly widget CSS -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
@@ -126,13 +128,24 @@
         
         <!-- Contact Section -->
         <section id="contact" class="py-20 bg-gray-900">
-            <div class="container mx-auto px-6 text-center">
-                 <div class="max-w-xl mx-auto fade-in-up">
+            <div class="container mx-auto px-6">
+                 <div class="max-w-4xl mx-auto fade-in-up text-center">
                     <h2 class="text-4xl font-bold mb-4">Let's Build Together</h2>
-                    <p class="text-gray-400 mb-8">Have an idea, a challenge, or an opportunity? I'm always open to collaboration and new ventures. Let's connect and create something remarkable.</p>
-                    <a href="mailto:Chimwopara@icloud.com" class="inline-block bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold py-4 px-12 rounded-lg text-xl transition-all duration-300 ease-in-out transform hover:scale-105">
-                        Get In Touch
-                    </a>
+                    <p class="text-gray-400 mb-8">Have an idea, a challenge, or an opportunity? Schedule a meeting directly in my calendar below.</p>
+                    
+                    <!-- Calendly inline widget begin -->
+                    <div id="calendly-widget-container" class="calendly-inline-widget rounded-lg overflow-hidden" style="min-width:320px;height:700px;"></div>
+                    <!-- IMPORTANT: Replace the 'data-url' with your actual Calendly link -->
+                    <script>
+                        document.addEventListener('DOMContentLoaded', function() {
+                            const calendlyContainer = document.getElementById('calendly-widget-container');
+                            if(calendlyContainer) {
+                                calendlyContainer.setAttribute('data-url', 'https://calendly.com/wopara/60min');
+                            }
+                        });
+                    </script>
+                    <!-- Calendly inline widget end -->
+
                  </div>
             </div>
         </section>
@@ -141,12 +154,36 @@
 
     <!-- Footer -->
     <footer class="bg-gray-900 border-t border-gray-800">
-        <div class="container mx-auto px-6 py-8 text-center text-gray-500 text-sm">
-             <p>&copy; <span id="year"></span> Chim Wopara. All Rights Reserved.</p>
-             <p class="mt-2">Built with passion in Edmonton, Alberta.</p>
+        <div class="container mx-auto px-6 py-12">
+            <div class="text-center mb-8">
+                <h4 class="text-sm uppercase text-gray-500 tracking-widest mb-4">A Chim Wopara Enterprises Company</h4>
+                <div class="flex justify-center items-center space-x-6 md:space-x-10">
+                    <a href="http://fromsupply.com" target="_blank" class="hover:opacity-80 transition-opacity">
+                        <img src="fs.png" alt="Fromsupply Logo" class="h-8 w-auto">
+                    </a>
+                    <span class="text-gray-600">|</span>
+                    <a href="http://devgameshow.com" target="_blank" class="hover:opacity-80 transition-opacity">
+                        <img src="dgs.png" alt="Dev Game Show Logo" class="h-8 w-auto">
+                    </a>
+                    <span class="text-gray-600">|</span>
+                    <a href="http://pautacos.com" target="_blank" class="hover:opacity-80 transition-opacity">
+                        <img src="pautacos.png" alt="Pautacos Logo" class="h-8 w-auto">
+                    </a>
+                </div>
+            </div>
+            <div class="text-center text-gray-500 text-sm">
+                <p>&copy; <span id="year"></span> Chim Wopara Enterprises. All Rights Reserved.</p>
+                <p class="mt-2">
+                    <a href="#" class="hover:text-gray-300">Privacy Policy</a>
+                    <span class="mx-2">&middot;</span>
+                    <a href="#" class="hover:text-gray-300">Terms of Service</a>
+                </p>
+            </div>
         </div>
     </footer>
-
+    
+    <!-- Calendly widget script -->
+    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // --- DATA ---
@@ -274,3 +311,4 @@
     </script>
 </body>
 </html>
+
