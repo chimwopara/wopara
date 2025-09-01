@@ -10,15 +10,14 @@
     <link rel="icon" href="logo.png" type="image/png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
-    <!-- Calendly widget CSS -->
-    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #111827;
+            background-color: #1B2330;
+            color: #B7D1E1;
         }
         .hero-bg {
-            background: linear-gradient(135deg, #111827 0%, #1f2937 50%, #111827 100%);
+            background: linear-gradient(135deg, #1B2330 0%, #3f5268 50%, #1B2330 100%);
         }
         .project-card {
             transition: transform 0.3s ease, box-shadow 0.3s ease;
@@ -43,7 +42,7 @@
             width: 20px;
             height: 20px;
             border-radius: 50%;
-            background-color: #1f2937;
+            background-color: #3f5268;
             border: 4px solid #38bdf8;
         }
         .fade-in-up {
@@ -57,16 +56,16 @@
         }
         .filter-btn.active {
             background-color: #38bdf8;
-            color: #111827;
+            color: #1B2330;
         }
     </style>
 </head>
-<body class="text-white">
+<body class="text-[#B7D1E1]">
 
     <!-- Header -->
-    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+    <header class="bg-[#1B2330]/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
-            <a href="#"><img src="logo.png" alt="Chim Wopara Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/120x40/111827/FFFFFF?text=CW'"></a>
+            <a href="#"><img src="logo.png" alt="Chim Wopara Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/120x40/1B2330/FFFFFF?text=CW'"></a>
              <nav class="space-x-6">
                 <a href="#projects" class="hover:text-sky-400 transition-colors">Projects</a>
                 <a href="#journey" class="hover:text-sky-400 transition-colors">Journey</a>
@@ -83,25 +82,25 @@
                 <img src="chim.png" alt="Chim Wopara" class="w-40 h-40 rounded-full mx-auto mb-6 border-4 border-sky-400 shadow-lg">
                 <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">Chim Wopara</h1>
                 <h2 class="text-2xl md:text-3xl font-bold text-sky-400 mb-8">Visionary Product Architect & AI Innovator</h2>
-                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
+                <p class="text-lg md:text-xl text-[#B7D1E1]/80 max-w-3xl mx-auto">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
             </div>
         </section>
 
         <!-- Projects Section -->
-        <section id="projects" class="py-20 bg-gray-900">
+        <section id="projects" class="py-20 bg-[#1B2330]">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-bold mb-2">My Work</h2>
-                    <p class="text-gray-400 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
+                    <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
                 </div>
                 
                 <!-- Filter Buttons -->
                 <div id="filter-container" class="flex justify-center flex-wrap gap-3 mb-10 fade-in-up">
-                    <button class="filter-btn active py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="all">All</button>
-                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="web">Web Platforms</button>
-                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="game">Games & Interactive</button>
-                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="business">Business & Enterprise</button>
-                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="brand">Branding & Design</button>
+                    <button class="filter-btn active py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="all">All</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="web">Web Platforms</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="game">Games & Interactive</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="business">Business & Enterprise</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="brand">Branding & Design</button>
                 </div>
 
                 <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -111,15 +110,15 @@
         </section>
 
         <!-- Journey / Timeline Section -->
-        <section id="journey" class="py-20 bg-gray-800">
+        <section id="journey" class="py-20 bg-[#3f5268]">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-16 fade-in-up">
                     <h2 class="text-4xl font-bold mb-2">My Journey</h2>
-                    <p class="text-gray-400 max-w-2xl mx-auto">Tracing the path of innovation, one project at a time.</p>
+                    <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">Tracing the path of innovation, one project at a time.</p>
                 </div>
 
                 <div class="relative max-w-3xl mx-auto">
-                    <div class="absolute left-0 h-full border-l-2 border-gray-700" style="margin-left: -22px;"></div>
+                    <div class="absolute left-0 h-full border-l-2 border-[#1B2330]" style="margin-left: -22px;"></div>
                     <!-- Timeline items will be dynamically inserted here by JavaScript -->
                     <div id="timeline-container"></div>
                 </div>
@@ -127,25 +126,11 @@
         </section>
         
         <!-- Contact Section -->
-        <section id="contact" class="py-20 bg-gray-900">
+        <section id="contact" class="py-20 bg-[#1B2330]">
             <div class="container mx-auto px-6">
                  <div class="max-w-4xl mx-auto fade-in-up text-center">
                     <h2 class="text-4xl font-bold mb-4">Let's Build Together</h2>
-                    <p class="text-gray-400 mb-8">Have an idea, a challenge, or an opportunity? Schedule a meeting directly in my calendar below.</p>
-                    
-                    <!-- Calendly inline widget begin -->
-                    <div id="calendly-widget-container" class="calendly-inline-widget rounded-lg overflow-hidden" style="min-width:320px;height:700px;"></div>
-                    <!-- IMPORTANT: Replace the 'data-url' with your actual Calendly link -->
-                    <script>
-                        document.addEventListener('DOMContentLoaded', function() {
-                            const calendlyContainer = document.getElementById('calendly-widget-container');
-                            if(calendlyContainer) {
-                                calendlyContainer.setAttribute('data-url', 'https://calendly.com/wopara/60min');
-                            }
-                        });
-                    </script>
-                    <!-- Calendly inline widget end -->
-
+                    <p class="text-[#B7D1E1]/80 mb-8">Have an idea, a challenge, or an opportunity? Schedule a time with me to discuss how we can bring your vision to life.</p>
                  </div>
             </div>
         </section>
@@ -153,69 +138,73 @@
     </main>
 
     <!-- Footer -->
-    <footer class="bg-gray-900 border-t border-gray-800">
+    <footer class="bg-[#1B2330] border-t border-[#3f5268]">
         <div class="container mx-auto px-6 py-12">
             <div class="text-center mb-8">
-                <h4 class="text-sm uppercase text-gray-500 tracking-widest mb-4">A Chim Wopara Enterprises Company</h4>
+                <h4 class="text-sm uppercase text-[#B7D1E1]/60 tracking-widest mb-4">A Chim Wopara Enterprises Company</h4>
                 <div class="flex justify-center items-center space-x-6 md:space-x-10">
                     <a href="http://fromsupply.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="fs.png" alt="Fromsupply Logo" class="h-8 w-auto">
                     </a>
-                    <span class="text-gray-600">|</span>
+                    <span class="text-[#B7D1E1]/40">|</span>
                     <a href="http://devgameshow.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="dgs.png" alt="Dev Game Show Logo" class="h-8 w-auto">
                     </a>
-                    <span class="text-gray-600">|</span>
+                    <span class="text-[#B7D1E1]/40">|</span>
                     <a href="http://pautacos.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="pautacos.png" alt="Pautacos Logo" class="h-8 w-auto">
                     </a>
                 </div>
             </div>
-            <div class="text-center text-gray-500 text-sm">
+            <div class="text-center text-[#B7D1E1]/60 text-sm">
                 <p>&copy; <span id="year"></span> Chim Wopara Enterprises. All Rights Reserved.</p>
                 <p class="mt-2">
-                    <a href="#" class="hover:text-gray-300">Privacy Policy</a>
+                    <a href="#" class="hover:text-[#B7D1E1]">Privacy Policy</a>
                     <span class="mx-2">&middot;</span>
-                    <a href="#" class="hover:text-gray-300">Terms of Service</a>
+                    <a href="#" class="hover:text-[#B7D1E1]">Terms of Service</a>
                 </p>
             </div>
         </div>
     </footer>
     
-    <!-- Calendly widget script -->
-    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
+    <!-- Calendly badge widget begin -->
+    <link href="https://assets.calendly.com/assets/external/widget.css" rel="stylesheet">
+    <script src="https://assets.calendly.com/assets/external/widget.js" type="text/javascript" async></script>
+    <script type="text/javascript">window.onload = function() { Calendly.initBadgeWidget({ url: 'https://calendly.com/wopara?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1b2330&text_color=b7d1e1&primary_color=3f5268', text: 'Schedule time with me', color: '#3f5268', textColor: '#b7d1e1', branding: false }); }</script>
+    <!-- Calendly badge widget end -->
+    
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // --- DATA ---
             const projects = [
-                { name: "FlatPurse Business", date: "May 2025 - Present", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=FlatPurse" },
-                { name: "Prastfarms.com", date: "May 2025", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=PrastFarms" },
-                { name: "Lenslore.ca", date: "May 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Lenslore" },
-                { name: "culyeimmigrationservices.com", date: "June 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Culye" },
-                { name: "bodidris.org", date: "July 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Bodidris" },
-                { name: "African Heritage Clothing", date: "May 2022", description: "Designed a culturally-inspired clothing brand, handling everything from concept to visual identity.", category: "brand", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Heritage" },
-                { name: "FsMedia (Club Belong)", date: "Jan 2023 - Present", description: "An app for streaming multiple perspectives of events anonymously, fostering a unique viewing experience.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=FsMedia" },
-                { name: "Fromsupply", date: "June 2023 - Present", description: "A marketplace for enterprise apps that uses a reserves system to encourage productivity.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fromsupply" },
-                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "brand", image: "https://placehold.co/600x400/1f2937/38bdf8?text=234Stones" },
-                { name: "FsMedia (Fivetaps)", date: "Jan 2024 - Present", description: "An app for interactive media consumption and creation, putting the user in control of the narrative.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fivetaps" },
-                { name: "Acters", date: "Feb 2024 - Present", description: "Script writing for a movie playable on my interactive media platform.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Acters" },
-                { name: "Chim Prompts", date: "Mar 2024 - Present", description: "The world's first universal context-based prompt programming syntax language; allowing users to represent any piece of code in a structured prompt.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chim+Prompts" },
-                { name: "Falling Cards", date: "Apr 2024 - Present", description: "An interactive game that teaches users how to manage scarce resources and perform quick maths under pressure.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Falling+Cards" },
-                { name: "GunvGun", date: "Aug 2024 - Present", description: "A fun 2D multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=GunvGun" },
-                { name: "Runneth", date: "Aug 2024 - Present", description: "A 3D Roblox multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Runneth" },
-                { name: "Plummet", date: "Aug 2024 - Present", description: "Another 3D Roblox multiplayer game focused on survival, scarcity, and economic principles.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Plummet" },
-                { name: "God's Embassy Church App", date: "Dec 2024 - Present", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=GEC+App" },
-                { name: "Chim Type", date: "Jan 2025 - Present", description: "A website for learning to type faster, designed for people that require speed with keyboards to excel.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chim+Type" },
-                { name: "Chim Maze", date: "Feb 2025 - Present", description: "A gamified learning platform that lets users test their ability to recall information by playing games with their own notes.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chim+Maze" },
-                { name: "Fs Prompts", date: "Mar 2025", description: "A marketplace for AI-driven developers (Vibe coders) to meet commission-based developers for quality control.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Prompts" },
-                { name: "Fs Logic Code", date: "Apr 2025", description: "An educational platform for learning to code using a points system and option boxes to build muscle memory.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Logic+Code" },
-                { name: "Fs Mall", date: "May 2025", description: "A high-end shopping platform for domestic products, prioritizing a luxurious gift-giving and delivery experience.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Mall" },
-                { name: "Fs Farms", date: "May 2025", description: "Encouraging foreign direct investment into agriculture via blockchain-represented assets and real-time 3D farm monitoring.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Farms" },
-                { name: "Chimron Calls", date: "May 2025", description: "An AI solution that enables inbound AI customer support calls and outbound AI lead follow-up calls.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chimron+Calls" },
-                { name: "Goodsline", date: "May 2025", description: "AI software that analyzes 5 years of social feedback on products to create relevancy and sentiment graphs.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Goodsline" },
-                { name: "Pautacos.com", date: "June 2025", description: "Created media and website for a food delivery network that handles payments, logistics, and discovery.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Pautacos" },
-                { name: "Devgameshow.com", date: "July 2025", description: "Created media and website for a tech game show, managing payments, logistics, and content delivery.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=DevGameShow" },
-                { name: "Whot Whot", date: "Aug 2025", description: "A digital version of the legacy Nigerian card game 'Naija Whot Whot' with multiplayer and single-player modes, using Firebase for server-side functions.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Whot+Whot" },
+                { name: "FlatPurse Business", date: "May 2025 - Present", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=FlatPurse" },
+                { name: "Prastfarms.com", date: "May 2025", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=PrastFarms" },
+                { name: "Lenslore.ca", date: "May 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Lenslore" },
+                { name: "culyeimmigrationservices.com", date: "June 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Culye" },
+                { name: "bodidris.org", date: "July 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Bodidris" },
+                { name: "African Heritage Clothing", date: "May 2022", description: "Designed a culturally-inspired clothing brand, handling everything from concept to visual identity.", category: "brand", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Heritage" },
+                { name: "FsMedia (Club Belong)", date: "Jan 2023 - Present", description: "An app for streaming multiple perspectives of events anonymously, fostering a unique viewing experience.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=FsMedia" },
+                { name: "Fromsupply", date: "June 2023 - Present", description: "A marketplace for enterprise apps that uses a reserves system to encourage productivity.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fromsupply" },
+                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "brand", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=234Stones" },
+                { name: "FsMedia (Fivetaps)", date: "Jan 2024 - Present", description: "An app for interactive media consumption and creation, putting the user in control of the narrative.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fivetaps" },
+                { name: "Acters", date: "Feb 2024 - Present", description: "Script writing for a movie playable on my interactive media platform.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Acters" },
+                { name: "Chim Prompts", date: "Mar 2024 - Present", description: "The world's first universal context-based prompt programming syntax language; allowing users to represent any piece of code in a structured prompt.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chim+Prompts" },
+                { name: "Falling Cards", date: "Apr 2024 - Present", description: "An interactive game that teaches users how to manage scarce resources and perform quick maths under pressure.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Falling+Cards" },
+                { name: "GunvGun", date: "Aug 2024 - Present", description: "A fun 2D multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=GunvGun" },
+                { name: "Runneth", date: "Aug 2024 - Present", description: "A 3D Roblox multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Runneth" },
+                { name: "Plummet", date: "Aug 2024 - Present", description: "Another 3D Roblox multiplayer game focused on survival, scarcity, and economic principles.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Plummet" },
+                { name: "God's Embassy Church App", date: "Dec 2024 - Present", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=GEC+App" },
+                { name: "Chim Type", date: "Jan 2025 - Present", description: "A website for learning to type faster, designed for people that require speed with keyboards to excel.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chim+Type" },
+                { name: "Chim Maze", date: "Feb 2025 - Present", description: "A gamified learning platform that lets users test their ability to recall information by playing games with their own notes.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chim+Maze" },
+                { name: "Fs Prompts", date: "Mar 2025", description: "A marketplace for AI-driven developers (Vibe coders) to meet commission-based developers for quality control.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Prompts" },
+                { name: "Fs Logic Code", date: "Apr 2025", description: "An educational platform for learning to code using a points system and option boxes to build muscle memory.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Logic+Code" },
+                { name: "Fs Mall", date: "May 2025", description: "A high-end shopping platform for domestic products, prioritizing a luxurious gift-giving and delivery experience.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Mall" },
+                { name: "Fs Farms", date: "May 2025", description: "Encouraging foreign direct investment into agriculture via blockchain-represented assets and real-time 3D farm monitoring.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Farms" },
+                { name: "Chimron Calls", date: "May 2025", description: "An AI solution that enables inbound AI customer support calls and outbound AI lead follow-up calls.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chimron+Calls" },
+                { name: "Goodsline", date: "May 2025", description: "AI software that analyzes 5 years of social feedback on products to create relevancy and sentiment graphs.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Goodsline" },
+                { name: "Pautacos.com", date: "June 2025", description: "Created media and website for a food delivery network that handles payments, logistics, and discovery.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Pautacos" },
+                { name: "Devgameshow.com", date: "July 2025", description: "Created media and website for a tech game show, managing payments, logistics, and content delivery.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=DevGameShow" },
+                { name: "Whot Whot", date: "Aug 2025", description: "A digital version of the legacy Nigerian card game 'Naija Whot Whot' with multiplayer and single-player modes, using Firebase for server-side functions.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Whot+Whot" },
             ];
 
             const projectGrid = document.getElementById('project-grid');
@@ -229,13 +218,13 @@
 
                 filteredProjects.forEach((project, index) => {
                     const card = document.createElement('div');
-                    card.className = `project-card bg-gray-800 rounded-xl overflow-hidden fade-in-up a-delay-${index % 3}`;
+                    card.className = `project-card bg-[#3f5268] rounded-xl overflow-hidden fade-in-up a-delay-${index % 3}`;
                     card.setAttribute('data-category', project.category);
                     card.innerHTML = `
                         <div class="relative">
                             <img src="${project.image}" alt="${project.name}" class="w-full h-56 object-cover">
                             <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 details">
-                                <p class="text-center text-white p-4">${project.description}</p>
+                                <p class="text-center text-[#B7D1E1] p-4">${project.description}</p>
                             </div>
                         </div>
                         <div class="p-6">
@@ -265,10 +254,10 @@
                     const item = document.createElement('div');
                     item.className = 'timeline-item relative pl-8 pb-12 fade-in-up';
                     item.innerHTML = `
-                        <div class="bg-gray-900 p-6 rounded-lg shadow-lg">
+                        <div class="bg-[#1B2330] p-6 rounded-lg shadow-lg">
                             <p class="text-sm text-sky-400 font-semibold mb-1">${project.date}</p>
                             <h3 class="text-xl font-bold mb-2">${project.name}</h3>
-                            <p class="text-gray-400 text-sm">${project.description}</p>
+                            <p class="text-[#B7D1E1]/80 text-sm">${project.description}</p>
                         </div>
                     `;
                     timelineContainer.appendChild(item);
