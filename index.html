@@ -39,12 +39,6 @@
             transform: translateY(-10px) scale(1.03);
             box-shadow: 0 20px 30px rgba(183, 209, 225, 0.1);
         }
-        .project-card .details {
-            transition: opacity 0.3s ease;
-        }
-        .project-card:hover .details {
-            opacity: 1;
-        }
         .timeline-item::before {
             content: '';
             position: absolute;
@@ -70,6 +64,13 @@
             background-color: #38bdf8;
             color: #1B2330;
         }
+         .cta-button {
+            transition: all 0.3s ease;
+        }
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
     </style>
 </head>
 <body class="text-[#B7D1E1]">
@@ -82,7 +83,6 @@
                 <a href="#projects" class="hover:text-sky-400 transition-colors">Projects</a>
                 <a href="#journey" class="hover:text-sky-400 transition-colors">Journey</a>
                 <a href="#contact" class="hover:text-sky-400 transition-colors">Contact</a>
-                <a href="index.html" target="_blank" rel="noopener noreferrer" class="hover:text-sky-400 transition-colors font-bold">Learn from me</a>
             </nav>
         </div>
     </header>
@@ -95,7 +95,10 @@
                 <img src="chim.png" alt="Chim Wopara" class="w-40 h-40 rounded-full mx-auto mb-6 shadow-lg">
                 <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">Chim Wopara</h1>
                 <h2 class="text-2xl md:text-3xl font-bold text-sky-400 mb-8">Visionary Product Architect & AI Innovator</h2>
-                <p class="text-lg md:text-xl text-[#B7D1E1]/80 max-w-3xl mx-auto">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
+                <p class="text-lg md:text-xl text-[#B7D1E1]/80 max-w-3xl mx-auto mb-8">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
+                <div class="mt-8">
+                    <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Learn from me</a>
+                </div>
             </div>
         </section>
 
@@ -229,18 +232,14 @@
 
                 filteredProjects.forEach((project, index) => {
                     const card = document.createElement('div');
-                    card.className = `project-card rounded-xl overflow-hidden fade-in-up a-delay-${index % 3}`;
+                    card.className = `project-card rounded-xl overflow-hidden fade-in-up a-delay-${index % 3} flex flex-col`;
                     card.setAttribute('data-category', project.category);
                     card.innerHTML = `
-                        <div class="relative">
-                            <img src="${project.image}" alt="${project.name}" class="w-full h-56 object-cover">
-                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 details">
-                                <p class="text-center text-[#B7D1E1] p-4">${project.description}</p>
-                            </div>
-                        </div>
-                        <div class="p-6">
+                        <img src="${project.image}" alt="${project.name}" class="w-full h-56 object-cover">
+                        <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-bold mb-1">${project.name}</h3>
-                            <p class="text-sm text-sky-400 font-medium">${project.date}</p>
+                            <p class="text-sm text-[#B7D1E1]/80 mb-4 flex-grow">${project.description}</p>
+                            <p class="text-sm text-sky-400 font-medium mt-auto">${project.date}</p>
                         </div>
                     `;
                     projectGrid.appendChild(card);
@@ -311,5 +310,4 @@
     </script>
 </body>
 </html>
-
 
