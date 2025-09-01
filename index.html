@@ -1,0 +1,276 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chim Wopara - Visionary Product Architect & AI Innovator</title>
+    <meta name="description" content="Explore the diverse portfolio of Chim Wopara, a product building genius with extensive experience in web and app development, AI integration, interactive entertainment, and business solutions.">
+    <meta name="keywords" content="Chim Wopara, Wopara, Portfolio, AI Developer, Full Stack Developer, Product Builder, Edmonton Developer, Python, Swift, C++, JavaScript, React, AI Projects">
+    <meta name="author" content="Chim Wopara">
+    <link rel="icon" href="logo.png" type="image/png">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #111827;
+        }
+        .hero-bg {
+            background: linear-gradient(135deg, #111827 0%, #1f2937 50%, #111827 100%);
+        }
+        .project-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            will-change: transform;
+        }
+        .project-card:hover {
+            transform: translateY(-10px) scale(1.03);
+            box-shadow: 0 20px 30px rgba(0, 255, 255, 0.1);
+        }
+        .project-card .details {
+            transition: opacity 0.3s ease;
+        }
+        .project-card:hover .details {
+            opacity: 1;
+        }
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -31.5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background-color: #1f2937;
+            border: 4px solid #38bdf8;
+        }
+        .fade-in-up {
+            opacity: 0;
+            transform: translateY(30px);
+            transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+        }
+        .fade-in-up.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+        .filter-btn.active {
+            background-color: #38bdf8;
+            color: #111827;
+        }
+    </style>
+</head>
+<body class="text-white">
+
+    <!-- Header -->
+    <header class="bg-gray-900/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
+        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+            <a href="#"><img src="logo.png" alt="Chim Wopara Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/120x40/111827/FFFFFF?text=CW'"></a>
+             <nav class="space-x-6">
+                <a href="#projects" class="hover:text-sky-400 transition-colors">Projects</a>
+                <a href="#journey" class="hover:text-sky-400 transition-colors">Journey</a>
+                <a href="#contact" class="hover:text-sky-400 transition-colors">Contact</a>
+            </nav>
+        </div>
+    </header>
+
+    <main class="pt-16">
+
+        <!-- Hero Section -->
+        <section class="hero-bg py-24 md:py-32 text-center">
+            <div class="container mx-auto px-6">
+                <img src="chim.png" alt="Chim Wopara" class="w-40 h-40 rounded-full mx-auto mb-6 border-4 border-sky-400 shadow-lg">
+                <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">Chim Wopara</h1>
+                <h2 class="text-2xl md:text-3xl font-bold text-sky-400 mb-8">Visionary Product Architect & AI Innovator</h2>
+                <p class="text-lg md:text-xl text-gray-300 max-w-3xl mx-auto">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
+            </div>
+        </section>
+
+        <!-- Projects Section -->
+        <section id="projects" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-12 fade-in-up">
+                    <h2 class="text-4xl font-bold mb-2">My Work</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
+                </div>
+                
+                <!-- Filter Buttons -->
+                <div id="filter-container" class="flex justify-center flex-wrap gap-3 mb-10 fade-in-up">
+                    <button class="filter-btn active py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="all">All</button>
+                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="web">Web Platforms</button>
+                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="game">Games & Interactive</button>
+                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="business">Business & Enterprise</button>
+                    <button class="filter-btn py-2 px-5 bg-gray-800 rounded-full text-sm font-semibold transition-all" data-filter="brand">Branding & Design</button>
+                </div>
+
+                <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                    <!-- Projects will be dynamically inserted here by JavaScript -->
+                </div>
+            </div>
+        </section>
+
+        <!-- Journey / Timeline Section -->
+        <section id="journey" class="py-20 bg-gray-800">
+            <div class="container mx-auto px-6">
+                <div class="text-center mb-16 fade-in-up">
+                    <h2 class="text-4xl font-bold mb-2">My Journey</h2>
+                    <p class="text-gray-400 max-w-2xl mx-auto">Tracing the path of innovation, one project at a time.</p>
+                </div>
+
+                <div class="relative max-w-3xl mx-auto">
+                    <div class="absolute left-0 h-full border-l-2 border-gray-700" style="margin-left: -22px;"></div>
+                    <!-- Timeline items will be dynamically inserted here by JavaScript -->
+                    <div id="timeline-container"></div>
+                </div>
+            </div>
+        </section>
+        
+        <!-- Contact Section -->
+        <section id="contact" class="py-20 bg-gray-900">
+            <div class="container mx-auto px-6 text-center">
+                 <div class="max-w-xl mx-auto fade-in-up">
+                    <h2 class="text-4xl font-bold mb-4">Let's Build Together</h2>
+                    <p class="text-gray-400 mb-8">Have an idea, a challenge, or an opportunity? I'm always open to collaboration and new ventures. Let's connect and create something remarkable.</p>
+                    <a href="mailto:Chimwopara@icloud.com" class="inline-block bg-gradient-to-r from-sky-500 to-cyan-500 hover:from-sky-600 hover:to-cyan-600 text-white font-bold py-4 px-12 rounded-lg text-xl transition-all duration-300 ease-in-out transform hover:scale-105">
+                        Get In Touch
+                    </a>
+                 </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-gray-900 border-t border-gray-800">
+        <div class="container mx-auto px-6 py-8 text-center text-gray-500 text-sm">
+             <p>&copy; <span id="year"></span> Chim Wopara. All Rights Reserved.</p>
+             <p class="mt-2">Built with passion in Edmonton, Alberta.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // --- DATA ---
+            const projects = [
+                { name: "FlatPurse Business", date: "May 2025 - Present", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=FlatPurse" },
+                { name: "Prastfarms.com", date: "May 2025", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=PrastFarms" },
+                { name: "Lenslore.ca", date: "May 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Lenslore" },
+                { name: "culyeimmigrationservices.com", date: "June 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Culye" },
+                { name: "bodidris.org", date: "July 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Bodidris" },
+                { name: "African Heritage Clothing", date: "May 2022", description: "Designed a culturally-inspired clothing brand, handling everything from concept to visual identity.", category: "brand", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Heritage" },
+                { name: "FsMedia (Club Belong)", date: "Jan 2023 - Present", description: "An app for streaming multiple perspectives of events anonymously, fostering a unique viewing experience.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=FsMedia" },
+                { name: "Fromsupply", date: "June 2023 - Present", description: "A marketplace for enterprise apps that uses a reserves system to encourage productivity.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fromsupply" },
+                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "brand", image: "https://placehold.co/600x400/1f2937/38bdf8?text=234Stones" },
+                { name: "FsMedia (Fivetaps)", date: "Jan 2024 - Present", description: "An app for interactive media consumption and creation, putting the user in control of the narrative.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fivetaps" },
+                { name: "Acters", date: "Feb 2024 - Present", description: "Script writing for a movie playable on my interactive media platform.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Acters" },
+                { name: "Chim Prompts", date: "Mar 2024 - Present", description: "The world's first universal context-based prompt programming syntax language; allowing users to represent any piece of code in a structured prompt.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chim+Prompts" },
+                { name: "Falling Cards", date: "Apr 2024 - Present", description: "An interactive game that teaches users how to manage scarce resources and perform quick maths under pressure.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Falling+Cards" },
+                { name: "GunvGun", date: "Aug 2024 - Present", description: "A fun 2D multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=GunvGun" },
+                { name: "Runneth", date: "Aug 2024 - Present", description: "A 3D Roblox multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Runneth" },
+                { name: "Plummet", date: "Aug 2024 - Present", description: "Another 3D Roblox multiplayer game focused on survival, scarcity, and economic principles.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Plummet" },
+                { name: "God's Embassy Church App", date: "Dec 2024 - Present", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=GEC+App" },
+                { name: "Chim Type", date: "Jan 2025 - Present", description: "A website for learning to type faster, designed for people that require speed with keyboards to excel.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chim+Type" },
+                { name: "Chim Maze", date: "Feb 2025 - Present", description: "A gamified learning platform that lets users test their ability to recall information by playing games with their own notes.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chim+Maze" },
+                { name: "Fs Prompts", date: "Mar 2025", description: "A marketplace for AI-driven developers (Vibe coders) to meet commission-based developers for quality control.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Prompts" },
+                { name: "Fs Logic Code", date: "Apr 2025", description: "An educational platform for learning to code using a points system and option boxes to build muscle memory.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Logic+Code" },
+                { name: "Fs Mall", date: "May 2025", description: "A high-end shopping platform for domestic products, prioritizing a luxurious gift-giving and delivery experience.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Mall" },
+                { name: "Fs Farms", date: "May 2025", description: "Encouraging foreign direct investment into agriculture via blockchain-represented assets and real-time 3D farm monitoring.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Fs+Farms" },
+                { name: "Chimron Calls", date: "May 2025", description: "An AI solution that enables inbound AI customer support calls and outbound AI lead follow-up calls.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Chimron+Calls" },
+                { name: "Goodsline", date: "May 2025", description: "AI software that analyzes 5 years of social feedback on products to create relevancy and sentiment graphs.", category: "business", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Goodsline" },
+                { name: "Pautacos.com", date: "June 2025", description: "Created media and website for a food delivery network that handles payments, logistics, and discovery.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Pautacos" },
+                { name: "Devgameshow.com", date: "July 2025", description: "Created media and website for a tech game show, managing payments, logistics, and content delivery.", category: "web", image: "https://placehold.co/600x400/1f2937/38bdf8?text=DevGameShow" },
+                { name: "Whot Whot", date: "Aug 2025", description: "A digital version of the legacy Nigerian card game 'Naija Whot Whot' with multiplayer and single-player modes, using Firebase for server-side functions.", category: "game", image: "https://placehold.co/600x400/1f2937/38bdf8?text=Whot+Whot" },
+            ];
+
+            const projectGrid = document.getElementById('project-grid');
+            const timelineContainer = document.getElementById('timeline-container');
+            const filterContainer = document.getElementById('filter-container');
+            
+            // --- RENDER PROJECTS ---
+            function renderProjects(filter = 'all') {
+                projectGrid.innerHTML = '';
+                const filteredProjects = projects.filter(p => filter === 'all' || p.category === filter);
+
+                filteredProjects.forEach((project, index) => {
+                    const card = document.createElement('div');
+                    card.className = `project-card bg-gray-800 rounded-xl overflow-hidden fade-in-up a-delay-${index % 3}`;
+                    card.setAttribute('data-category', project.category);
+                    card.innerHTML = `
+                        <div class="relative">
+                            <img src="${project.image}" alt="${project.name}" class="w-full h-56 object-cover">
+                            <div class="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center opacity-0 details">
+                                <p class="text-center text-white p-4">${project.description}</p>
+                            </div>
+                        </div>
+                        <div class="p-6">
+                            <h3 class="text-xl font-bold mb-1">${project.name}</h3>
+                            <p class="text-sm text-sky-400 font-medium">${project.date}</p>
+                        </div>
+                    `;
+                    projectGrid.appendChild(card);
+                });
+                // Re-trigger animations
+                observeElements();
+            }
+
+            // --- RENDER TIMELINE ---
+            const timelineProjects = [...projects].sort((a, b) => new Date(a.date.split(' ')[1], monthToNum(a.date.split(' ')[0])) - new Date(b.date.split(' ')[1], monthToNum(b.date.split(' ')[0])));
+            const yearGroups = timelineProjects.reduce((acc, p) => {
+                const year = p.date.match(/\d{4}/);
+                if (year) {
+                    if (!acc[year[0]]) acc[year[0]] = [];
+                    acc[year[0]].push(p);
+                }
+                return acc;
+            }, {});
+
+            Object.keys(yearGroups).sort((a,b) => b-a).forEach(year => {
+                 yearGroups[year].forEach((project, index) => {
+                    const item = document.createElement('div');
+                    item.className = 'timeline-item relative pl-8 pb-12 fade-in-up';
+                    item.innerHTML = `
+                        <div class="bg-gray-900 p-6 rounded-lg shadow-lg">
+                            <p class="text-sm text-sky-400 font-semibold mb-1">${project.date}</p>
+                            <h3 class="text-xl font-bold mb-2">${project.name}</h3>
+                            <p class="text-gray-400 text-sm">${project.description}</p>
+                        </div>
+                    `;
+                    timelineContainer.appendChild(item);
+                });
+            });
+
+            // --- FILTERING LOGIC ---
+            filterContainer.addEventListener('click', (e) => {
+                if(e.target.classList.contains('filter-btn')) {
+                    document.querySelector('.filter-btn.active').classList.remove('active');
+                    e.target.classList.add('active');
+                    renderProjects(e.target.dataset.filter);
+                }
+            });
+
+            // --- UTILS ---
+            function monthToNum(month) {
+                const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
+                return months.indexOf(month.substring(0,3));
+            }
+
+            // --- SCROLL ANIMATIONS ---
+            function observeElements() {
+                const elementsToAnimate = document.querySelectorAll('.fade-in-up');
+                const observer = new IntersectionObserver((entries) => {
+                    entries.forEach(entry => {
+                        if (entry.isIntersecting) {
+                            entry.target.classList.add('visible');
+                        }
+                    });
+                }, { threshold: 0.1 });
+                elementsToAnimate.forEach(el => observer.observe(el));
+            }
+
+            // --- INITIALIZATION ---
+            document.getElementById('year').textContent = new Date().getFullYear();
+            renderProjects();
+            observeElements();
+        });
+    </script>
+</body>
+</html>
