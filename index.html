@@ -13,8 +13,8 @@
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1B2330;
-            color: #B7D1E1;
+            background-color: #1B2330; /* Chimdark */
+            color: #B7D1E1; /* Chimlight */
         }
         @keyframes animate-gradient {
             0% { background-position: 0% 50%; }
@@ -22,7 +22,7 @@
             100% { background-position: 0% 50%; }
         }
         .hero-bg {
-            background: linear-gradient(-45deg, #1B2330, #3f5268, #B7D1E1, #3f5268);
+            background: linear-gradient(-45deg, #1B2330, #3f5268, #B7D1E1, #3f5268); /* Chimdark, Chimdeep, Chimlight, Chimdeep */
             background-size: 400% 400%;
             animation: animate-gradient 25s ease infinite;
         }
@@ -39,18 +39,6 @@
             transform: translateY(-10px) scale(1.03);
             box-shadow: 0 20px 30px rgba(183, 209, 225, 0.1);
         }
-        .timeline-item::before {
-            content: '';
-            position: absolute;
-            left: -31.5px;
-            top: 50%;
-            transform: translateY(-50%);
-            width: 20px;
-            height: 20px;
-            border-radius: 50%;
-            background-color: #3f5268;
-            border: 4px solid #38bdf8;
-        }
         .fade-in-up {
             opacity: 0;
             transform: translateY(30px);
@@ -61,8 +49,8 @@
             transform: translateY(0);
         }
         .filter-btn.active {
-            background-color: #38bdf8;
-            color: #1B2330;
+            background-color: #B7D1E1; /* Chimlight */
+            color: #1B2330; /* Chimdark */
         }
          .cta-button {
             transition: all 0.3s ease;
@@ -79,11 +67,13 @@
     <header class="bg-[#1B2330]/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
         <div class="container mx-auto px-6 py-3 flex justify-between items-center">
             <a href="#"><img src="logo.png" alt="Chim Wopara Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/120x40/1B2330/FFFFFF?text=CW'"></a>
-             <nav class="space-x-6">
-                <a href="#projects" class="hover:text-sky-400 transition-colors">Projects</a>
-                <a href="#journey" class="hover:text-sky-400 transition-colors">Journey</a>
-                <a href="#contact" class="hover:text-sky-400 transition-colors">Contact</a>
+             <nav class="flex-grow text-center space-x-6">
+                <a href="#projects" class="text-[#B7D1E1]/80 hover:text-[#B7D1E1] transition-colors">Projects</a>
+                <a href="#contact" class="text-[#B7D1E1]/80 hover:text-[#B7D1E1] transition-colors">Contact</a>
             </nav>
+            <a href="https://chat.whatsapp.com/Bn75K4eoSVvLUOylfu9Urt?mode=ems_copy_c" target="_blank" rel="noopener noreferrer" class="text-white hover:opacity-80 transition-opacity">
+                <img src="whatsapp.png" alt="WhatsApp Community" class="h-7 w-7">
+            </a>
         </div>
     </header>
 
@@ -94,10 +84,10 @@
             <div class="container mx-auto px-6">
                 <img src="chim.png" alt="Chim Wopara" class="w-40 h-40 rounded-full mx-auto mb-6 shadow-lg">
                 <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">Chim Wopara</h1>
-                <h2 class="text-2xl md:text-3xl font-bold text-sky-400 mb-8">Visionary Product Architect & AI Innovator</h2>
+                <h2 class="text-2xl md:text-3xl font-bold text-[#3f5268] mb-8">Visionary Product Architect & AI Innovator</h2>
                 <p class="text-lg md:text-xl text-[#B7D1E1]/80 max-w-3xl mx-auto mb-8">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
                 <div class="mt-8">
-                    <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="bg-sky-500 hover:bg-sky-600 text-white font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Learn from me</a>
+                    <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Learn from me</a>
                 </div>
             </div>
         </section>
@@ -124,31 +114,15 @@
                 </div>
             </div>
         </section>
-
-        <!-- Journey / Timeline Section -->
-        <section id="journey" class="py-20 bg-[#3f5268]">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-16 fade-in-up">
-                    <h2 class="text-4xl font-bold mb-2">My Journey</h2>
-                    <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">Tracing the path of innovation, one project at a time.</p>
-                </div>
-
-                <div class="relative max-w-3xl mx-auto">
-                    <div class="absolute left-0 h-full border-l-2 border-[#1B2330]" style="margin-left: -22px;"></div>
-                    <!-- Timeline items will be dynamically inserted here by JavaScript -->
-                    <div id="timeline-container"></div>
-                </div>
-            </div>
-        </section>
         
         <!-- Contact Section -->
-        <section id="contact" class="py-20 bg-[#1B2330]">
+        <section id="contact" class="py-20 bg-[#3f5268]">
             <div class="container mx-auto px-6">
                  <div class="max-w-4xl mx-auto fade-in-up text-center">
                     <h2 class="text-4xl font-bold mb-4">Let's Build Together</h2>
                     <p class="text-[#B7D1E1]/80 mb-8">Have an idea, a challenge, or an opportunity? Schedule a time with me to discuss how we can bring your vision to life.</p>
                     <!-- Calendly inline widget begin -->
-                    <div class="calendly-inline-widget" data-url="https://calendly.com/wopara?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=3f5268&text_color=b7d1e1&primary_color=1b2330" style="min-width:320px;height:700px;"></div>
+                    <div class="calendly-inline-widget" data-url="https://calendly.com/wopara?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1B2330&text_color=b7d1e1&primary_color=3f5268" style="min-width:320px;height:700px;"></div>
                     <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
                     <!-- Calendly inline widget end -->
                  </div>
@@ -179,9 +153,9 @@
             <div class="text-center text-[#B7D1E1]/60 text-sm">
                 <p>&copy; <span id="year"></span> Chim Wopara Enterprises. All Rights Reserved.</p>
                 <p class="mt-2">
-                    <a href="#" class="hover:text-[#B7D1E1]">Privacy Policy</a>
+                    <a href="terms.html#privacy" class="hover:text-[#B7D1E1]">Privacy Policy</a>
                     <span class="mx-2">&middot;</span>
-                    <a href="#" class="hover:text-[#B7D1E1]">Terms of Service</a>
+                    <a href="terms.html#terms" class="hover:text-[#B7D1E1]">Terms of Service</a>
                 </p>
             </div>
         </div>
@@ -222,7 +196,6 @@
             ];
 
             const projectGrid = document.getElementById('project-grid');
-            const timelineContainer = document.getElementById('timeline-container');
             const filterContainer = document.getElementById('filter-container');
             
             // --- RENDER PROJECTS ---
@@ -239,7 +212,7 @@
                         <div class="p-6 flex flex-col flex-grow">
                             <h3 class="text-xl font-bold mb-1">${project.name}</h3>
                             <p class="text-sm text-[#B7D1E1]/80 mb-4 flex-grow">${project.description}</p>
-                            <p class="text-sm text-sky-400 font-medium mt-auto">${project.date}</p>
+                            <p class="text-sm text-[#B7D1E1] font-medium mt-auto">${project.date}</p>
                         </div>
                     `;
                     projectGrid.appendChild(card);
@@ -247,32 +220,6 @@
                 // Re-trigger animations
                 observeElements();
             }
-
-            // --- RENDER TIMELINE ---
-            const timelineProjects = [...projects].sort((a, b) => new Date(a.date.split(' ')[1], monthToNum(a.date.split(' ')[0])) - new Date(b.date.split(' ')[1], monthToNum(b.date.split(' ')[0])));
-            const yearGroups = timelineProjects.reduce((acc, p) => {
-                const year = p.date.match(/\d{4}/);
-                if (year) {
-                    if (!acc[year[0]]) acc[year[0]] = [];
-                    acc[year[0]].push(p);
-                }
-                return acc;
-            }, {});
-
-            Object.keys(yearGroups).sort((a,b) => b-a).forEach(year => {
-                 yearGroups[year].forEach((project, index) => {
-                    const item = document.createElement('div');
-                    item.className = 'timeline-item relative pl-8 pb-12 fade-in-up';
-                    item.innerHTML = `
-                        <div class="bg-[#1B2330] p-6 rounded-lg shadow-lg">
-                            <p class="text-sm text-sky-400 font-semibold mb-1">${project.date}</p>
-                            <h3 class="text-xl font-bold mb-2">${project.name}</h3>
-                            <p class="text-[#B7D1E1]/80 text-sm">${project.description}</p>
-                        </div>
-                    `;
-                    timelineContainer.appendChild(item);
-                });
-            });
 
             // --- FILTERING LOGIC ---
             filterContainer.addEventListener('click', (e) => {
