@@ -22,9 +22,21 @@
             100% { background-position: 0% 50%; }
         }
         .hero-bg {
-            background: linear-gradient(-45deg, #1B2330, #3f5268, #B7D1E1, #3f5268); /* Chimdark, Chimdeep, Chimlight, Chimdeep */
+            position: relative;
+            background: linear-gradient(-45deg, #1B2330, #3f5268, #B7D1E1, #3f5268);
             background-size: 400% 400%;
             animation: animate-gradient 25s ease infinite;
+            overflow: hidden;
+        }
+        .hero-image-bg {
+            position: relative;
+            background-image: url('hero.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 1;
         }
         .project-card {
             background: rgba(63, 82, 104, 0.35); /* Chimdeep with transparency */
@@ -59,41 +71,235 @@
             transform: translateY(-3px) scale(1.05);
             box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
         }
+        .pricing-item {
+            background: rgba(63, 82, 104, 0.35);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(183, 209, 225, 0.2);
+            transition: all 0.3s ease;
+        }
+        .pricing-item:hover {
+            border-color: #B7D1E1; /* Chimlight */
+            background: rgba(63, 82, 104, 0.5); /* Chimdeep */
+        }
+        .pricing-item.selected {
+            border-color: #B7D1E1; /* Chimlight */
+            background: rgba(183, 209, 225, 0.1); /* Chimlight */
+        }
+        .cart-item {
+            background: rgba(27, 35, 48, 0.8); /* Chimdark */
+            border: 1px solid rgba(183, 209, 225, 0.2); /* Chimlight */
+        }
+        /* Styles for the page development options */
+        .page-dev-options {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.5s ease-out, margin-top 0.5s ease-out;
+        }
+        .page-dev-options.open {
+             max-height: 200px; /* Adjust as needed */
+             margin-top: 1rem;
+        }
+        .page-preset-btn {
+            background-color: #1B2330; /* Chimdark */
+            border: 1px solid rgba(183, 209, 225, 0.2); /* Chimlight */
+            padding: 6px 12px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            transition: all 0.2s ease;
+        }
+        .page-preset-btn.active, .page-preset-btn:hover {
+             background-color: #3f5268; /* Chimdeep */
+             color: #B7D1E1; /* Chimlight */
+             border-color: #3f5268; /* Chimdeep */
+        }
+        #custom-page-count-wrapper.hidden {
+            display: none;
+        }
+        html {
+            scroll-behavior: smooth;
+        }
+        .footer-bg {
+            position: relative;
+            background-image: url('hero.png');
+            background-size: cover;
+            background-position: center;
+        }
+        .footer-bg::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-color: rgba(27, 35, 48, 0.85); /* Dark overlay for readability */
+        }
+        .glassy-card {
+            background: rgba(63, 82, 104, 0.35);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(183, 209, 225, 0.2);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+            padding: 2rem;
+            border-radius: 1rem;
+        }
+        /* About Section Collage Styles */
+        .about-collage {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            margin: 1rem auto;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .about-orbit-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            animation: spin 35s linear infinite;
+        }
+
+        .about-central-image {
+            width: 256px;
+            height: 256px;
+            border-radius: 50%;
+            object-fit: cover;
+            position: relative;
+            z-index: 30;
+            border: 4px solid #3f5268;
+        }
+
+        .about-surrounding-image {
+            position: absolute;
+            transition: all 0.3s ease;
+            z-index: 32;
+            display: block; /* Make the <a> tag a block for positioning */
+        }
+        .about-surrounding-image img {
+            width: 100%;
+            height: 100%;
+        }
+
+        .about-surrounding-image:hover {
+            filter: brightness(1.2);
+            transform: scale(1.3) !important;
+            z-index: 35 !important;
+        }
+
+        .about-surrounding-image-1 { /* Github */
+            width: 50px; height: 50px;
+            top: calc(50% - 180px - 25px);
+            left: calc(50% - 25px);
+            animation: counter-spin-1 35s linear infinite;
+        }
+        .about-surrounding-image-2 { /* Instagram */
+            width: 55px; height: 55px;
+            top: calc(50% - 90px - 27.5px);
+            left: calc(50% + 140px - 27.5px);
+            animation: counter-spin-2 33s linear infinite;
+        }
+        .about-surrounding-image-3 { /* TikTok */
+            width: 50px; height: 50px;
+            top: calc(50% + 90px - 25px);
+            left: calc(50% + 145px - 25px);
+            animation: counter-spin-3 38s linear infinite;
+        }
+        .about-surrounding-image-4 { /* WhatsApp */
+            width: 52px; height: 52px;
+            top: calc(50% + 170px - 26px);
+            left: calc(50% - 100px - 26px);
+            animation: counter-spin-4 32s linear infinite;
+        }
+        .about-surrounding-image-5 { /* UAlberta */
+            width: 55px; height: 55px;
+            top: calc(50% + 95px - 27.5px);
+            left: calc(50% - 160px - 27.5px);
+            animation: counter-spin-5 36s linear infinite;
+        }
+        .about-surrounding-image-6 { /* YouTube */
+            width: 50px; height: 50px;
+            top: calc(50% - 100px - 25px);
+            left: calc(50% - 150px - 25px);
+            animation: counter-spin-6 34s linear infinite;
+        }
+        .about-surrounding-image-7 { /* Facebook */
+            width: 50px; height: 50px;
+            top: calc(50% - 150px - 25px);
+            left: calc(50% + 100px - 25px);
+            animation: counter-spin-7 37s linear infinite;
+        }
+
+        @keyframes counter-spin-1 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes counter-spin-2 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes counter-spin-3 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes counter-spin-4 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes counter-spin-5 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes counter-spin-6 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+        @keyframes counter-spin-7 { from { transform: rotate(0deg); } to { transform: rotate(-360deg); } }
+
+        /* Responsive adjustments for about collage */
+        @media (max-width: 768px) {
+            .about-collage {
+                width: 300px;
+                height: 300px;
+            }
+            .about-central-image {
+                width: 180px;
+                height: 180px;
+            }
+        }
     </style>
 </head>
 <body class="text-[#B7D1E1]">
 
     <!-- Header -->
     <header class="bg-[#1B2330]/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
-        <div class="container mx-auto px-6 py-3 flex justify-between items-center">
+        <div class="container mx-auto px-6 py-3 flex justify-center items-center">
             <a href="#"><img src="logo.png" alt="Chim Wopara Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/120x40/1B2330/FFFFFF?text=CW'"></a>
-             <nav class="flex-grow text-center space-x-6">
-                <a href="#projects" class="text-[#B7D1E1]/80 hover:text-[#B7D1E1] transition-colors">Projects</a>
-                <a href="#contact" class="text-[#B7D1E1]/80 hover:text-[#B7D1E1] transition-colors">Contact</a>
-            </nav>
-            <a href="https://chat.whatsapp.com/Bn75K4eoSVvLUOylfu9Urt?mode=ems_copy_c" target="_blank" rel="noopener noreferrer" class="text-white hover:opacity-80 transition-opacity">
-                <img src="whatsapp.png" alt="WhatsApp Community" class="h-7 w-7">
-            </a>
         </div>
     </header>
 
     <main class="pt-16">
 
         <!-- Hero Section -->
-        <section class="hero-bg py-24 md:py-32 text-center">
-            <div class="container mx-auto px-6">
-                <img src="chim.png" alt="Chim Wopara" class="w-40 h-40 rounded-full mx-auto mb-6 shadow-lg">
-                <h1 class="text-4xl md:text-6xl font-black tracking-tight leading-tight mb-4">Chim Wopara</h1>
-                <h2 class="text-2xl md:text-3xl font-bold text-[#3f5268] mb-8">Visionary Product Architect & AI Innovator</h2>
-                <p class="text-lg md:text-xl text-[#B7D1E1]/80 max-w-3xl mx-auto mb-8">Transforming complex problems into elegant, impactful solutions. With a diverse background spanning from interactive entertainment to enterprise-level platforms, I build products that are not only functional but also foundational for future innovation.</p>
-                <div class="mt-8">
-                    <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Learn from me</a>
+        <section class="py-20 hero-image-bg overflow-hidden">
+            <div class="container mx-auto px-6 hero-content">
+                <div class="grid grid-cols-1 md:grid-cols-2 items-center gap-12 fade-in-up">
+                    <!-- Orbiting Icons on the left -->
+                    <div class="about-collage">
+                        <img src="chim.png" alt="Profile photo of Chim Wopara" class="about-central-image">
+                        <div class="about-orbit-container">
+                            <a href="https://github.com/chimwopara" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-1"><img src="github.png" alt="GitHub"></a>
+                            <a href="https://www.instagram.com/chimwopara" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-2"><img src="instagram.png" alt="Instagram"></a>
+                            <a href="https://www.tiktok.com/@chimwopara?_t=ZS-8zXMw9gpRDO&_r=1" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-3"><img src="tiktok.png" alt="TikTok"></a>
+                            <a href="https://chat.whatsapp.com/Bn75K4eoSVvLUOylfu9Urt?mode=ems_copy_c" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-4"><img src="whatsapp.png" alt="WhatsApp"></a>
+                            <a href="https://ualberta.ca" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-5"><img src="ualberta.png" alt="UAlberta"></a>
+                            <a href="https://youtube.com/@chimwopara?si=rMgMJHTLgJJzwL_D" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-6"><img src="youtube.png" alt="YouTube"></a>
+                            <a href="https://www.facebook.com/profile.php?id=61579876920080" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-7"><img src="facebook.png" alt="Facebook"></a>
+                        </div>
+                    </div>
+                    <!-- Glassy card on the right -->
+                    <div class="glassy-card text-center md:text-left">
+                        <h2 class="text-3xl font-bold mb-4 text-[#B7D1E1]">Hi,</h2>
+                        <p class="text-[#B7D1E1]/80 mb-4">I'm Chim Wopara, and i create enterprise solutions with my strong background in Computer Science and Economics.</p>
+                        <p class="text-[#B7D1E1]/80 mb-6"> My primary aim is for Artificial Intelligence to empower the next generation of Nigerians, helping us thrive in a future where AI will be relevant.</p>
+                        <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
+                            <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Join my Academy</a>
+                            <a href="#contact" class="bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Talk to me</a>
+                            <button onclick="openPricingModal()" class="bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Pricing estimate</button>
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
 
         <!-- Projects Section -->
-        <section id="projects" class="py-20 bg-[#1B2330]">
+        <section id="projects" class="py-20 hero-bg">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
                     <h2 class="text-4xl font-bold mb-2">My Work</h2>
@@ -112,6 +318,12 @@
                 <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
                     <!-- Projects will be dynamically inserted here by JavaScript -->
                 </div>
+                <div class="text-center mt-12">
+                    <div id="see-more-container">
+                        <button id="see-more-btn" class="bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-3 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">See more disclosed works</button>
+                    </div>
+                    <p class="text-[#B7D1E1]/60 text-sm mt-4">Some of my works are confidential and arn't disclosed here</p>
+                </div>
             </div>
         </section>
         
@@ -119,7 +331,7 @@
         <section id="contact" class="py-20 bg-[#3f5268]">
             <div class="container mx-auto px-6">
                  <div class="max-w-4xl mx-auto fade-in-up text-center">
-                    <h2 class="text-4xl font-bold mb-4">Let's Build Together</h2>
+                    <h2 class="text-4xl font-bold mb-4">Lets talk</h2>
                     <p class="text-[#B7D1E1]/80 mb-8">Have an idea, a challenge, or an opportunity? Schedule a time with me to discuss how we can bring your vision to life.</p>
                     <!-- Calendly inline widget begin -->
                     <div class="calendly-inline-widget" data-url="https://calendly.com/wopara?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1B2330&text_color=b7d1e1&primary_color=3f5268" style="min-width:320px;height:700px;"></div>
@@ -129,24 +341,237 @@
             </div>
         </section>
 
+        <!-- Pricing Estimate Modal -->
+        <div id="pricing-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
+            <div class="bg-[#3f5268] rounded-xl p-8 max-w-6xl w-full max-h-[90vh] overflow-y-auto border border-[#1B2330]">
+                <div class="flex justify-between items-center mb-6">
+                    <h3 class="text-3xl font-bold text-[#B7D1E1]">Project Pricing Estimate</h3>
+                    <button onclick="closePricingModal()" class="text-[#B7D1E1]/80 hover:text-[#B7D1E1]">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                        </svg>
+                    </button>
+                </div>
+                
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                    <!-- Services Selection -->
+                    <div class="lg:col-span-2">
+                        <h4 class="text-xl font-bold mb-4 text-[#B7D1E1]">Select Services</h4>
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                            <!-- Monthly Services -->
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="certificates" data-price="5" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Site Certificates</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">SSL & security certificates</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$5/mo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="copywriting" data-price="10" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Website Copywriting</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Professional content writing</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$10/mo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="theme-toggle" data-price="5" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Light/Dark Mode</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Theme switching functionality</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$5/mo</span>
+                                </div>
+                            </div>
+                            
+                            <!-- Page Development Item with Presets -->
+                            <div class="pricing-item p-4 rounded-lg" data-service="page-development" data-price="5" data-type="monthly">
+                                <div class="flex justify-between items-center cursor-pointer" id="page-dev-toggle">
+                                    <div>
+                                        <h5 class="font-semibold">Page Development</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Per page development & maintenance</p>
+                                    </div>
+                                    <span class="text-lg font-bold" id="page-dev-price-display">$5/mo</span>
+                                </div>
+                                <div class="page-dev-options" id="page-dev-options">
+                                    <div id="page-preset-container" class="flex flex-wrap gap-2">
+                                        <button class="page-preset-btn" data-count="1">1 Page</button>
+                                        <button class="page-preset-btn" data-count="5">Up to 5</button>
+                                        <button class="page-preset-btn" data-count="10">10 Pages</button>
+                                        <button class="page-preset-btn" data-count="custom">Custom</button>
+                                    </div>
+                                    <div id="custom-page-count-wrapper" class="hidden mt-3">
+                                        <label for="page-count" class="block text-sm font-medium mb-1 text-white">Enter amount:</label>
+                                        <input type="number" id="page-count" min="1" value="11" class="w-24 px-2 py-1 bg-[#1B2330] border border-[#B7D1E1]/20 rounded-lg focus:outline-none focus:border-[#B7D1E1]">
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="hosting" data-price="20" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Domain & Hosting</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Complete hosting solution</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$20/mo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="media-generation" data-price="20" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Media Generation</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">AI-powered content creation</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$20/mo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="seo" data-price="10" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Weekly SEO Optimization</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Search engine optimization</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$10/mo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="newsletter" data-price="25" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Weekly Newsletter/Blog</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Content marketing & updates</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$25/mo</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="privacy-terms" data-price="10" data-type="monthly">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Privacy Policy & Terms</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Legal compliance documents</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$10/mo</span>
+                                </div>
+                            </div>
+                            
+                            <!-- One-time Services -->
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="site-upgrade" data-price="300" data-type="onetime">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Site Upgrade</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Major feature additions & improvements</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$300</span>
+                                </div>
+                            </div>
+                            
+                            <div class="pricing-item p-4 rounded-lg cursor-pointer" data-service="maintenance-upgrades" data-price="5" data-type="onetime">
+                                <div class="flex justify-between items-center">
+                                    <div>
+                                        <h5 class="font-semibold">Maintenance Upgrades</h5>
+                                        <p class="text-sm text-[#B7D1E1]/80">Small changes & updates per request</p>
+                                    </div>
+                                    <span class="text-lg font-bold">$5 per change</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Project Details Form -->
+                        <div class="bg-[#1B2330]/50 p-6 rounded-lg">
+                            <h4 class="text-xl font-bold mb-4 text-[#B7D1E1]">Project Details</h4>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Your Name</label>
+                                    <input type="text" id="client-name" class="w-full px-3 py-2 bg-[#3f5268] border border-[#B7D1E1]/20 rounded-lg focus:outline-none focus:border-[#B7D1E1] text-white" placeholder="Enter your name">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium mb-2">Email Address</label>
+                                    <input type="email" id="client-email" class="w-full px-3 py-2 bg-[#3f5268] border border-[#B7D1E1]/20 rounded-lg focus:outline-none focus:border-[#B7D1E1] text-white" placeholder="Enter your email">
+                                </div>
+                            </div>
+                            
+                            <div class="mb-4">
+                                <label class="block text-sm font-medium mb-2">Project Type</label>
+                                <select id="project-type" class="w-full px-3 py-2 bg-[#3f5268] border border-[#B7D1E1]/20 rounded-lg focus:outline-none focus:border-[#B7D1E1] text-white">
+                                    <option value="">Select project type</option>
+                                    <option value="new-website">New Website</option>
+                                    <option value="portfolio-site">Portfolio Site</option>
+                                    <option value="business-landing">Business Landing Page</option>
+                                    <option value="website-redesign">Website Redesign</option>
+                                    <option value="e-commerce">E-commerce Platform</option>
+                                    <option value="web-app">Web Application</option>
+                                    <option value="mobile-app">Mobile App</option>
+                                    <option value="ai-integration">AI Integration</option>
+                                    <option value="maintenance">Website Maintenance</option>
+                                    <option value="custom">Custom Project</option>
+                                </select>
+                            </div>
+                            
+                            <div>
+                                <label class="block text-sm font-medium mb-2">Additional Requirements</label>
+                                <textarea id="additional-requirements" rows="4" class="w-full px-3 py-2 bg-[#3f5268] border border-[#B7D1E1]/20 rounded-lg focus:outline-none focus:border-[#B7D1E1] text-white" placeholder="Describe any specific features, integrations, or requirements not covered in the preset options..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Cart Summary -->
+                    <div class="lg:col-span-1">
+                        <div class="bg-[#1B2330]/50 p-6 rounded-lg sticky top-4">
+                            <h4 class="text-xl font-bold mb-4 text-[#B7D1E1]">Cart Summary</h4>
+                            <div id="cart-items" class="space-y-3 mb-6">
+                                <p class="text-[#B7D1E1]/80 text-center">No services selected</p>
+                            </div>
+                            
+                            <div class="border-t border-[#B7D1E1]/20 pt-4">
+                                <div class="flex justify-between items-center mb-2">
+                                    <span class="font-semibold">Monthly Total:</span>
+                                    <span id="monthly-total" class="font-bold text-lg">$0</span>
+                                </div>
+                                <div class="flex justify-between items-center mb-4">
+                                    <span class="font-semibold">One-time Total:</span>
+                                    <span id="onetime-total" class="font-bold text-lg">$0</span>
+                                </div>
+                                
+                                <button onclick="submitEstimate()" class="w-full bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B3030] text-[#B7D1E1] font-bold py-3 px-6 rounded-lg transition-colors" id="submit-estimate-btn" disabled>
+                                    Get Quote
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </main>
 
     <!-- Footer -->
-    <footer class="bg-[#1B2330] border-t border-[#3f5268]">
-        <div class="container mx-auto px-6 py-12">
+    <footer class="footer-bg border-t border-[#3f5268]">
+        <div class="container mx-auto px-6 py-12 relative z-10">
             <div class="text-center mb-8">
                 <h4 class="text-sm uppercase text-[#B7D1E1]/60 tracking-widest mb-4">A Chim Wopara Enterprises Company</h4>
                 <div class="flex justify-center items-center space-x-6 md:space-x-10">
                     <a href="http://fromsupply.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="fs.png" alt="Fromsupply Logo" class="h-8 w-auto">
                     </a>
-                    <span class="text-[#B7D1E1]/40">|</span>
+                    <span class="text-[#3f5268]">|</span>
                     <a href="http://devgameshow.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="dgs.png" alt="Dev Game Show Logo" class="h-8 w-auto">
                     </a>
-                    <span class="text-[#B7D1E1]/40">|</span>
+                    <span class="text-[#3f5268]">|</span>
                     <a href="http://pautacos.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="pautacos.png" alt="Pautacos Logo" class="h-8 w-auto">
+                    </a>
+                    <span class="text-[#3f5268]">|</span>
+                    <a href="https://chimwopara.com" target="_blank" rel="noopener noreferrer" class="text-white hover:opacity-80 transition-opacity">
+                        <img src="logo.png" alt="Chim Wopara" class="h-8 w-auto">
                     </a>
                 </div>
             </div>
@@ -165,45 +590,54 @@
         document.addEventListener('DOMContentLoaded', function() {
             // --- DATA ---
             const projects = [
-                { name: "FlatPurse Business", date: "May 2025 - Present", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=FlatPurse" },
-                { name: "Prastfarms.com", date: "May 2025", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=PrastFarms" },
-                { name: "Lenslore.ca", date: "May 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Lenslore" },
-                { name: "culyeimmigrationservices.com", date: "June 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Culye" },
-                { name: "bodidris.org", date: "July 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Bodidris" },
-                { name: "African Heritage Clothing", date: "May 2022", description: "Designed a culturally-inspired clothing brand, handling everything from concept to visual identity.", category: "brand", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Heritage" },
-                { name: "FsMedia (Club Belong)", date: "Jan 2023 - Present", description: "An app for streaming multiple perspectives of events anonymously, fostering a unique viewing experience.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=FsMedia" },
-                { name: "Fromsupply", date: "June 2023 - Present", description: "A marketplace for enterprise apps that uses a reserves system to encourage productivity.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fromsupply" },
-                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "brand", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=234Stones" },
-                { name: "FsMedia (Fivetaps)", date: "Jan 2024 - Present", description: "An app for interactive media consumption and creation, putting the user in control of the narrative.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fivetaps" },
-                { name: "Acters", date: "Feb 2024 - Present", description: "Script writing for a movie playable on my interactive media platform.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Acters" },
-                { name: "Chim Prompts", date: "Mar 2024 - Present", description: "The world's first universal context-based prompt programming syntax language; allowing users to represent any piece of code in a structured prompt.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chim+Prompts" },
-                { name: "Falling Cards", date: "Apr 2024 - Present", description: "An interactive game that teaches users how to manage scarce resources and perform quick maths under pressure.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Falling+Cards" },
-                { name: "GunvGun", date: "Aug 2024 - Present", description: "A fun 2D multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=GunvGun" },
-                { name: "Runneth", date: "Aug 2024 - Present", description: "A 3D Roblox multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Runneth" },
-                { name: "Plummet", date: "Aug 2024 - Present", description: "Another 3D Roblox multiplayer game focused on survival, scarcity, and economic principles.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Plummet" },
-                { name: "God's Embassy Church App", date: "Dec 2024 - Present", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=GEC+App" },
-                { name: "Chim Type", date: "Jan 2025 - Present", description: "A website for learning to type faster, designed for people that require speed with keyboards to excel.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chim+Type" },
-                { name: "Chim Maze", date: "Feb 2025 - Present", description: "A gamified learning platform that lets users test their ability to recall information by playing games with their own notes.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chim+Maze" },
-                { name: "Fs Prompts", date: "Mar 2025", description: "A marketplace for AI-driven developers (Vibe coders) to meet commission-based developers for quality control.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Prompts" },
-                { name: "Fs Logic Code", date: "Apr 2025", description: "An educational platform for learning to code using a points system and option boxes to build muscle memory.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Logic+Code" },
-                { name: "Fs Mall", date: "May 2025", description: "A high-end shopping platform for domestic products, prioritizing a luxurious gift-giving and delivery experience.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Mall" },
-                { name: "Fs Farms", date: "May 2025", description: "Encouraging foreign direct investment into agriculture via blockchain-represented assets and real-time 3D farm monitoring.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Fs+Farms" },
-                { name: "Chimron Calls", date: "May 2025", description: "An AI solution that enables inbound AI customer support calls and outbound AI lead follow-up calls.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Chimron+Calls" },
-                { name: "Goodsline", date: "May 2025", description: "AI software that analyzes 5 years of social feedback on products to create relevancy and sentiment graphs.", category: "business", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Goodsline" },
-                { name: "Pautacos.com", date: "June 2025", description: "Created media and website for a food delivery network that handles payments, logistics, and discovery.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Pautacos" },
-                { name: "Devgameshow.com", date: "July 2025", description: "Created media and website for a tech game show, managing payments, logistics, and content delivery.", category: "web", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=DevGameShow" },
-                { name: "Whot Whot", date: "Aug 2025", description: "A digital version of the legacy Nigerian card game 'Naija Whot Whot' with multiplayer and single-player modes, using Firebase for server-side functions.", category: "game", image: "https://placehold.co/600x400/3f5268/B7D1E1?text=Whot+Whot" },
+                { name: "FlatPurse Business", date: "May 2025 - Present", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "web", image: "flatpurse.png" },
+                { name: "Prastfarms.com", date: "May 2025", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "business", image: "prast.png" },
+                { name: "Lenslore.ca", date: "May 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "web", image: "lenslore.png" },
+                { name: "culyeimmigrationservices.com", date: "June 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "web", image: "culye.png" },
+                { name: "bodidris.org", date: "July 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "web", image: "bod.png" },
+                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "brand", image: "stones.png" },
+                { name: "FsMedia (Club Belong)", date: "Jan 2023 - Present", description: "An app for streaming multiple perspectives of events anonymously, fostering a unique viewing experience.", category: "business", image: "cb.png" },
+                { name: "Fromsupply", date: "June 2023 - Present", description: "A marketplace for enterprise apps that uses a reserves system to encourage productivity.", category: "business", image: "fromsupply.png" },
+                { name: "Chim Wopara Clothing", date: "May 2022", description: "Designed a culturally-inspired clothing brand, handling everything from concept to visual identity.", category: "brand", image: "cw.png" },
+                { name: "FsMedia (Fivetaps)", date: "Jan 2024 - Present", description: "An app for interactive media consumption and creation, putting the user in control of the narrative.", category: "game", image: "fivetaps.png" },
+                { name: "Acters", date: "Feb 2024 - Present", description: "Script writing for a movie playable on my interactive media platform.", category: "game", image: "acters.png" },
+                { name: "Chim Prompts", date: "Mar 2024 - Present", description: "The world's first universal context-based prompt programming syntax language; allowing users to represent any piece of code in a structured prompt.", category: "business", image: "prompts.png" },
+                { name: "Falling Cards", date: "Apr 2024 - Present", description: "An interactive game that teaches users how to manage scarce resources and perform quick maths under pressure.", category: "game", image: "falling.png" },
+                { name: "GunvGun", date: "Aug 2024 - Present", description: "A fun 2D multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "gunvgun.png" },
+                { name: "Runneth", date: "Aug 2024 - Present", description: "A 3D Roblox multiplayer game with scarce resources, inflation, and other economic principles.", category: "game", image: "runneth.png" },
+                { name: "Plummet", date: "Aug 2024 - Present", description: "Another 3D Roblox multiplayer game focused on survival, scarcity, and economic principles.", category: "game", image: "plummett.png" },
+                { name: "God's Embassy Church App", date: "Dec 2024 - Present", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "web", image: "godsembassy.png" },
+                { name: "Chim Type", date: "Jan 2025 - Present", description: "A website for learning to type faster, designed for people that require speed with keyboards to excel.", category: "web", image: "chimtype.png" },
+                { name: "Chim Maze", date: "Feb 2025 - Present", description: "A gamified learning platform that lets users test their ability to recall information by playing games with their own notes.", category: "game", image: "maze.png" },
+                { name: "Fs Prompts", date: "Mar 2025", description: "A marketplace for AI-driven developers (Vibe coders) to meet commission-based developers for quality control.", category: "business", image: "fs.png" },
+                { name: "Fs Logic Code", date: "Apr 2025", description: "An educational platform for learning to code using a points system and option boxes to build muscle memory.", category: "web", image: "fs.png" },
+                { name: "Fs Mall", date: "May 2025", description: "A high-end shopping platform for domestic products, prioritizing a luxurious gift-giving and delivery experience.", category: "web", image: "fs.png" },
+                { name: "Fs Farms", date: "May 2025", description: "Encouraging foreign direct investment into agriculture via blockchain-represented assets and real-time 3D farm monitoring.", category: "business", image: "fs.png" },
+                { name: "Chimron Calls", date: "May 2025", description: "An AI solution that enables inbound AI customer support calls and outbound AI lead follow-up calls.", category: "business", image: "chimron.png" },
+                { name: "Fs Browser", date: "May 2025", description: "AI software that analyzes 5 years of social feedback on products to create relevancy and sentiment graphs.", category: "business", image: "fs.png" },
+                { name: "Pautacos.com", date: "June 2025", description: "Created media and website for a food delivery network that handles payments, logistics, and discovery.", category: "web", image: "pautacos.png" },
+                { name: "Devgameshow.com", date: "July 2025", description: "Created media and website for a tech game show, managing payments, logistics, and content delivery.", category: "web", image: "dgs.png" },
+                { name: "Whot Whot", date: "Aug 2025", description: "A digital version of the legacy Nigerian card game 'Naija Whot Whot' with multiplayer and single-player modes, using Firebase for server-side functions.", category: "game", image: "whot.png" },
             ];
 
             const projectGrid = document.getElementById('project-grid');
             const filterContainer = document.getElementById('filter-container');
+            const seeMoreContainer = document.getElementById('see-more-container');
+            const seeMoreBtn = document.getElementById('see-more-btn');
+            
+            // Cart system
+            let cart = new Map();
+            let pageCount = 1;
+            let showingAllProjects = false;
             
             // --- RENDER PROJECTS ---
             function renderProjects(filter = 'all') {
                 projectGrid.innerHTML = '';
                 const filteredProjects = projects.filter(p => filter === 'all' || p.category === filter);
 
-                filteredProjects.forEach((project, index) => {
+                const projectsToDisplay = showingAllProjects ? filteredProjects : filteredProjects.slice(0, 6);
+
+                projectsToDisplay.forEach((project, index) => {
                     const card = document.createElement('div');
                     card.className = `project-card rounded-xl overflow-hidden fade-in-up a-delay-${index % 3} flex flex-col`;
                     card.setAttribute('data-category', project.category);
@@ -217,7 +651,13 @@
                     `;
                     projectGrid.appendChild(card);
                 });
-                // Re-trigger animations
+
+                if (showingAllProjects || filteredProjects.length <= 6) {
+                    seeMoreContainer.style.display = 'none';
+                } else {
+                    seeMoreContainer.style.display = 'block';
+                }
+
                 observeElements();
             }
 
@@ -226,14 +666,201 @@
                 if(e.target.classList.contains('filter-btn')) {
                     document.querySelector('.filter-btn.active').classList.remove('active');
                     e.target.classList.add('active');
+                    showingAllProjects = false; // Reset when filter changes
                     renderProjects(e.target.dataset.filter);
                 }
             });
 
-            // --- UTILS ---
-            function monthToNum(month) {
-                const months = ["Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sept", "Oct", "Nov", "Dec"];
-                return months.indexOf(month.substring(0,3));
+            seeMoreBtn.addEventListener('click', () => {
+                showingAllProjects = true;
+                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
+                renderProjects(currentFilter);
+            });
+
+            // --- PRICING MODAL FUNCTIONS ---
+            window.openPricingModal = function() {
+                document.getElementById('pricing-modal').classList.remove('hidden');
+            }
+
+            window.closePricingModal = function() {
+                document.getElementById('pricing-modal').classList.add('hidden');
+                resetPricingForm();
+            }
+            
+            function resetPricingForm() {
+                 cart.clear();
+                 pageCount = 1;
+                 document.getElementById('page-count').value = 11;
+                 document.getElementById('page-dev-options').classList.remove('open');
+                 document.getElementById('custom-page-count-wrapper').classList.add('hidden');
+
+                 document.querySelectorAll('.page-preset-btn').forEach(btn => btn.classList.remove('active'));
+                 document.querySelectorAll('.pricing-item').forEach(item => item.classList.remove('selected'));
+                 
+                 document.getElementById('client-name').value = '';
+                 document.getElementById('client-email').value = '';
+                 document.getElementById('project-type').value = '';
+                 document.getElementById('additional-requirements').value = '';
+                 updateCartDisplay();
+            }
+            
+            function calculateTotals() {
+                let monthlyTotal = 0;
+                let onetimeTotal = 0;
+                cart.forEach(item => {
+                    if (item.type === 'monthly') {
+                        monthlyTotal += item.price;
+                    } else {
+                        onetimeTotal += item.price;
+                    }
+                });
+                return { monthlyTotal, onetimeTotal };
+            }
+
+            // Handle Standard Service selection
+            document.querySelectorAll('.pricing-item:not([data-service="page-development"])').forEach(item => {
+                item.addEventListener('click', function() {
+                    const service = this.dataset.service;
+                    const price = parseInt(this.dataset.price);
+                    const type = this.dataset.type;
+                    const name = this.querySelector('h5').textContent;
+
+                    if (this.classList.toggle('selected')) {
+                        cart.set(service, { name, price, type });
+                    } else {
+                        cart.delete(service);
+                    }
+                    updateCartDisplay();
+                });
+            });
+            
+            // --- UPDATED: Handle Page Development Item with Presets ---
+            const pageDevItem = document.querySelector('.pricing-item[data-service="page-development"]');
+            const pageDevToggle = document.getElementById('page-dev-toggle');
+            const pageDevOptions = document.getElementById('page-dev-options');
+            const pagePresetContainer = document.getElementById('page-preset-container');
+            const customPageCountWrapper = document.getElementById('custom-page-count-wrapper');
+            const pageCountInput = document.getElementById('page-count');
+            
+            pageDevToggle.addEventListener('click', () => {
+                const isSelected = pageDevItem.classList.toggle('selected');
+                pageDevOptions.classList.toggle('open');
+                
+                if (isSelected) {
+                    // If no preset is active, default to 1 page
+                    if (!pagePresetContainer.querySelector('.active')) {
+                        pagePresetContainer.querySelector('[data-count="1"]').classList.add('active');
+                        pageCount = 1;
+                    }
+                    updatePageDevelopmentInCart();
+                } else {
+                    cart.delete('page-development');
+                }
+                updateCartDisplay();
+            });
+
+            pagePresetContainer.addEventListener('click', (e) => {
+                if (e.target.classList.contains('page-preset-btn')) {
+                    // Update active button
+                    pagePresetContainer.querySelectorAll('.page-preset-btn').forEach(btn => btn.classList.remove('active'));
+                    e.target.classList.add('active');
+
+                    const count = e.target.dataset.count;
+                    if (count === 'custom') {
+                        customPageCountWrapper.classList.remove('hidden');
+                        pageCount = parseInt(pageCountInput.value) || 11;
+                    } else {
+                        customPageCountWrapper.classList.add('hidden');
+                        pageCount = parseInt(count);
+                    }
+                    updatePageDevelopmentInCart();
+                    updateCartDisplay();
+                }
+            });
+
+            pageCountInput.addEventListener('input', () => {
+                pageCount = parseInt(pageCountInput.value) || 1;
+                 if (pageCount < 1) {
+                    pageCount = 1;
+                    pageCountInput.value = 1;
+                 }
+                // Only update if the item is already selected
+                if (pageDevItem.classList.contains('selected')) {
+                    updatePageDevelopmentInCart();
+                    updateCartDisplay();
+                }
+            });
+            
+            function updatePageDevelopmentInCart() {
+                const basePrice = parseInt(pageDevItem.dataset.price);
+                const calculatedPrice = basePrice * pageCount;
+                
+                let name = `Page Development (${pageCount} page${pageCount > 1 ? 's' : ''})`;
+                const activePreset = pagePresetContainer.querySelector('.active');
+                if (activePreset && activePreset.dataset.count === '5') {
+                    name = `Page Development (Up to 5 pages)`;
+                }
+
+                cart.set('page-development', { name, price: calculatedPrice, type: 'monthly' });
+                document.getElementById('page-dev-price-display').textContent = `$${calculatedPrice}/mo`;
+            }
+
+            function updateCartDisplay() {
+                const cartItemsContainer = document.getElementById('cart-items');
+                const monthlyTotalEl = document.getElementById('monthly-total');
+                const onetimeTotalEl = document.getElementById('onetime-total');
+                const submitBtn = document.getElementById('submit-estimate-btn');
+
+                if (cart.size === 0) {
+                    cartItemsContainer.innerHTML = '<p class="text-[#B7D1E1]/80 text-center">No services selected</p>';
+                    submitBtn.disabled = true;
+                } else {
+                    let cartHTML = '';
+                    cart.forEach((item) => {
+                        cartHTML += `
+                            <div class="cart-item p-3 rounded-lg flex justify-between items-center">
+                                <span class="text-sm">${item.name}</span>
+                                <span class="font-semibold">$${item.price}${item.type === 'monthly' ? '/mo' : ''}</span>
+                            </div>
+                        `;
+                    });
+                    cartItemsContainer.innerHTML = cartHTML;
+                    submitBtn.disabled = false;
+                }
+                
+                const { monthlyTotal, onetimeTotal } = calculateTotals();
+                monthlyTotalEl.textContent = `$${monthlyTotal}/mo`;
+                onetimeTotalEl.textContent = `$${onetimeTotal}`;
+            }
+
+            window.submitEstimate = function() {
+                const name = document.getElementById('client-name').value;
+                const email = document.getElementById('client-email').value;
+                const projectType = document.getElementById('project-type').value;
+                const additionalRequirements = document.getElementById('additional-requirements').value;
+
+                if (!name || !email || cart.size === 0) {
+                    console.error('Please fill in your name, email, and select at least one service.');
+                    return;
+                }
+
+                const { monthlyTotal, onetimeTotal } = calculateTotals();
+                const estimateData = {
+                    clientName: name,
+                    clientEmail: email,
+                    projectType: projectType,
+                    additionalRequirements: additionalRequirements,
+                    services: Array.from(cart.values()),
+                    monthlyTotal: monthlyTotal,
+                    onetimeTotal: onetimeTotal,
+                    timestamp: new Date().toISOString()
+                };
+
+                console.log('Pricing Estimate:', estimateData);
+                
+                alert(`Thank you, ${name}! Your pricing estimate has been generated. \n\nMonthly total: $${monthlyTotal}/mo\nOne-time total: $${onetimeTotal}\n\nWe'll send you a detailed quote at ${email} within 2 hours.`);
+                
+                closePricingModal();
             }
 
             // --- SCROLL ANIMATIONS ---
@@ -257,4 +884,8 @@
     </script>
 </body>
 </html>
+
+
+
+
 
