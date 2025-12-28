@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Fromsupply - Terms</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+    font-family: 'Inter', sans-serif;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: visible;
+    border-radius: 24px;
+    height: auto;
+}
+
+        /* Custom styles for the accordion and button */
+        .accordion-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.2s ease-out, padding 0.2s ease-out;
+    padding: 0 1.5rem;
+}
+        ::-webkit-scrollbar {
+    width: 0px;
+    background: transparent;
+}
+
+.accordion-item {
+    border: 1px solid rgba(255, 255, 255, 0.2); 
+    border-radius: 20px; 
+    overflow: hidden;
+}
+
+.accordion-item:first-child .accordion-button {
+    border-radius: 20px 20px 0 0;
+}
+
+.accordion-item:first-child .accordion-content {
+    border-radius: 0 0 20px 20px;
+}
+
+#top-agree-button {
+    min-height: 44px;
+    min-width: 120px;
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+    cursor: pointer;
+}
+
+#top-agree-button:active {
+    transform: scale(0.95);
+    background: rgba(255, 255, 255, 0.3) !important;
+}
+
+* {
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+}
+
+        .accordion-button.active + .accordion-content {
+    max-height: 15000px; /* Adjust as needed for extensive content */
+    padding: 1.5rem;
+    transition: max-height 0.25s ease-out, padding 0.25s ease-out;
+}
+
+        .accordion-button .icon {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        .accordion-button.active .icon {
+    transform: rotate(45deg);
+}
+
+.accordion-button {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+}
+
+button {
+    touch-action: manipulation;
+    -webkit-touch-callout: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+        .agree-button.agreed {
+            background-color: #10B981; /* Emerald-500 */
+            color: white;
+            box-shadow: 0 0 20px 5px rgba(16, 185, 129, 0.6);
+            transition: background-color 0.3s ease, color 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .prose p, .prose li, .prose div {
+            margin-bottom: 1em;
+        }
+        .prose strong {
+    color: #ffffff; /* white */
+}
+        .prose h3 {
+            font-size: 1.1em;
+            font-weight: 600;
+            margin-top: 1.5em;
+            margin-bottom: 0.5em;
+        }
+        .prose ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+        }
+        .prose .uppercase-text {
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body class="text-white" style="background: transparent;">
+
+    <div class="w-full" style="background: transparent; min-height: 100vh;">
+        <div class="overflow-y-auto" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(25px); border: 1px solid rgba(255, 255, 255, 0.2); max-height: 100vh; overflow-x: hidden;">
+            <div class="p-6 sm:p-10">
+                <div class="flex justify-between items-center mb-4">
+    <div class="flex items-center">
+        <img src="logo.jpg" 
+             alt="Fromsupply Logo" 
+             class="h-12 w-auto mr-4"
+             onerror="this.onerror=null;this.src='https://placehold.co/160x48/e2e8f0/4a5568?text=Fromsupply';">
+       <h1 class="text-3xl sm:text-4xl font-bold text-white">Terms</h1>
+    </div>
+    <button id="top-agree-button" class="px-6 py-2 text-sm font-semibold text-white rounded-full transition duration-300" style="background: rgba(255, 255, 255, 0.15); backdrop-filter: blur(10px); border: 1px solid rgba(255, 255, 255, 0.3);" onmouseover="this.style.background='rgba(255, 255, 255, 0.25)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.15)'">
+        Agree to Terms
+    </button>
+</div>
+<p class="text-gray-300 mb-8">Effective Date: August 8, 2025
+               <div class="prose max-w-none text-gray-200 mb-8">
+                    <p><strong>Preamble</strong></p>
+                    <p>Welcome to fromsupply.com. This digital ecosystem, including all associated websites, mobile applications, software, content, products, and services (collectively, the "Services"), is owned, operated, and provided by Chim Wopara Enterprise, a registered entity in the province of Alberta, Canada ("fromsupply," "we," "us," "our").</p>
+                    <p>These Universal Terms of Service (the "Terms") constitute a comprehensive legal agreement that governs your access to and use of the Services. The Services are the exclusive property of Chim Wopara Enterprise, with its principal place of business located at 1705 10909 103 Ave, Edmonton, Alberta, Canada, and its licensors.</p>
+                    <p>This document, along with any policies, guidelines, or additional terms referenced herein, including but not limited to the fromsupply.com Privacy Policy, forms a legally binding contract between you and fromsupply.</p>
+                    <p class="uppercase-text">BY CREATING AN ACCOUNT, ACCESSING, OR USING ANY PART OF THE SERVICES, YOU ACKNOWLEDGE THAT YOU HAVE READ, UNDERSTOOD, AND AGREE TO BE BOUND BY THESE TERMS IN THEIR ENTIRETY. YOUR ACTION OF ACCESSING OR USING THE SERVICES SIGNIFIES YOUR UNCONDITIONAL ACCEPTANCE OF THIS AGREEMENT. IF YOU DO NOT AGREE TO THESE TERMS, YOU ARE NOT PERMITTED TO ACCESS OR USE THE SERVICES AND MUST CEASE DOING SO IMMEDIATELY.</p>
+                </div>
+
+                <div id="accordion-container" class="space-y-4">
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+    <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+        <span class="text-lg font-semibold text-white">1. Agreement to Terms and Modifications</span>
+    </button>
+    <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px);">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>1.1. Acceptance of Terms</h3>
+                                <p>These Terms establish the legal foundation of the relationship between you and fromsupply. They define the rights and obligations of both parties concerning the provision and use of the Services. If you are accessing or using the Services on behalf of a corporation, partnership, or other legal entity, you represent and warrant that you possess the full legal authority to enter into this agreement and bind that entity to these Terms. In such a case, "you" and "your" will refer to that entity. If you lack such authority, you must not accept these Terms and may not use the Services on behalf of that entity.</p>
+                                <h3>1.2. Changes to Terms</h3>
+                                <p>The digital landscape and the Services themselves are subject to constant evolution. To adapt to technological advancements, changes in law, and shifts in business practices, fromsupply reserves the right, at its sole and absolute discretion, to change, modify, add, or remove portions of these Terms at any time. We are committed to transparency and will provide you with reasonable advance notice of any material changes that may adversely affect your rights or obligations. Such notice may be provided by posting the updated Terms on our website, sending a notification to the email address associated with your account, or through an in-app alert or other conspicuous method. Your continued access to or use of the Services following the effective date of such changes will constitute your binding acceptance of the revised Terms. It is your sole responsibility to check these Terms periodically for changes. Non-material changes, such as clarifications or corrections, may be made without advance notice. Furthermore, changes made for urgent reasons, such as to address a security vulnerability, prevent ongoing abuse, or comply with a legal requirement, may become effective immediately without prior notice. If you do not agree to the amended Terms, your sole recourse is to stop using the Services and terminate your account.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">2. The fromsupply Services: Definitions and Scope</span>
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <p>To ensure clarity and a common understanding of the diverse functionalities within the fromsupply ecosystem, the following terms are defined as they are used throughout this agreement.</p>
+                                <div><strong>2.1. Arcade:</strong> A curated digital marketplace integrated within the Services, where Users can browse, license, purchase, and download a variety of software applications, digital goods, in-app items, and other forms of digital content ("Arcade Products"). Transactions within the Arcade may be conducted using either real-world currency or the platform's proprietary virtual unit of exchange, Reserves.</div>
+                                <div><strong>2.2. Bank:</strong> An integrated feature that facilitates the management and peer-to-peer transfer of Reserves between authorized User accounts. The Bank and its associated functionalities operate as a closed-loop system, exclusively for transactions involving Reserves within the fromsupply platform. It is explicitly stated that fromsupply is not a chartered bank, a registered financial institution, or a money services business (MSB).</div>
+                                <div><strong>2.3. Blob:</strong> A customizable user interface component that serves as a personalized dashboard or space, designed to provide Users with efficient and streamlined access to their most frequently used applications and a centralized search interface.</div>
+                                <div><strong>2.4. Browser:</strong> A proprietary search engine enabling Users to search for profiles, products, and news within the platform. Search results may be augmented with platform-generated metadata, including relevancy scores and aggregated like-to-dislike ratios.</div>
+                                <div><strong>2.5. Builder:</strong> A comprehensive suite of developer tools, APIs, and SDKs designed to empower Users to design, develop, publish, and manage their own products and applications for the fromsupply platform.</div>
+                                <div><strong>2.6. Console:</strong> An alternative user interface for navigating and interacting with the Services, accessible through specific user actions like a double-tap gesture on the Desktop or via the Search function.</div>
+                                <div><strong>2.7. Coplay:</strong> A service that enables Users to engage in synchronous, shared interactive experiences. Certain Coplay experiences may include functionalities that permit Users to stake real currency or Reserves on the outcome of specific in-app events.</div>
+                                <div><strong>2.8. Desktop:</strong> The primary graphical user interface and virtual workspace provided to each User, serving as the main environment for launching applications and navigating the platform.</div>
+                                <div><strong>2.9. Directory Bar:</strong> A user interface element that provides a hierarchical navigation aid, commonly known as a "breadcrumb trail," displaying the User's current location within the Services.</div>
+                                <div><strong>2.10. Farm:</strong> A multifaceted, interactive simulation experience available in two distinct modes:
+                                    <ul>
+                                        <li><strong>Live Mode:</strong> A single-player simulation where Users can use real money to purchase licenses for virtual assets, which may generate in-app rewards based on simulated economic conditions.</li>
+                                        <li><strong>Schemer Mode:</strong> A multiplayer, team-based simulation where Users collaborate to build a virtual village and can acquire virtual assets. It features a competitive "Haunting" event where a player's assets may be forcibly and permanently taken by a player from an opposing village.</li>
+                                    </ul>
+                                </div>
+                                <div><strong>2.11. Logic:</strong> An interactive educational service designed to facilitate learning through structured content and decision-based modules. Users can save insights and reflections to the Notes application.</div>
+                                <div><strong>2.12. Mall:</strong> A comprehensive e-commerce marketplace for peer-to-peer and business-to-consumer transactions of tangible physical goods like food, technology, and apparel.</div>
+                                <div><strong>2.13. Media:</strong> A content service for the creation, hosting, distribution, and consumption of User-Generated Content, including music, videos, photos, and interactive films.</div>
+                                <div><strong>2.14. Notes:</strong> A personal productivity application that allows Users to create, store, and manage digital notes, often related to the Logic service.</div>
+                                <div><strong>2.15. Pals:</strong> The native, in-app communication and social networking service that enables Users to connect and interact with other Users.</div>
+                                <div><strong>2.16. Prompts:</strong> A developer-oriented service allowing Users to contribute their code to the fromsupply system, which can then be referenced by other developers using Builder tools.</div>
+                                <div><strong>2.17. Reserves:</strong> The official, non-redeemable, closed-loop virtual unit of exchange used exclusively within the fromsupply ecosystem. Reserves are a limited license right and not real-world currency; they possess no monetary value outside of the Services.</div>
+                                <div><strong>2.18. Saved:</strong> A bookmarking utility integrated with the Directory Bar that allows Users to save a directory path for quick future access.</div>
+                                <div><strong>2.19. Search:</strong> A global search functionality to find and discover elements across the entire fromsupply ecosystem.</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">3. Your fromsupply Account</span>
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>3.1. Registration and Eligibility</h3>
+                                <p>To access and use the Services, you must create a fromsupply account, agreeing to provide information that is accurate, current, and complete. Use of false information is a material breach of these Terms.</p>
+                                <p>By creating a general account, you represent you are at least 13 years old (or the minimum age in your jurisdiction). However, to access or use the Bank, Coplay, and Farm services, you must be at least 18 years of age (or the age of legal majority in your jurisdiction, whichever is greater). We reserve the right to implement age-verification measures.</p>
+                                <h3>3.2. Account Security</h3>
+                                <p>You are solely responsible for maintaining the confidentiality of your account credentials and for all activities that occur under your account. You must notify fromsupply immediately of any suspected unauthorized use of your account. fromsupply will not be liable for any loss or damages arising from your failure to comply with this security obligation.</p>
+                                <h3>3.3. Account Suspension and Termination</h3>
+                                <p>fromsupply reserves the right to suspend, disable, or terminate your account or access to the Services at any time, in our sole discretion, for any breach of these Terms.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">4. Financial Terms, Payments, and Subscriptions</span>
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>4.1. fromsupply Membership</h3>
+                                <p>Access to certain premium features may be offered on a subscription basis ("Membership"). Fees, billing intervals, and features will be disclosed at the time of purchase. Memberships will automatically renew unless canceled prior to the renewal date through your account settings.</p>
+                                <h3>4.2. Purchases (Reserves, Arcade/Mall/Farm Products)</h3>
+                                <p>All purchases of digital and physical goods are final and non-refundable, except where required by law. Prices are subject to change without notice. We reserve the right to refuse or cancel any order at our discretion.</p>
+                                <h3>4.3. Payment Methods and Security</h3>
+                                <p>You agree to provide a valid, authorized payment method for all purchases. You authorize us or our third-party payment processor to charge your payment method for the total amount, including applicable taxes and fees. We comply with the Payment Card Industry Data Security Standard (PCI DSS); we do not store your full credit card number on our servers. Your payment information is encrypted and transmitted directly to our certified third-party payment processors.</p>
+                                <h3>4.4. Taxes</h3>
+                                <p>You are solely responsible for the payment of all applicable taxes (e.g., GST, HST, PST) arising from your use of the Services and any purchases. Taxes will be calculated and added to your total charge at checkout.</p>
+                                <h3>4.5. Wallet and Funding</h3>
+                                <p>The Services may offer a digital wallet feature to store a balance of real-world currency. These funds are a prepayment for goods and services and are not considered a deposit. Balances are not insured by the Canada Deposit Insurance Corporation (CDIC) and do not earn interest.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">5. Content, Intellectual Property, and User Licenses</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>5.1. fromsupply's Intellectual Property</h3>
+                                <p>The Services and all materials therein ("fromsupply Content") are owned by, controlled by, or licensed to Chim Wopara Enterprise and are protected by Canadian and international intellectual property laws. Except as expressly provided, no part of the Services or Content may be copied, reproduced, or distributed without our express prior written consent.</p>
+                                <h3>5.2. User-Generated Content ("Your Content")</h3>
+                                <p>You retain full ownership of the content you create and make available on the Services ("Your Content"). You represent and warrant that you are the exclusive owner of Your Content or have all necessary rights to grant fromsupply the license described in these Terms, and that Your Content does not infringe on any third-party rights.</p>
+                                <h3>5.3. License You Grant to fromsupply</h3>
+                                <p>By making Your Content available on the Services, you grant to fromsupply a worldwide, non-exclusive, royalty-free, perpetual, irrevocable, sublicensable, and transferable license to use, host, store, reproduce, modify, create derivative works of, communicate, publish, publicly display, and distribute Your Content. This license is for the limited purpose of operating, providing, promoting, and improving our Services, and to develop new ones.</p>
+                                <h3>5.4. License fromsupply Grants to You</h3>
+                                <p>Subject to your compliance with these Terms, fromsupply grants you a personal, non-commercial, non-exclusive, non-transferable, non-sublicensable, and fully revocable limited license to access and use the Services and Content.</p>
+                                <h3>5.5. Copyright Infringement (Notice and Takedown)</h3>
+                                <p>fromsupply respects intellectual property rights and will respond to notices of alleged copyright infringement that comply with Canada's Copyright Act. If you believe your copyright has been infringed, you may submit a notification to our designated Copyright Agent with all required information.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">6. Acceptable Use and Code of Conduct</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>6.1. Prohibited Conduct</h3>
+                                <p>You agree that you will not do any of the following:</p>
+                                <ul>
+                                    <li>Violate any applicable law or regulation.</li>
+                                    <li>Post or distribute unlawful, fraudulent, defamatory, obscene, or otherwise objectionable content.</li>
+                                    <li>Impersonate any person or entity or create a false identity.</li>
+                                    <li>Engage in harassment, stalking, or threatening behavior.</li>
+                                    <li>Harvest or collect information about other users without their consent.</li>
+                                    <li>Use the Services for spamming or any unsolicited commercial purpose.</li>
+                                    <li>Distribute viruses, worms, or other malicious code.</li>
+                                    <li>Attempt to gain unauthorized access to the Services or other users' accounts.</li>
+                                </ul>
+                                <h3>6.2. Platform Integrity</h3>
+                                <p>You may not copy, modify, reverse engineer, or attempt to extract the source code of the Services. You may not use automated means (like bots or scrapers) to access or monitor the Services.</p>
+                                <h3>6.3. Enforcement</h3>
+                                <p>fromsupply reserves the right to monitor your use of the Services, investigate violations, and take appropriate action, including removing content and suspending or terminating your account without a refund.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">7. Specific Terms for fromsupply Services</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>7.1. Arcade and Mall Marketplace Terms</h3>
+                                <p>You acknowledge that the Arcade and Mall are platforms that enable third-party sellers to connect with buyers, and fromsupply is not the seller of record for items offered by third parties. We are not a party to the contract of sale between a buyer and a seller. Sellers are solely responsible for their products and for complying with all laws. Any claim related to a product must be directed solely against the third-party seller.</p>
+                                <h3>7.2. Bank and Reserves Virtual Currency Terms</h3>
+                                <p>You acknowledge that Reserves are a limited, revocable license for use within our Services and are not real-world currency. They have no cash value and are not redeemable for money from fromsupply. We reserve the right to manage, modify, or eliminate Reserves at any time without liability.</p>
+                                <h3>7.3. Builder and Prompts Developer Platform Terms</h3>
+                                <p>We grant you a limited, non-exclusive, revocable license to use our Developer Tools to build applications that integrate with our Services. You are solely responsible for your application and must maintain a clear, legally compliant privacy policy for your users. You must obtain explicit consent from users before accessing their data.</p>
+                                <h3>7.4. Farm Interactive Experience Terms</h3>
+                                <p class="uppercase-text">YOU EXPRESSLY ACKNOWLEDGE, UNDERSTAND, AND AGREE THAT THE FARM SERVICE IS PROVIDED FOR ENTERTAINMENT PURPOSES ONLY. ANY PURCHASES MADE USING REAL MONEY ARE FOR A LIMITED LICENSE TO USE VIRTUAL ITEMS. ANY "RETURNS" GENERATED ARE IN-APP REWARDS WITH NO CASH VALUE AND ARE NOT GUARANTEED. YOU ACKNOWLEDGE THAT YOU ARE NOT MAKING A FINANCIAL INVESTMENT AND HAVE NO EXPECTATION OF MONETARY PROFIT.</p>
+                                <p>You acknowledge that assets in "Schemer Mode" are subject to the risk of permanent loss through the "Haunting" gameplay mechanic and you voluntarily assume this risk.</p>
+                                <h3>7.5. Coplay Shared Experience and Staking Terms</h3>
+                                <p>Any feature allowing you to stake real currency or Reserves is subject to specific rules disclosed for that experience. You participate voluntarily and at your own sole risk. Staking activities will be structured to comply with applicable Canadian laws, incorporating a predominant element of skill where possible.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">8. Disclaimers, Limitation of Liability, and Indemnification</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>8.1. WARRANTY DISCLAIMER</h3>
+                                <p class="uppercase-text">TO THE FULLEST EXTENT PERMITTED BY APPLICABLE LAW, THE SERVICES AND ALL CONTENT THEREIN ARE PROVIDED ON AN "AS IS" AND "AS AVAILABLE" BASIS, WITHOUT WARRANTY OF ANY KIND, EITHER EXPRESS OR IMPLIED. CHIM WOPARA ENTERPRISE EXPLICITLY DISCLAIM ANY AND ALL WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, QUIET ENJOYMENT, OR NON-INFRINGEMENT.</p>
+                                <h3>8.2. LIMITATION OF LIABILITY</h3>
+                                <p class="uppercase-text">TO THE MAXIMUM EXTENT PERMITTED BY LAW, IN NO EVENT SHALL CHIM WOPARA ENTERPRISE BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, OR ANY LOSS OF PROFITS OR REVENUES. IN NO EVENT SHALL THE AGGREGATE LIABILITY OF FROMSUPPLY EXCEED THE GREATER OF ONE HUNDRED CANADIAN DOLLARS (\$100.00 CAD) OR THE AMOUNT YOU PAID FROMSUPPLY, IF ANY, IN THE PAST SIX MONTHS FOR THE SERVICES GIVING RISE TO THE CLAIM.</p>
+                                <h3>8.3. Indemnification</h3>
+                                <p>You agree to defend, indemnify, and hold harmless Chim Wopara Enterprise from and against any and all claims, liabilities, damages, and expenses arising out of or in any way connected with your access to or use of the Services, Your Content, or your violation of these Terms.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">9. Governing Law and Dispute Resolution</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>9.1. Governing Law</h3>
+                                <p>These Terms will be governed by and construed in accordance with the laws of the Province of Alberta and the federal laws of Canada applicable therein. The exclusive jurisdiction and venue for any action will be the courts located in Edmonton, Alberta.</p>
+                                <h3>9.2. Dispute Resolution; Mandatory Arbitration</h3>
+                                <p>If a dispute cannot be resolved informally, you and fromsupply agree to resolve any claim by binding arbitration administered by a recognized Canadian arbitration institution in Edmonton, Alberta.</p>
+                                <p class="uppercase-text">CLASS ACTION WAIVER: TO THE FULLEST EXTENT PERMITTED BY LAW, YOU AND FROMSUPPLY AGREE THAT EACH MAY BRING CLAIMS AGAINST THE OTHER ONLY IN YOUR OR ITS INDIVIDUAL CAPACITY, AND NOT AS A PLAINTIFF OR CLASS MEMBER IN ANY PURPORTED CLASS OR REPRESENTATIVE PROCEEDING.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">10. General Provisions</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <h3>10.1. Entire Agreement</h3>
+                                <p>These Terms, together with the Privacy Policy, constitute the entire and exclusive understanding and agreement between fromsupply and you regarding the Services, superseding all prior agreements.</p>
+                                <h3>10.2. Severability</h3>
+                                <p>If any provision of these Terms is held to be invalid or unenforceable, that provision will be enforced to the maximum extent permissible and the other provisions will remain in full force and effect.</p>
+                                <h3>10.3. Assignment</h3>
+                                <p>You may not assign or transfer these Terms without fromsupply's prior written consent. fromsupply may freely assign or transfer these Terms without restriction.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">11. Privacy Policy</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <p><strong>Preamble</strong></p>
+                                <p>This Privacy Policy describes how Chim Wopara Enterprise ("fromsupply," "we," "us," or "our") collects, uses, discloses, transfers, and stores your personal information when you use our Services. Our practices are designed to comply with Canada's federal privacy law, the Personal Information Protection and Electronic Documents Act (PIPEDA).</p>
+                                <h3>1. Our Commitment to PIPEDA's Fair Information Principles</h3>
+                                <p>Our approach to privacy is built upon the ten fair information principles of PIPEDA, including Accountability, Identifying Purposes, Consent, Limiting Collection, Limiting Use, Accuracy, Safeguards, Openness, Individual Access, and Challenging Compliance.</p>
+                                <h3>2. Information We Collect and How We Collect It</h3>
+                                <p>We collect personal information you provide to us (e.g., Account Information, Profile Information, User-Generated Content, Payment Information, Communications) and information we collect automatically (e.g., Usage Data, Log and Device Data, Cookies).</p>
+                                <h3>3. How and Why We Use Your Information</h3>
+                                <p>We use your information to provide, operate, and maintain the Services; process transactions; improve and personalize our Services; communicate with you; maintain safety and security; and comply with legal obligations.</p>
+                                <h3>4. Consent</h3>
+                                <p>Consent is the cornerstone of our privacy practices. We are committed to ensuring your consent is both informed and meaningful. We obtain your express or implied consent for the collection, use, or disclosure of your personal information. You have the right to withdraw your consent at any time, subject to legal or contractual restrictions.</p>
+                                <h3>5. How We Share and Disclose Information</h3>
+                                <p>We do not sell your personal information. We may share it with third-party service providers who perform services on our behalf (e.g., payment processing), for legal reasons, or in connection with a business transfer.</p>
+                                <h3>6. Data Security, Retention, and Access</h3>
+                                <p>We have implemented reasonable and appropriate security measures to protect your personal information. We retain your information only as long as necessary. Under PIPEDA, you have the right to request access to and correction of your personal information.</p>
+                                <h3>7. Children's Privacy</h3>
+                                <p>Our Services are not directed to individuals under 13. We do not knowingly collect personal information from children under 13. If we become aware that we have done so, we will take steps to remove that information.</p>
+                                <h3>8. Changes to This Privacy Policy</h3>
+                                <p>We may update this Privacy Policy from time to time. If we make a material change, we will provide you with reasonable notice.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="accordion-item" style="border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; overflow: hidden;">
+                        <button class="accordion-button w-full flex justify-between items-center text-left p-4 transition duration-300" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(10px);" onmouseover="this.style.background='rgba(255, 255, 255, 0.2)'" onmouseout="this.style.background='rgba(255, 255, 255, 0.1)'">
+                            <span class="text-lg font-semibold text-white">12. Contact Information</span>
+                            <span class="text-lg font-semibold text-white">
+                        </button>
+                        <div class="accordion-content" style="background: rgba(255, 255, 255, 0.1); backdrop-filter: blur(15px); border-radius: 0 0 20px 20px;">
+                            <div class="prose max-w-none text-gray-200">
+                                <p>If you have any questions, comments, or concerns about these Terms or the Services, please contact our Legal Department:</p>
+                                <p><strong>Chim Wopara Enterprise</strong><br>Attn: Legal Department<br>1705 10909 103 Ave<br>Edmonton, Alberta, Canada<br>Email: legal@fromsupply.com</p>
+                                <p>For questions or complaints about our Privacy Policy or privacy practices, please contact our Privacy Officer:</p>
+                                <p><strong>Privacy Officer</strong><br>Chim Wopara Enterprise<br>1705 10909 103 Ave<br>Edmonton, Alberta, Canada<br>Email: privacy@fromsupply.com</p>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+           <!-- Bottom button removed - only top button is functional -->
+
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const accordionContainer = document.getElementById('accordion-container');
+            const accordionButtons = accordionContainer.querySelectorAll('.accordion-button');
+
+            accordionButtons.forEach(button => {
+    // Mouse click handler
+    button.addEventListener('click', () => {
+        toggleAccordion(button);
+    });
+    
+    // Touch handler for mobile
+    button.addEventListener('touchend', (e) => {
+        e.preventDefault(); // Prevent ghost clicks
+        toggleAccordion(button);
+    });
+});
+
+function toggleAccordion(button) {
+    const currentlyActive = accordionContainer.querySelector('.accordion-button.active');
+    
+    if (currentlyActive && currentlyActive !== button) {
+        currentlyActive.classList.remove('active');
+    }
+    
+    button.classList.toggle('active');
+}
+
+const topAgreeButton = document.getElementById('top-agree-button');
+
+function handleAgreement() {
+    // Send message immediately to dismiss window
+    if (window.parent && window.parent !== window) {
+        window.parent.postMessage('termsAccepted', '*');
+    }
+}
+
+if (topAgreeButton) {
+    // Mouse click handler
+    topAgreeButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Top button clicked'); // Debug log
+        handleAgreement();
+    });
+
+    // Touch handler for mobile
+    topAgreeButton.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Top button touched'); // Debug log
+        handleAgreement();
+    });
+    
+    // Backup - direct onclick
+    topAgreeButton.onclick = function(e) {
+        e.preventDefault();
+        e.stopPropagation();
+        console.log('Top button onclick'); // Debug log
+        handleAgreement();
+        return false;
+    };
+} else {
+    console.error('Top agree button not found!');
+}
+    });
+    
+// Listen for messages from parent window
+window.addEventListener('message', function(event) {
+    if (event.data && event.data.action === 'scrollToSupport') {
+        // Scroll to support section (Contact Information)
+        const supportSection = document.querySelector('span:contains("12. Contact Information")');
+        if (supportSection) {
+            supportSection.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        } else {
+            // Fallback - scroll to last accordion item
+            const lastAccordion = document.querySelector('.accordion-item:last-child');
+            if (lastAccordion) {
+                lastAccordion.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                // Auto-open the contact section
+                const button = lastAccordion.querySelector('.accordion-button');
+                if (button && !button.classList.contains('active')) {
+                    button.click();
+                }
+            }
+        }
+    }
+});
+
+function scrollToAcceptButtonAndBlink() {
+    // Find the accept button
+    const acceptButton = document.getElementById('agreement-button');
+    if (acceptButton) {
+        // Scroll to the button smoothly without interfering with future scrolling
+        acceptButton.scrollIntoView({ 
+            behavior: 'smooth', 
+            block: 'center' 
+        });
+        
+        // Wait for scroll to complete, then blink
+        setTimeout(() => {
+            blinkButton(acceptButton);
+        }, 800);
+    }
+}
+
+function blinkButton(button) {
+    // Store original styles
+    const originalBackground = button.style.backgroundColor;
+    const originalTransform = button.style.transform;
+    const originalBoxShadow = button.style.boxShadow;
+    
+    // First blink - green
+    button.style.backgroundColor = '#22c55e';
+    button.style.transform = 'scale(1.05)';
+    button.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.8)';
+    button.style.transition = 'all 0.2s ease';
+    
+    setTimeout(() => {
+        // Return to normal
+        button.style.backgroundColor = originalBackground;
+        button.style.transform = originalTransform;
+        button.style.boxShadow = originalBoxShadow;
+        
+        setTimeout(() => {
+            // Second blink - green
+            button.style.backgroundColor = '#22c55e';
+            button.style.transform = 'scale(1.05)';
+            button.style.boxShadow = '0 0 20px rgba(34, 197, 94, 0.8)';
+            
+            setTimeout(() => {
+                // Final return to normal
+                button.style.backgroundColor = originalBackground;
+                button.style.transform = originalTransform;
+                button.style.boxShadow = originalBoxShadow;
+                
+                // Remove transition after animation
+                setTimeout(() => {
+                    button.style.transition = '';
+                }, 200);
+            }, 300);
+        }, 200);
+    }, 300);
+}
+// Check if this is readonly mode (already signed in)
+const urlParams = new URLSearchParams(window.location.search);
+const isReadonly = urlParams.get('readonly') === 'true';
+
+if (isReadonly) {
+    // Hide the agree button for signed-in users
+    const agreeButton = document.getElementById('top-agree-button');
+    if (agreeButton) {
+        agreeButton.style.display = 'none';
+    }
+}
+
+document.addEventListener('DOMContentLoaded', function () {
+    // Existing DOMContentLoaded code stays the same
+    // ... existing code ...
+    
+    // Only add agree button functionality if not readonly
+    if (!isReadonly && topAgreeButton) {
+        // Existing button event handlers
+        topAgreeButton.addEventListener('click', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Top button clicked');
+            handleAgreement();
+        });
+        
+        topAgreeButton.addEventListener('touchend', (e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Top button touched');
+            handleAgreement();
+        });
+        
+        topAgreeButton.onclick = function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            console.log('Top button onclick');
+            handleAgreement();
+            return false;
+        };
+    }
+});
+</script>
+
+</body>
+</html>

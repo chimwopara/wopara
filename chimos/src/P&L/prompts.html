@@ -1,0 +1,2243 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chim Prompts</title>
+    <style>
+        /* Reset and base styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            height: 100%; /* Ensure html and body take full height */
+            overflow: hidden; /* Prevent body scrollbars */
+        }
+
+        :root {
+            --chimdark: #1B2330;
+            --chimdeep: #3F5268;
+            --chimlight: #B7D1E1;
+            --chimwhite: #FFFFFF;
+            /* Updated & New Category Colors */
+            --chim-start: rgb(121, 182, 242);      /* Blue */
+            --chim-references: rgb(179, 136, 255); /* Purple */
+            --chim-generation: rgb(124, 237, 161); /* Green */
+            --chim-attributes: rgb(255, 199, 119); /* Orange */
+            --chim-position: rgb(255, 148, 148);   /* Red */
+            --chim-styling: rgb(94, 234, 212);     /* Teal */
+            --chim-organization: rgb(250, 160, 218); /* Pink */
+
+            --chim-disabled-opacity: 0.5;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+            line-height: 1.6;
+            color: var(--chimwhite);
+            background-color: var(--chimdark);
+            overscroll-behavior: none; /* Prevent pull-to-refresh */
+            display: flex; /* Use flex to manage height */
+            flex-direction: column;
+        }
+
+        /* Layout */
+        .container {
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem;
+            flex-grow: 1; /* Allow container to grow */
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent container overflow */
+        }
+
+        header {
+            flex-shrink: 0; /* Prevent header from shrinking */
+        }
+
+        main {
+            flex-grow: 1; /* Allow main to fill space */
+            overflow: hidden; /* Prevent main overflow */
+            display: flex; /* Use flex for row */
+        }
+
+        .row {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: nowrap; /* Prevent wrapping by default */
+            width: 100%;
+            height: 100%; /* Make row fill main height */
+            overflow: hidden; /* Prevent row overflow */
+        }
+
+        .col-left {
+            flex: 1;
+            min-width: 300px;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            overflow: hidden; /* Prevent overflow */
+        }
+         .col-right {
+             flex: 1;
+             min-width: 300px;
+             display: flex;
+             flex-direction: column;
+             gap: 1rem;
+             overflow: hidden; /* Prevent overflow */
+         }
+
+
+        /* Flex utilities */
+        .flex { display: flex; }
+        .flex-col { flex-direction: column; }
+        .flex-row { flex-direction: row; }
+        .flex-wrap { flex-wrap: wrap; }
+        .justify-between { justify-content: space-between; }
+        .justify-end { justify-content: flex-end; }
+        .justify-center { justify-content: center; }
+        .items-center { align-items: center; }
+        .flex-grow { flex-grow: 1; }
+        .flex-shrink-0 { flex-shrink: 0; }
+
+        /* Spacing utilities */
+        .gap-1 { gap: 0.25rem; }
+        .gap-2 { gap: 0.5rem; }
+        .gap-4 { gap: 1rem; }
+        .mt-2 { margin-top: 0.5rem; }
+        .mt-4 { margin-top: 1rem; }
+        .mb-2 { margin-bottom: 0.5rem; }
+        .mb-4 { margin-bottom: 1rem; }
+        .mr-2 { margin-right: 0.5rem; }
+        .space-y-2 > * + * { margin-top: 0.5rem; }
+        .space-y-4 > * + * { margin-top: 1rem; }
+
+        /* Sizing utilities */
+        .w-full { width: 100%; }
+        .h-full { height: 100%; }
+        .min-h-\[100px\] { min-height: 100px; } /* Escaped brackets */
+
+        /* Position utilities */
+        .relative { position: relative; }
+        .absolute { position: absolute; }
+        .fixed { position: fixed; }
+        .inset-0 { top: 0; right: 0; bottom: 0; left: 0; }
+        .top-2 { top: 0.5rem; }
+        .right-2 { right: 0.5rem; }
+        .bottom-0 { bottom: 0; }
+        .left-0 { left: 0; }
+        .right-0 { right: 0; }
+        .z-10 { z-index: 10; }
+        .z-50 { z-index: 50; }
+
+        /* Interaction utilities */
+        .pointer-events-none { pointer-events: none; }
+        .cursor-pointer { cursor: pointer; }
+        .cursor-not-allowed { cursor: not-allowed; } /* Added */
+
+        /* Typography */
+        h1, h2, h3, h4, h5, h6 {
+            color: var(--chimlight);
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        h1 { font-size: 2.5rem; } /* Title style */
+        h2 { font-size: 2rem; }
+        h3 { font-size: 1.5rem; }
+
+        p { margin-bottom: 1rem; }
+
+        code, .font-mono {
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+        }
+
+        /* Inline code style used in chat messages and explanations */
+        .inline-code-example {
+            background-color: rgba(255,255,255,0.1);
+            padding: 0.1em 0.3em;
+            border-radius: 3px;
+            font-size: 0.9em;
+            color: var(--chimlight);
+        }
+
+        /* Inline code (outside chat/explanations) */
+        code:not(pre > code):not(.message-bubble code):not(.inline-code-example) {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 0.15rem 0.3rem;
+            border-radius: 4px;
+            color: var(--chimlight);
+            font-size: 0.9em;
+        }
+
+
+        /* Code blocks */
+        pre {
+            background-color: var(--chimdark);
+            border: 1px solid var(--chimdeep);
+            padding: 1rem;
+            border-radius: 6px;
+            overflow-x: auto;
+            margin-bottom: 1rem;
+            color: var(--chimwhite);
+        }
+
+        pre code {
+            background-color: transparent;
+            padding: 0;
+            color: inherit;
+            font-size: 0.9rem;
+        }
+
+        .whitespace-pre-wrap { white-space: pre-wrap; }
+        .text-sm { font-size: 0.875rem; }
+        .text-lg { font-size: 1.125rem; }
+        .font-medium { font-weight: 500; }
+        .text-foreground { color: var(--chimwhite); }
+        .text-muted-foreground { color: var(--chimlight); opacity: 0.8; }
+
+        /* Components */
+        .card {
+            background-color: var(--chimdeep);
+            border-radius: 8px;
+            overflow: hidden;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .card-content {
+            padding: 1.5rem;
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* Prevent content overflow */
+        }
+
+        /* Tabs */
+        .tabs {
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+            overflow: hidden; /* Prevent tabs content overflow */
+        }
+
+        .tab-list {
+            display: flex;
+            background-color: var(--chimdark);
+            border: 1px solid var(--chimdeep);
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+            flex-shrink: 0; /* Prevent tab list from shrinking */
+        }
+
+        .tab {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            text-align: center;
+            border: none;
+            background: none;
+            color: var(--chimlight);
+            font-weight: 500;
+            transition: background-color 0.2s, color 0.2s;
+            position: relative;
+            border-bottom: 2px solid transparent;
+        }
+
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        .tab.active {
+            color: var(--chimwhite);
+            border-bottom-color: var(--chimlight);
+        }
+
+        .tab-content {
+            display: none;
+            flex-grow: 1;
+            overflow-y: auto; /* Allow content scrolling */
+            flex-direction: column; /* Ensure vertical layout */
+            min-height: 0; /* Allow shrinking */
+        }
+
+        .tab-content.active {
+            display: flex; /* Use flex for active content */
+        }
+
+        /* Element Categories & Buttons (Right Column) */
+         #element-categories-container {
+             background-color: var(--chimdeep);
+             border-radius: 8px;
+             padding: 1.5rem;
+             height: 100%; /* Fill column height */
+             overflow-y: auto; /* Allow scrolling if needed */
+         }
+
+        .element-category {
+            margin-bottom: 1.5rem; /* Increased spacing */
+        }
+
+        .category-title {
+            font-size: 0.875rem;
+            font-weight: 600; /* Bolder */
+            color: var(--chimlight);
+            margin-bottom: 0.75rem; /* Increased spacing */
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .element-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+
+        .element-button {
+            position: relative;
+            padding: 0.375rem 0.75rem;
+            border-radius: 6px;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--chimlight);
+        }
+
+        .element-button:hover:not(:disabled) { /* Don't apply hover effect if disabled */
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+
+        .element-button:active:not(:disabled) {
+            transform: translateY(0px);
+            box-shadow: none;
+        }
+
+        .element-button.selected {
+            border-width: 1px;
+            border-style: solid;
+            box-shadow: 0 0 0 2px rgba(255, 255, 255, 0.3);
+        }
+
+        /* Disabled state for element buttons */
+        .element-button:disabled {
+            opacity: var(--chim-disabled-opacity);
+            cursor: not-allowed;
+            background-color: rgba(128, 128, 128, 0.1); /* Greyer background */
+            color: rgba(255, 255, 255, 0.4); /* Dimmer text */
+            border-color: transparent; /* Remove specific color border */
+        }
+        .element-button:disabled:hover { /* Remove hover effects when disabled */
+           transform: none;
+           box-shadow: none;
+        }
+
+
+        /* Element colors - Apply to buttons */
+        .element-start { background-color: rgba(121, 182, 242, 0.1); color: var(--chim-start); border-color: rgba(121, 182, 242, 0.3); }
+        .element-start.selected { background-color: rgba(121, 182, 242, 0.2); border-color: var(--chim-start); }
+        .element-start:disabled { background-color: rgba(121, 182, 242, 0.05); color: rgba(121, 182, 242, 0.4); border-color: rgba(121, 182, 242, 0.1); }
+
+        .element-references { background-color: rgba(179, 136, 255, 0.1); color: var(--chim-references); border-color: rgba(179, 136, 255, 0.3); }
+        .element-references.selected { background-color: rgba(179, 136, 255, 0.2); border-color: var(--chim-references); }
+        .element-references:disabled { background-color: rgba(179, 136, 255, 0.05); color: rgba(179, 136, 255, 0.4); border-color: rgba(179, 136, 255, 0.1); }
+
+        .element-generation { background-color: rgba(124, 237, 161, 0.1); color: var(--chim-generation); border-color: rgba(124, 237, 161, 0.3); }
+        .element-generation.selected { background-color: rgba(124, 237, 161, 0.2); border-color: var(--chim-generation); }
+        .element-generation:disabled { background-color: rgba(124, 237, 161, 0.05); color: rgba(124, 237, 161, 0.4); border-color: rgba(124, 237, 161, 0.1); }
+
+        .element-attributes { background-color: rgba(255, 199, 119, 0.1); color: var(--chim-attributes); border-color: rgba(255, 199, 119, 0.3); }
+        .element-attributes.selected { background-color: rgba(255, 199, 119, 0.2); border-color: var(--chim-attributes); }
+        .element-attributes:disabled { background-color: rgba(255, 199, 119, 0.05); color: rgba(255, 199, 119, 0.4); border-color: rgba(255, 199, 119, 0.1); }
+
+        .element-position { background-color: rgba(255, 148, 148, 0.1); color: var(--chim-position); border-color: rgba(255, 148, 148, 0.3); }
+        .element-position.selected { background-color: rgba(255, 148, 148, 0.2); border-color: var(--chim-position); }
+        .element-position:disabled { background-color: rgba(255, 148, 148, 0.05); color: rgba(255, 148, 148, 0.4); border-color: rgba(255, 148, 148, 0.1); }
+
+         .element-styling { background-color: rgba(94, 234, 212, 0.1); color: var(--chim-styling); border-color: rgba(94, 234, 212, 0.3); }
+        .element-styling.selected { background-color: rgba(94, 234, 212, 0.2); border-color: var(--chim-styling); }
+        .element-styling:disabled { background-color: rgba(94, 234, 212, 0.05); color: rgba(94, 234, 212, 0.4); border-color: rgba(94, 234, 212, 0.1); }
+
+        .element-organization { background-color: rgba(250, 160, 218, 0.1); color: var(--chim-organization); border-color: rgba(250, 160, 218, 0.3); }
+        .element-organization.selected { background-color: rgba(250, 160, 218, 0.2); border-color: var(--chim-organization); }
+        .element-organization:disabled { background-color: rgba(250, 160, 218, 0.05); color: rgba(250, 160, 218, 0.4); border-color: rgba(250, 160, 218, 0.1); }
+
+
+        /* Prompt Builder (Left Column) */
+        .prompt-builder {
+            flex-shrink: 0; /* Prevent prompt builder shrinking */
+            display: flex; /* Use flex for label and wrapper */
+            flex-direction: column;
+        }
+
+        /* === UPDATED STYLES for Textarea and Highlight === */
+        .textarea-wrapper {
+            position: relative;
+            border: 1px solid var(--chimdeep);
+            border-radius: 8px;
+            background-color: var(--chimdark);
+            overflow: hidden; /* Important: hide wrapper overflow */
+            /* Let flexbox handle height */
+            flex-grow: 1;
+            min-height: 150px; /* Or adjust as needed */
+            display: flex; /* Contain the textarea */
+        }
+
+        .textarea {
+            width: 100%;
+            height: 100%; /* Fill the wrapper */
+            padding: 1rem; /* Consistent padding */
+            background-color: transparent;
+            color: var(--chimwhite);
+            border: none; /* Border is on the wrapper */
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Match highlight */
+            font-size: 1rem; /* Match highlight */
+            line-height: 1.5; /* Match highlight */
+            resize: none;
+            position: relative; /* Keep for z-index */
+            z-index: 1;
+            caret-color: var(--chimlight);
+            white-space: pre-wrap; /* Match highlight */
+            word-wrap: break-word; /* Match highlight */
+            word-break: break-word; /* Added for consistency */
+            overflow-y: auto; /* Allow scrolling */
+            box-sizing: border-box; /* Explicit */
+            outline: none; /* Remove focus outline */
+        }
+
+        .textarea:focus {
+            outline: none;
+        }
+
+        .highlight-container {
+            position: absolute;
+            inset: 0; /* Fill the wrapper */
+            pointer-events: none;
+            padding: 1rem; /* Match textarea */
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace; /* Match textarea */
+            font-size: 1rem; /* Match textarea */
+            line-height: 1.5; /* Match textarea */
+            color: transparent; /* Base text is transparent */
+            white-space: pre-wrap; /* Match textarea */
+            word-wrap: break-word; /* Match textarea */
+            word-break: break-word; /* Added for consistency */
+            z-index: 0;
+            overflow: hidden; /* MUST be hidden */
+            box-sizing: border-box; /* Explicit */
+            /* border: 1px solid transparent; /* Optional: Match wrapper border width for perfect alignment */
+        }
+        /* === END UPDATED STYLES === */
+
+        /* Style for the highlighted keywords (color + brackets ARE NOW IN THE TEXT) */
+        .highlight-container span.chim-element {
+            font-weight: 500;
+            /* Brackets are now part of the span's content, not added via CSS */
+        }
+
+
+        /* Chat (Left Column) */
+        .chat-container {
+            background-color: var(--chimdark); /* Match screenshot bg */
+            border-radius: 8px;
+            border: 1px solid var(--chimdeep);
+            overflow: hidden;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1; /* Allow chat to fill space */
+            min-height: 300px; /* Ensure minimum height */
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .message {
+            display: flex;
+            margin-bottom: 1rem;
+            max-width: 90%;
+        }
+
+        .message.user {
+            justify-content: flex-end;
+            margin-left: auto;
+        }
+
+        .message.assistant {
+            justify-content: flex-start;
+            margin-right: auto;
+        }
+
+        .message-bubble {
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            line-height: 1.5;
+        }
+        /* Style chat bubbles */
+        .message.user .message-bubble {
+            background-color: var(--chimdeep); /* Darker user bubble */
+            color: var(--chimwhite);
+            border-bottom-right-radius: 4px;
+        }
+
+        .message.assistant .message-bubble {
+            background-color: var(--chimdark); /* Even darker assistant bubble */
+             border: 1px solid var(--chimdeep); /* Add border like screenshot */
+            color: var(--chimwhite);
+            border-bottom-left-radius: 4px;
+        }
+         /* Style code within chat bubbles */
+         /* Style for colored [keyword] spans */
+         .message-bubble code.chim-keyword-in-chat {
+             font-weight: 500;
+             background-color: transparent !important;
+             padding: 0 !important;
+             font-size: inherit !important;
+             color: inherit; /* Will be overridden by inline style */
+         }
+         /* Style for plain `code` examples and backticked code */
+         .message-bubble code:not(.chim-keyword-in-chat) {
+             background-color: rgba(255,255,255,0.1) !important; /* Use specific style */
+             padding: 0.1em 0.3em !important;
+             border-radius: 3px !important;
+             font-size: 0.9em !important; /* Slightly smaller */
+             color: var(--chimlight) !important;
+         }
+
+
+        .input-container {
+            padding: 1rem;
+            background-color: var(--chimdark); /* Match screenshot bg */
+            border-top: 1px solid var(--chimdeep);
+            display: flex;
+            gap: 0.5rem;
+            align-items: center;
+            flex-shrink: 0; /* Prevent input area shrinking */
+        }
+
+        .input {
+            flex: 1;
+            padding: 0.75rem 1rem;
+            background-color: var(--chimdeep);
+            color: var(--chimwhite);
+            border: 1px solid var(--chimdeep);
+            border-radius: 6px;
+            transition: border-color 0.2s, box-shadow 0.2s;
+        }
+        .input:focus {
+            outline: none;
+            border-color: var(--chimlight);
+            box-shadow: 0 0 0 2px rgba(183, 209, 225, 0.3);
+        }
+
+        /* Buttons */
+        .button {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.2s;
+            border: 1px solid transparent;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            white-space: nowrap;
+        }
+        .button:disabled {
+            opacity: var(--chim-disabled-opacity);
+            cursor: not-allowed;
+        }
+
+        /* Specific button styles */
+        .button-primary { /* Send button */
+           background-color: var(--chimdeep); /* Match input bg */
+           color: var(--chimlight);
+           border-color: var(--chimdeep);
+           padding: 0.5rem; /* Make it square-ish */
+        }
+        .button-primary:hover:not(:disabled) {
+           background-color: var(--chimlight);
+           border-color: var(--chimlight);
+           color: var(--chimdark);
+        }
+
+        .button-outline { /* Add New buttons */
+            background-color: transparent;
+            color: var(--chimlight);
+            border: 1px solid var(--chimdeep);
+        }
+        .button-outline:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.05);
+            border-color: var(--chimlight);
+            color: var(--chimwhite);
+        }
+
+        .button-ghost { /* Dialog cancel */
+            background-color: transparent;
+            color: var(--chimlight);
+            border: 1px solid transparent;
+        }
+        .button-ghost:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--chimwhite);
+        }
+
+        .button-danger { /* Confirm delete */
+            background-color: transparent;
+            color: var(--chim-position); /* Use position color for danger */
+            border: 1px solid var(--chimdeep);
+        }
+        .button-danger:hover:not(:disabled) {
+            background-color: rgba(255, 148, 148, 0.1);
+            border-color: var(--chim-position);
+            color: var(--chim-position);
+        }
+
+        .button-icon { /* Nav, Info, Card actions */
+            padding: 0.5rem;
+            border-radius: 6px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: transparent;
+            color: var(--chimlight);
+            border: 1px solid transparent;
+        }
+        .button-icon:hover:not(:disabled) {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: var(--chimwhite);
+            border-color: var(--chimdeep);
+        }
+        .button-icon svg {
+            width: 16px;
+            height: 16px;
+        }
+
+        /* Context cards */
+        .context-card {
+            background-color: var(--chimdeep);
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--chimdeep);
+        }
+
+        .context-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 1rem;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+        }
+        .context-header h3 {
+            margin-bottom: 0;
+            color: var(--chimwhite);
+        }
+        /* Style action buttons within the header */
+        .context-header .button-icon {
+           color: var(--chimlight); /* Ensure icon color */
+        }
+        .context-header .button-icon:hover {
+           color: var(--chimwhite); /* White on hover */
+           background-color: rgba(255, 255, 255, 0.15); /* Slightly stronger hover */
+        }
+
+
+        .context-content {
+            background-color: var(--chimdark);
+            padding: 1rem;
+            border-radius: 6px;
+            white-space: pre-wrap;
+            font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', Menlo, Courier, monospace;
+            font-size: 0.875rem;
+            overflow-x: auto;
+            max-height: 200px;
+            overflow-y: auto;
+            border: 1px solid var(--chimdark);
+        }
+        /* Style code within context cards (keywords) */
+        .context-content code.chim-keyword-in-context {
+            display: inline; /* Keep inline */
+            background: none !important;
+            padding: 0 !important;
+            color: inherit; /* Use color from inline style */
+            font-weight: 500;
+            font-size: inherit; /* Match surrounding text */
+        }
+
+
+        .context-comment {
+            margin-top: 0.75rem;
+            font-size: 0.875rem;
+            color: var(--chimlight);
+            opacity: 0.8;
+            font-style: italic;
+        }
+        /* Update comment keyword color */
+        .context-comment .font-mono {
+            color: var(--chim-organization); /* Match 'maybe' color */
+            font-style: normal;
+            opacity: 1;
+            font-weight: 500; /* Make keyword bold */
+        }
+
+        /* Dialog */
+        .dialog-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0, 0, 0, 0.7);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+        }
+        .dialog-overlay.visible {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .dialog {
+            background-color: var(--chimdark);
+            border: 1px solid var(--chimdeep);
+            border-radius: 8px;
+            padding: 1.5rem;
+            width: 90%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+            transform: scale(0.95);
+            transition: transform 0.2s ease-in-out;
+        }
+        .dialog-overlay.visible .dialog {
+            transform: scale(1);
+        }
+
+        .dialog-header {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--chimdeep);
+        }
+
+        .dialog-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--chimwhite);
+            margin-bottom: 0;
+        }
+
+        .dialog-body {
+            margin-bottom: 1.5rem;
+        }
+        .dialog-body label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-size: 0.875rem;
+            color: var(--chimlight);
+            font-weight: 500;
+        }
+        /* Ensure dialog textarea uses consistent styling */
+        .dialog-body .textarea {
+            background-color: var(--chimdeep);
+            border: 1px solid var(--chimdeep); /* Add border for dialog */
+            border-radius: 6px; /* Add radius for dialog */
+            min-height: 100px; /* Ensure min height */
+            height: auto; /* Allow it to grow */
+        }
+        .dialog-body .input {
+            background-color: var(--chimdeep);
+            border-color: var(--chimdeep);
+        }
+        .dialog-body .textarea:focus,
+        .dialog-body .input:focus {
+            border-color: var(--chimlight);
+            box-shadow: 0 0 0 2px rgba(183, 209, 225, 0.3);
+        }
+
+
+        .dialog-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 0.75rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--chimdeep);
+        }
+
+        /* Switch */
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 42px;
+            height: 22px;
+        }
+
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+
+        .slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: var(--chimdeep);
+            transition: .4s;
+            border-radius: 22px;
+            border: 1px solid var(--chimdeep);
+        }
+
+        .slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 2px;
+            bottom: 2px;
+            background-color: var(--chimwhite);
+            transition: .4s;
+            border-radius: 50%;
+        }
+
+        input:checked + .slider {
+            background-color: var(--chimlight);
+            border-color: var(--chimlight);
+        }
+
+        input:checked + .slider:before {
+            transform: translateX(20px);
+            background-color: var(--chimdark);
+        }
+
+        /* Keyboard shortcuts hint */
+        .shortcut-hint {
+            position: absolute;
+            top: -18px; /* Position above button */
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(0, 0, 0, 0.8);
+            color: white;
+            font-size: 10px;
+            padding: 2px 6px;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+            z-index: 10;
+            pointer-events: none;
+            opacity: 0; /* Hidden by default */
+            transition: opacity 0.2s;
+            white-space: nowrap; /* Prevent wrapping */
+        }
+        /* Show hints when body has 'show-shortcuts' class (Tab is pressed) */
+        body.show-shortcuts .element-button .shortcut-hint {
+            opacity: 1;
+        }
+        /* Keep showing hint on hover as well for discoverability */
+         .element-button:hover .shortcut-hint {
+             opacity: 1;
+         }
+
+
+        /* Utilities */
+        .visually-hidden {
+            border: 0;
+            clip: rect(0 0 0 0);
+            height: 1px;
+            margin: -1px;
+            overflow: hidden;
+            padding: 0;
+            position: absolute;
+            width: 1px;
+        }
+
+        /* Media queries */
+        @media (max-width: 900px) {
+             /* Stack columns on medium screens and below */
+             .row {
+                 flex-direction: column-reverse; /* Put elements above prompt/chat */
+                 flex-wrap: wrap; /* Allow wrapping */
+                 height: auto; /* Allow height to adjust */
+                 overflow: visible; /* Allow overflow */
+             }
+             main {
+                 overflow: auto; /* Allow main to scroll if needed */
+             }
+             .col-left, .col-right {
+                 width: 100%;
+                 min-width: unset; /* Remove min-width */
+                 overflow: visible; /* Allow overflow */
+                 height: auto; /* Adjust height */
+             }
+             #element-categories-container {
+                 height: auto; /* Allow height to adjust */
+                 max-height: 40vh; /* Limit height */
+             }
+             /* Adjust prompt builder height on smaller screens */
+             .prompt-builder .textarea-wrapper {
+                min-height: 150px;
+                height: 25vh; /* Example viewport height */
+             }
+             .card {
+                 height: auto; /* Adjust height */
+                 min-height: 400px; /* Ensure tabs card has height */
+             }
+        }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 2rem; }
+            h2 { font-size: 1.75rem; }
+            h3 { font-size: 1.25rem; }
+
+            .container { padding: 0.5rem; }
+            .card-content { padding: 1rem; }
+            #element-categories-container { padding: 1rem; }
+            .tab { padding: 0.5rem; font-size: 0.875rem; }
+            .input-container { padding: 0.5rem; flex-wrap: wrap; }
+            .input { width: 100%; margin-bottom: 0.5rem; }
+            /* Adjust chat input buttons for smaller screens */
+             .input-container .button-icon {
+                 padding: 0.4rem; /* Slightly smaller padding */
+             }
+             .input-container .button-primary {
+                  padding: 0.4rem; /* Slightly smaller padding */
+             }
+             .input-container > .flex { /* Target the nav buttons container */
+                 margin-right: 0.25rem; /* Reduce margin */
+             }
+
+            .context-header { flex-direction: column; align-items: flex-start; }
+            .dialog { width: 95%; }
+        }
+
+    </style>
+</head>
+<body > <div class="container">
+        <header class="mb-4 flex-shrink-0">
+            <h1 style="text-align:center;">Chim Prompts</h1>
+            </header>
+
+        <main>
+            <div class="row">
+                <div class="col-left flex flex-col gap-4">
+                    <div class="prompt-builder">
+                         
+                        <div class="textarea-wrapper">
+                            <div class="highlight-container" id="highlight-container" aria-hidden="true"></div>
+                            <textarea id="prompt-textarea" class="textarea" placeholder="using the elements below or chat page ( tab + space ) ..."></textarea>
+                            <button class="button button-icon absolute top-2 right-2 z-10" id="copy-button" title="Copy prompt">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"></rect><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="card flex-grow"> <div class="card-content">
+                            <div class="tabs" id="main-tabs">
+                                <div class="tab-list">
+                                    <button class="tab active" data-tab="chat">Chat</button>
+                                    <button class="tab" data-tab="contexts">Contexts</button>
+                                    <button class="tab" data-tab="prompts">Prompts</button>
+                                </div>
+
+                                <div class="tab-content active" id="tab-chat">
+                                    <div class="chat-container">
+                                        <div class="chat-messages" id="chat-messages">
+                                            </div>
+                                        <div class="input-container">
+                                            <div class="flex gap-1 mr-2">
+                                                <button class="button button-icon" id="prev-question" title="Previous question (↑)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+                                                </button>
+                                                <button class="button button-icon" id="next-question" title="Next question (↓)">
+                                                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+                                                </button>
+                                            </div>
+                                            <input type="text" class="input" id="chat-input" placeholder="Type your answer ...">
+                                            <button class="button button-primary" id="send-button">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                                            </button>
+                                            <button class="button button-icon" id="info-button" title="Info">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="12" y1="16" x2="12" y2="12"></line><line x1="12" y1="8" x2="12.01" y2="8"></line></svg>
+                                            </button>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-content" id="tab-contexts">
+                                    <div class="tabs" id="contexts-tabs">
+                                        <div class="tab-list">
+                                            <button class="tab active" data-subtab="mine-contexts">Mine</button>
+                                            <button class="tab" data-subtab="community-contexts">Community</button>
+                                        </div>
+
+                                        <div class="tab-content active" id="subtab-mine-contexts">
+                                            <div id="my-contexts-container" class="space-y-4 flex-grow overflow-y-auto">
+                                                </div>
+                                            <button class="button button-outline w-full mt-4" id="add-context-button">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                Add New Context
+                                            </button>
+                                        </div>
+
+                                        <div class="tab-content" id="subtab-community-contexts">
+                                            <p class="text-muted-foreground p-4 text-center">Community contexts feature coming soon.</p>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <div class="tab-content" id="tab-prompts">
+                                    <div class="tabs" id="prompts-tabs">
+                                        <div class="tab-list">
+                                            <button class="tab active" data-subtab="prompts">Prompts</button>
+                                            <button class="tab" data-subtab="forges">Forges</button>
+                                            <button class="tab" data-subtab="molds">Molds</button>
+                                            <button class="tab" data-subtab="explore">Explore</button>
+                                        </div>
+
+                                        <div class="tab-content active" id="subtab-prompts">
+                                             <div id="my-prompts-container" class="space-y-4 flex-grow overflow-y-auto">
+                                                 </div>
+                                            <button class="button button-outline w-full mt-4" id="add-prompt-button">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                Add New Prompt
+                                            </button>
+                                        </div>
+
+                                        <div class="tab-content" id="subtab-forges">
+                                             <div id="my-forges-container" class="space-y-4 flex-grow overflow-y-auto">
+                                                 </div>
+                                            <button class="button button-outline w-full mt-4" id="add-forge-button">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                Add New Forge
+                                            </button>
+                                        </div>
+
+                                        <div class="tab-content" id="subtab-molds">
+                                            <div id="my-molds-container" class="space-y-4 flex-grow overflow-y-auto">
+                                                </div>
+                                            <button class="button button-outline w-full mt-4" id="add-mold-button">
+                                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                                                Add New Mold
+                                            </button>
+                                        </div>
+
+                                        <div class="tab-content" id="subtab-explore">
+                                            <p class="text-muted-foreground p-4 text-center">Explore public prompts feature coming soon.</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-right">
+                    <div id="element-categories-container">
+                        </div>
+                </div>
+            </div>
+        </main>
+
+        <div class="dialog-overlay" id="context-dialog">
+            <div class="dialog">
+                <div class="dialog-header">
+                    <h2 class="dialog-title" id="context-dialog-title">Add New Context</h2>
+                </div>
+                <div class="dialog-body">
+                    <input type="hidden" id="context-edit-id">
+                    <div>
+                        <label for="context-content">Content:</label>
+                        <textarea id="context-content" class="textarea" placeholder="Enter code snippet or context..."></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label for="context-comment">Comment (optional):</label>
+                        <input type="text" id="context-comment" class="input w-full" placeholder="Describe this context">
+                    </div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="button button-ghost" data-action="cancel-context">Cancel</button>
+                    <button class="button button-primary" data-action="save-context">Save Context</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog-overlay" id="prompt-dialog">
+            <div class="dialog">
+                <div class="dialog-header">
+                    <h2 class="dialog-title" id="prompt-dialog-title">Add New Item</h2>
+                </div>
+                <div class="dialog-body">
+                    <input type="hidden" id="prompt-edit-id">
+                    <input type="hidden" id="prompt-type">
+                    <div>
+                        <label for="prompt-content">Content:</label>
+                        <textarea id="prompt-content" class="textarea" placeholder="Enter your prompt, forge, or mold..."></textarea>
+                    </div>
+                    <div class="mt-4">
+                        <label for="prompt-comment">Comment (optional):</label>
+                        <input type="text" id="prompt-comment" class="input w-full" placeholder="Describe this item">
+                    </div>
+                </div>
+                <div class="dialog-footer">
+                    <button class="button button-ghost" data-action="cancel-prompt">Cancel</button>
+                    <button class="button button-primary" data-action="save-prompt">Save Item</button>
+                </div>
+            </div>
+        </div>
+
+        <div class="dialog-overlay" id="confirm-dialog">
+            <div class="dialog">
+                <div class="dialog-header">
+                    <h2 class="dialog-title" id="confirm-dialog-title">Confirm Action</h2>
+                </div>
+                <div class="dialog-body">
+                    <p id="confirm-dialog-message">Are you sure?</p>
+                </div>
+                <div class="dialog-footer">
+                    <button class="button button-ghost" data-action="confirm-cancel">Cancel</button>
+                    <button class="button button-danger" data-action="confirm-proceed">Confirm</button>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // ======================
+        // === CONFIGURATION ===
+        // ======================
+
+        // *** UPDATED ELEMENT_CATEGORIES ***
+        const ELEMENT_CATEGORIES = [
+             { name: "Start", colorClass: "element-start", colorValue: "var(--chim-start)", isSyntax: true, elements: [
+                 { name: "in", shortcut: "i" }, // Moved
+                 { name: "for", shortcut: "f" }, // Moved
+             ]},
+             { name: "References", colorClass: "element-references", colorValue: "var(--chim-references)", isSyntax: false, elements: [
+                 { name: "context", shortcut: "c" }, // Moved
+                 { name: "line", shortcut: "l" },    // Moved
+                 { name: "chimcontext" }, // New
+                 { name: "prompt" },      // New
+                 { name: "chimprompt" },  // New
+                 { name: "file", shortcut: "p" },    // Kept from old Context
+                 { name: "error", shortcut: "e" },   // Kept from old Context
+             ]},
+             { name: "Generation", colorClass: "element-generation", colorValue: "var(--chim-generation)", isSyntax: false, elements: [
+                 { name: "spawn" },  // New
+                 { name: "rare" },   // New
+                 { name: "create" }, // New (like old 'add')
+                 { name: "refactor", shortcut: "r" }, // Moved
+                 { name: "explain", shortcut: "x" },  // Moved
+                 { name: "optimize", shortcut: "o" }, // Moved
+                 { name: "debug", shortcut: "d" },    // Moved
+             ]},
+             { name: "Attributes", colorClass: "element-attributes", colorValue: "var(--chim-attributes)", isSyntax: false, elements: [
+                 { name: "from" },        // New
+                 { name: "makeit" },      // New
+                 { name: "like" },        // New
+                 { name: "but" },         // New
+                 { name: "with", shortcut: "w" },      // Moved & kept shortcut
+                 { name: "without" },     // New
+                 { name: "prefer", shortcut: "v" },    // Moved & kept shortcut
+                 { name: "format", shortcut: "k" },    // Moved & kept shortcut
+                 { name: "steps", shortcut: "t" },     // Moved & kept shortcut
+                 { name: "between", shortcut: "b" },   // Moved & kept shortcut
+             ]},
+             { name: "Position", colorClass: "element-position", colorValue: "var(--chim-position)", isSyntax: false, elements: [
+                 { name: "nextto" }, // New
+                 { name: "blame" },  // New
+             ]},
+             { name: "Styling", colorClass: "element-styling", colorValue: "var(--chim-styling)", isSyntax: false, elements: [
+                 { name: "animate" },     // New
+                 { name: "background" }, // New
+                 { name: "font" },        // New
+                 { name: "style", shortcut: "s" }, // Moved & kept shortcut
+             ]},
+             { name: "Organization", colorClass: "element-organization", colorValue: "var(--chim-organization)", isSyntax: false, elements: [
+                 { name: "maybe", shortcut: "m" }, // Moved & kept shortcut
+                 { name: "then" },        // New
+                 { name: "forge", shortcut: "g" }, // Moved & kept shortcut
+                 { name: "mold", shortcut: "y" },  // Moved & kept shortcut
+                 { name: "jump", shortcut: "j" },  // Moved & kept shortcut
+                 { name: "using", shortcut: "u" }, // Moved & kept shortcut (Could also fit in Attributes?)
+             ]}
+         ];
+
+        // *** Keyword Explanations ***
+        const KEYWORD_EXPLANATIONS = {
+            "in": "Specifies the language for the output (e.g., `[in] swift`).",
+            "for": "Specifies the target app platform (e.g., `[for] apple phone`).",
+            "context": "References saved code context by index number(s) (e.g., `[context] 39`, `[context] 39; 45`, `[context] 39 to 45`).",
+            "line": "Specifies the target line number, optionally with a language/framework hint (e.g., `[line] 150`, `[line] react; 150`).",
+            "chimcontext": "References saved code context by its unique ID (e.g., `[chimcontext] 4535hevne53354`).",
+            "prompt": "Loads a locally saved prompt by its name (e.g., `[prompt] saved1`, `[prompt] [homepage]`).",
+            "chimprompt": "Loads a publicly shared prompt by its name (e.g., `[chimprompt] richardssearchbar`).",
+            "file": "References a file context (similar to 'context' but specifically for files).",
+            "error": "References an error message context.",
+            "spawn": "Creates a visually similar *entire page* based on a description and a reference program/URL (e.g., `[spawn] instagram/ home page; instagram.com`).",
+            "rare": "Randomly creates a unique object based on a description (e.g., `[rare] search bar`).",
+            "create": "Specifies the particular object to be generated (e.g., `[create] search bar`).",
+            "refactor": "Indicates that the referenced code should be refactored.",
+            "explain": "Requests an explanation of the referenced code or concept.",
+            "optimize": "Requests optimization of the referenced code.",
+            "debug": "Requests debugging assistance for the referenced code or error.",
+            "from": "Mimics the *appearance* of an object from an existing app (e.g., `[from] instagram/ search page`).",
+            "makeit": "Specifies if an object should be auto-hiding (dynamic) or static (e.g., `[makeit] static`).",
+            "like": "Mimics the *functionality* of a similar object from a different project (e.g., `[like] snapchat/ explore page`).",
+            "but": "Replaces abstract attributes or adds exact details/dimensions (e.g., `[but] fire edges; top center; rectangle; 4:5; 35`).",
+            "with": "Adds abstract attributes (e.g., `[with] fire edges`).",
+            "without": "Removes abstract attributes (e.g., `[without] search icon`).",
+            "prefer": "Specifies preferred libraries, patterns, or approaches.",
+            "format": "Specifies the desired output format (e.g., JSON, Markdown).",
+            "steps": "Requests the output to be provided in steps.",
+            "between": "Specifies a range or condition for generation.",
+            "nextto": "References position relative to another object (e.g., `[nextto] left (search bar)`, `[nextto] within left (loading screen)`).",
+            "blame": "Specifies a problem or anti-pattern to avoid, referencing an example (e.g., `[blame] instagram / search page`).",
+            "animate": "Adds animation details for interaction and timing (e.g., `[animate] start(3; appear); end(5, fade out)`).",
+            "background": "Sets the background color, potentially with light/dark mode variants (e.g., `[background] ffffffff`, `[background] light(ffffff); dark(000000)`).",
+            "font": "Specifies font properties like family, alignment, color (light/dark), and size (e.g., `[font] aerial; center; ffffffff; 15`, `[font] aerial; left; light(000000); dark(ffffff); 15`).",
+            "style": "Provides general styling instructions.",
+            "maybe": "Provides extra context or description in natural language (e.g., `[maybe] snapchat search bar with a bit of instagram feel`).",
+            "then": "Applies the preceding edits/configurations to multiple subsequent items (e.g., `[then] loading screen; checkout page`).",
+            "forge": "Saves or applies a configuration for a component or a set of attributes (e.g., `[forge] (ig bias)`).",
+            "mold": "Groups multiple objects or components into a single page or view (e.g., `[mold] loading screen; checkout page; [home page]`).",
+            "jump": "Automatically rearranges prompt elements by importance or resets order (e.g., `[jump] descending`, `[jump] reset`).",
+            "using": "Specifies tools, libraries, or techniques to be used (e.g., `[using] arrow functions`)."
+        };
+
+
+        // Map shortcuts to element details for quick lookup
+        const SHORTCUT_MAP = {};
+        ELEMENT_CATEGORIES.forEach(category => {
+            category.elements.forEach(el => {
+                if (el.shortcut) {
+                    if (SHORTCUT_MAP[el.shortcut]) {
+                        console.warn(`Duplicate shortcut '${el.shortcut}' defined for element '${el.name}'. Overwriting previous.`);
+                    }
+                    SHORTCUT_MAP[el.shortcut] = { name: el.name, isSyntax: category.isSyntax };
+                }
+            });
+        });
+
+        // Map element names to syntax status
+        const ELEMENT_SYNTAX_STATUS = {};
+         ELEMENT_CATEGORIES.forEach(category => {
+             category.elements.forEach(el => {
+                 ELEMENT_SYNTAX_STATUS[el.name] = category.isSyntax;
+             });
+         });
+
+
+        // Sample questions for chat input history (updated with new keywords)
+        const QUESTIONS = [
+            "How do I use [context] elements?",
+            "Explain the difference between [forge] and [mold].",
+            "Can you [refactor] this code [using] arrow functions?",
+            "Generate a React component [for] a login form [style] minimalist.",
+            "What does [maybe] mean in a context comment?",
+            "Create a button [with] a blue [background]",
+            "Explain this code [context] [line] 10-15",
+            "[spawn] 3 variations [like] this example"
+        ];
+
+        // ======================
+        // === DOM ELEMENTS ===
+        // ======================
+        const $ = (selector) => document.querySelector(selector);
+        const $$ = (selector) => document.querySelectorAll(selector);
+
+        const bodyElement = document.body; // Reference to body for class toggling
+
+        // Prompt builder
+        const promptTextarea = $('#prompt-textarea');
+        const highlightContainer = $('#highlight-container');
+        const copyButton = $('#copy-button');
+        const elementCategoriesContainer = $('#element-categories-container'); // Now in right col
+
+        // Main tabs (Left Col)
+        const mainTabsContainer = $('#main-tabs');
+
+        // Contexts Tab (Left Col)
+        const contextsTabsContainer = $('#contexts-tabs');
+        const myContextsContainer = $('#my-contexts-container');
+        const addContextButton = $('#add-context-button');
+
+        // Prompts Tab (Left Col)
+        const promptsTabsContainer = $('#prompts-tabs');
+        const myPromptsContainer = $('#my-prompts-container');
+        const myForgesContainer = $('#my-forges-container');
+        const myMoldsContainer = $('#my-molds-container');
+        const addPromptButton = $('#add-prompt-button');
+        const addForgeButton = $('#add-forge-button');
+        const addMoldButton = $('#add-mold-button');
+
+        // Chat elements (Left Col)
+        const chatMessages = $('#chat-messages');
+        const chatInput = $('#chat-input');
+        const sendButton = $('#send-button');
+        const prevQuestionButton = $('#prev-question');
+        const nextQuestionButton = $('#next-question');
+        const infoButton = $('#info-button'); // Added
+
+        // Dialogs
+        const contextDialog = $('#context-dialog');
+        const contextDialogTitle = $('#context-dialog-title');
+        const contextEditId = $('#context-edit-id');
+        const contextContent = $('#context-content');
+        const contextComment = $('#context-comment');
+
+        const promptDialog = $('#prompt-dialog');
+        const promptDialogTitle = $('#prompt-dialog-title');
+        const promptEditId = $('#prompt-edit-id');
+        const promptTypeInput = $('#prompt-type');
+        const promptContent = $('#prompt-content');
+        const promptComment = $('#prompt-comment');
+
+        const confirmDialog = $('#confirm-dialog');
+        const confirmDialogTitle = $('#confirm-dialog-title');
+        const confirmDialogMessage = $('#confirm-dialog-message');
+
+        // ======================
+        // === STATE ===
+        // ======================
+
+        // Using localStorage for persistence
+        const storage = {
+            get: (key, defaultValue = []) => {
+                const stored = localStorage.getItem(key);
+                try {
+                    // Stored data is plain text
+                    return stored ? JSON.parse(stored) : defaultValue;
+                } catch (e) {
+                    console.error(`Error parsing localStorage key "${key}":`, e);
+                    return defaultValue;
+                }
+            },
+            set: (key, value) => {
+                 // Save plain text
+                localStorage.setItem(key, JSON.stringify(value));
+            }
+        };
+
+        let savedContexts = storage.get('chim_contexts', [
+            { id: 1, name: "Context 1", content: "function calculateSum(a, b) {\n  return a + b;\n}", isPublic: false, comment: "Basic math function" }, // Added name
+            { id: 2, name: "Context 2", content: "class User {\n  constructor(name, age) {\n    this.name = name;\n    this.age = age;\n  }\n}", isPublic: false, comment: "User class definition" } // Added name
+        ]);
+
+        // Default prompts updated to use bracketed syntax
+        let savedPrompts = storage.get('chim_prompts', [
+            { id: 101, type: "prompt", name: "JS Todo Prompt", content: "[in] javascript [for] web development [create] a simple todo app", isPublic: false, comment: "Basic web app prompt" },
+            { id: 102, type: "forge", name: "Modernize Forge", content: "[forge] [refactor] [using] modern ES6 syntax", isPublic: false, comment: "Code modernization forge" },
+            { id: 103, type: "mold", name: "React Component Mold", content: "[mold] component [for] React [style] functional [with] hooks", isPublic: false, comment: "React component template" }
+        ]);
+
+        const state = {
+            isTabPressed: false,
+            currentQuestionIndex: -1, // Start before the first question
+            confirmCallback: null, // Stores the action to perform on confirmation
+            // *** NEW: Track if info mode is active ***
+             isInfoModeActive: false,
+             lastInfoPromptMessageId: null // Store the ID of the info prompt message
+        };
+
+        // ============================
+        // === CONFIRMATION DIALOG ===
+        // ============================
+
+        function showConfirmDialog(message, title = "Confirm Action", callback) {
+            confirmDialogTitle.textContent = title;
+            confirmDialogMessage.textContent = message;
+            state.confirmCallback = callback;
+            confirmDialog.classList.add('visible');
+        }
+
+        function hideConfirmDialog() {
+            confirmDialog.classList.remove('visible');
+            state.confirmCallback = null;
+        }
+
+        $('[data-action="confirm-cancel"]').addEventListener('click', hideConfirmDialog);
+
+        $('[data-action="confirm-proceed"]').addEventListener('click', () => {
+            if (typeof state.confirmCallback === 'function') {
+                state.confirmCallback();
+            }
+            hideConfirmDialog();
+        });
+
+
+        // ======================
+        // === INITIALIZATION ===
+        // ======================
+
+        function initialize() {
+            renderElementCategories();
+            renderContexts();
+            renderPromptsByType('prompt');
+            renderPromptsByType('forge');
+            renderPromptsByType('mold');
+            // Add initial message (formatting handled by addChatMessage)
+            addChatMessage('assistant', 'What programming language or framework are you using ? ( e.g. , JavaScript , Swift , React )');
+            setupEventListeners();
+            handlePromptChange(); // Initial highlight rendering and button state check
+        }
+
+        // ==========================
+        // === RENDERING FUNCTIONS ===
+        // ==========================
+
+        // *** UPDATED renderElementCategories ***
+        function renderElementCategories() {
+            elementCategoriesContainer.innerHTML = ''; // Clear existing
+            ELEMENT_CATEGORIES.forEach(category => {
+                const categoryDiv = document.createElement('div');
+                categoryDiv.className = 'element-category';
+
+                const title = document.createElement('h4');
+                title.className = 'category-title';
+                title.textContent = category.name;
+                categoryDiv.appendChild(title);
+
+                const buttonsDiv = document.createElement('div');
+                buttonsDiv.className = 'element-buttons';
+
+                category.elements.forEach(element => {
+                    const button = document.createElement('button');
+                    // Use the category name in the class for color styling
+                    button.className = `element-button element-${category.name.toLowerCase().replace(/\s+/g, '-')}`; // Handle spaces in names
+                    button.dataset.element = element.name;
+                    // Display keyword WITHOUT brackets on the button itself
+                    button.textContent = element.name;
+                    button.dataset.isSyntax = category.isSyntax; // Store syntax flag
+
+                    if (element.shortcut) {
+                        button.dataset.shortcut = element.shortcut;
+                        const hint = document.createElement('span');
+                        hint.className = 'shortcut-hint';
+                        hint.textContent = element.shortcut.toUpperCase();
+                        button.appendChild(hint);
+                    }
+
+                    button.addEventListener('click', () => handleElementButtonClick(element.name, button));
+                    buttonsDiv.appendChild(button);
+                });
+
+                categoryDiv.appendChild(buttonsDiv);
+                elementCategoriesContainer.appendChild(categoryDiv);
+            });
+            updateElementButtonStates(); // Sync button states with current prompt
+        }
+
+        // Render Contexts
+        function renderContexts() {
+            myContextsContainer.innerHTML = ''; // Clear container
+            if (savedContexts.length === 0) {
+                myContextsContainer.innerHTML = '<p class="text-muted-foreground text-center p-4">No contexts saved yet. Click "Add New Context" below.</p>';
+                return;
+            }
+            savedContexts.forEach((context, index) => {
+                myContextsContainer.appendChild(createItemCard(context, 'context', index));
+            });
+            storage.set('chim_contexts', savedContexts); // Persist changes
+        }
+
+        // Render Prompts/Forges/Molds
+        function renderPromptsByType(type) {
+            let container;
+            let items = savedPrompts.filter(p => p.type === type);
+            let typeName = type.charAt(0).toUpperCase() + type.slice(1);
+
+            switch (type) {
+                case 'prompt': container = myPromptsContainer; break;
+                case 'forge': container = myForgesContainer; break;
+                case 'mold': container = myMoldsContainer; break;
+                default: return;
+            }
+
+            container.innerHTML = ''; // Clear container
+            if (items.length === 0) {
+                container.innerHTML = `<p class="text-muted-foreground text-center p-4">No ${typeName.toLowerCase()}s saved yet. Click "Add New ${typeName}" below.</p>`;
+                return;
+            }
+            items.forEach((item, index) => {
+                // Find the correct index within the *full* savedPrompts array for consistency if needed,
+                // but for display purposes, using the filtered index might be okay.
+                // Let's stick to the filtered index for the card display for simplicity.
+                container.appendChild(createItemCard(item, type, index)); // Pass filtered index
+            });
+            storage.set('chim_prompts', savedPrompts); // Persist changes
+        }
+
+        // Create a generic card for Contexts, Prompts, Forges, Molds
+        function createItemCard(item, type, displayIndex) { // Use displayIndex passed from render function
+            const card = document.createElement('div');
+            card.className = 'context-card'; // Re-use styling
+            const isContext = type === 'context';
+            const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+            const displayName = item.name || `${typeName} ${displayIndex + 1}`; // Use displayIndex for naming
+            const referenceId = `${type}:${displayIndex + 1}`; // Use displayIndex for reference ID
+
+             // Render content WITH BRACKETS for display in the card, applying color spans
+             let displayContent = escapeHtml(item.content || '');
+             ELEMENT_CATEGORIES.forEach(category => {
+                 category.elements.forEach(element => {
+                     const bracketedElement = `[${element.name}]`;
+                     // Use RegExp to find the literal bracketed element globally
+                     const regex = new RegExp(escapeRegExp(bracketedElement), 'g');
+                     displayContent = displayContent.replace(regex,
+                         // Use a specific class for context card keywords if different styling needed
+                         `<code class="chim-keyword-in-context" style="color: ${category.colorValue};">${bracketedElement}</code>`
+                     );
+                 });
+             });
+
+            card.innerHTML = `
+                <div class="context-header">
+                    <h3 class="font-medium text-lg">${escapeHtml(displayName)}</h3>
+                    <div class="flex items-center gap-4">
+                        <code class="text-sm text-muted-foreground">${referenceId}</code>
+                        <div class="flex items-center gap-1">
+                            <span class="text-sm text-muted-foreground mr-1">${item.isPublic ? 'Public' : 'Private'}</span>
+                            <label class="switch" title="Toggle visibility">
+                                <input type="checkbox" ${item.isPublic ? 'checked' : ''} data-id="${item.id}" data-type="${type}">
+                                <span class="slider"></span>
+                            </label>
+                            <button class="button button-icon" data-action="edit" data-id="${item.id}" data-type="${type}" title="Edit">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"></path><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"></path></svg>
+                            </button>
+                            <button class="button button-icon button-danger" data-action="delete" data-id="${item.id}" data-type="${type}" title="Delete">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"></polyline><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path></svg>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                <div class="context-content">
+                    ${displayContent} {/* Display formatted content directly */}
+                </div>
+                 ${item.comment ? `<div class="context-comment"><span class="font-mono">[maybe]</span> ${escapeHtml(item.comment)}</div>` : ''} {/* Updated comment keyword */}
+            `;
+
+            // --- Add Event Listeners to Card Elements ---
+            card.querySelector('input[type="checkbox"]').addEventListener('change', (e) => {
+                const id = parseInt(e.target.dataset.id);
+                const itemType = e.target.dataset.type;
+                const items = itemType === 'context' ? savedContexts : savedPrompts;
+                const itemIndex = items.findIndex(i => i.id === id);
+                if (itemIndex !== -1) {
+                    items[itemIndex].isPublic = e.target.checked;
+                    // Re-render the specific list
+                    if (itemType === 'context') renderContexts();
+                    else renderPromptsByType(items[itemIndex].type);
+                }
+            });
+            card.querySelector('[data-action="edit"]').addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                const id = parseInt(button.dataset.id);
+                const itemType = button.dataset.type;
+                const items = itemType === 'context' ? savedContexts : savedPrompts;
+                const item = items.find(i => i.id === id);
+                if (item) {
+                    if (itemType === 'context') openContextDialog(item);
+                    else openPromptDialog(item.type, item); // Pass item with plain content
+                }
+            });
+            card.querySelector('[data-action="delete"]').addEventListener('click', (e) => {
+                const button = e.currentTarget;
+                const id = parseInt(button.dataset.id);
+                const itemType = button.dataset.type;
+                const typeName = itemType.charAt(0).toUpperCase() + itemType.slice(1);
+                showConfirmDialog(`Are you sure you want to delete this ${typeName.toLowerCase()}? This action cannot be undone.`, `Delete ${typeName}`, () => {
+                    if (itemType === 'context') {
+                        savedContexts = savedContexts.filter(c => c.id !== id);
+                        renderContexts(); // Re-render contexts
+                    } else {
+                        const deletedItem = savedPrompts.find(p => p.id === id);
+                        if (deletedItem) {
+                            savedPrompts = savedPrompts.filter(p => p.id !== id);
+                            renderPromptsByType(deletedItem.type); // Re-render the specific type list
+                        }
+                    }
+                });
+            });
+            return card;
+        }
+
+        // *** UPDATED renderPromptHighlighting to find existing brackets ***
+        function renderPromptHighlighting(text) {
+            let highlightedText = escapeHtml(text);
+            ELEMENT_CATEGORIES.forEach(category => {
+                category.elements.forEach(element => {
+                    const bracketedElement = `[${element.name}]`;
+                    // Regex to find the literal bracketed element globally
+                    const regex = new RegExp(escapeRegExp(bracketedElement), 'g');
+
+                    // Replace the found bracketed element with a span wrapping it
+                    highlightedText = highlightedText.replace(
+                        regex,
+                        `<span class="chim-element" style="color: ${category.colorValue}; font-weight: 500;">${bracketedElement}</span>` // Wrap existing brackets
+                    );
+                });
+            });
+
+            highlightContainer.innerHTML = highlightedText + '\n'; // Add newline to prevent layout shift
+            // Sync scroll positions using requestAnimationFrame
+            requestAnimationFrame(() => {
+               highlightContainer.scrollTop = promptTextarea.scrollTop;
+               highlightContainer.scrollLeft = promptTextarea.scrollLeft;
+            });
+        }
+
+
+        // ======================
+        // === EVENT HANDLERS ===
+        // ======================
+
+        function handlePromptChange() {
+            renderPromptHighlighting(promptTextarea.value);
+            updateElementButtonStates();
+        }
+
+        // *** UPDATED handleElementButtonClick ***
+        function handleElementButtonClick(elementName, buttonElement) {
+            // Check if info mode is active (i.e., the last message was the info prompt)
+            const allMessages = chatMessages.querySelectorAll('.message');
+            const lastMessageElement = allMessages.length > 0 ? allMessages[allMessages.length - 1] : null;
+            const lastMessageId = lastMessageElement ? lastMessageElement.dataset.messageId : null;
+
+            // Check if the specific info prompt message is the last one
+            if (state.isInfoModeActive && lastMessageId === state.lastInfoPromptMessageId) {
+                 const explanation = KEYWORD_EXPLANATIONS[elementName];
+                 if (explanation) {
+                     // Format explanation with keyword in brackets and colored code tags for other keywords
+                     let formattedExplanation = `<code class="chim-keyword-in-chat" style="color: ${getComputedStyle(buttonElement).color};">[${elementName}]</code>: ${escapeHtml(explanation)}`;
+                     ELEMENT_CATEGORIES.forEach(cat => {
+                         cat.elements.forEach(el => {
+                             // Use word boundaries for replacing other keywords
+                             const regex = new RegExp(`\\b(${escapeRegExp(el.name)})\\b`, 'g');
+                             formattedExplanation = formattedExplanation.replace(regex, (match, p1) => {
+                                 // Don't re-wrap the main keyword being explained if already wrapped
+                                 if (p1 === elementName && match.includes('chim-keyword-in-chat')) return match;
+                                 // Find the color for this element
+                                 let elColor = 'var(--chimwhite)'; // Default color
+                                 const elCat = ELEMENT_CATEGORIES.find(c => c.elements.some(e => e.name === p1));
+                                 if (elCat) elColor = elCat.colorValue;
+
+                                 return `<code class="chim-keyword-in-chat" style="color: ${elColor};">[${p1}]</code>`;
+                             });
+                         });
+                     });
+                     // Highlight example code snippets if present (like `[in] swift`) using the standard inline code style
+                     formattedExplanation = formattedExplanation.replace(/`([^`]+)`/g, (match, p1) => {
+                         let codeHtml = escapeHtml(p1);
+                         // Colorize keywords within the backticks if needed
+                         ELEMENT_CATEGORIES.forEach(cat => {
+                             cat.elements.forEach(el => {
+                                 const regex = new RegExp(`\\b(${escapeRegExp(el.name)})\\b`, 'g');
+                                 codeHtml = codeHtml.replace(regex, `<span style="color: ${cat.colorValue}; font-weight: 500;">[${el.name}]</span>`);
+                             });
+                         });
+                         // Use the general inline code class
+                         return `<code class="inline-code-example">${codeHtml}</code>`;
+                     });
+
+
+                     addChatMessage('assistant', formattedExplanation, false); // Add explanation without setting info mode again
+                 } else {
+                     addChatMessage('assistant', `Sorry, I don't have an explanation for <code class="chim-keyword-in-chat" style="color: ${getComputedStyle(buttonElement).color};">[${elementName}]</code> yet.`, false);
+                 }
+                 state.isInfoModeActive = false; // Deactivate info mode after showing explanation
+                 state.lastInfoPromptMessageId = null;
+                 return; // Stop further execution (don't insert element)
+            }
+
+
+            // --- Normal element insertion/removal ---
+            if (buttonElement.disabled) {
+                 buttonElement.animate([ { transform: 'translateX(-3px)' }, { transform: 'translateX(3px)' }, { transform: 'translateX(0)' } ], { duration: 300, iterations: 1 });
+                 return;
+            }
+            toggleBracketedElement(elementName); // *** Use the updated function ***
+            promptTextarea.focus();
+             // Deactivate info mode if user inserts an element instead of clicking after info prompt
+             state.isInfoModeActive = false;
+             state.lastInfoPromptMessageId = null;
+        }
+
+        // Tab Switching Logic - No changes needed here
+        function handleTabSwitch(containerElement) {
+            containerElement.addEventListener('click', (e) => {
+                const clickedTab = e.target.closest('.tab');
+                if (!clickedTab || clickedTab.classList.contains('active')) return;
+
+                const isSubtab = clickedTab.hasAttribute('data-subtab');
+                const targetAttr = isSubtab ? 'data-subtab' : 'data-tab';
+                const targetValue = clickedTab.getAttribute(targetAttr);
+                const contentPrefix = isSubtab ? '#subtab-' : '#tab-';
+                const targetContentId = contentPrefix + targetValue;
+
+                const tabList = clickedTab.closest('.tab-list');
+                const allTabsInList = tabList.querySelectorAll('.tab');
+
+                const parentTabsContainer = clickedTab.closest('.tabs');
+                 if (!parentTabsContainer) return;
+                const allContentPanes = parentTabsContainer.querySelectorAll(`:scope > .tab-content`); // Select direct children only
+
+                allTabsInList.forEach(tab => tab.classList.remove('active'));
+                allContentPanes.forEach(content => content.classList.remove('active'));
+                clickedTab.classList.add('active');
+                const targetContent = $(targetContentId);
+                if (targetContent) targetContent.classList.add('active');
+                else console.warn(`Tab content not found for ID: ${targetContentId}`);
+            });
+        }
+
+
+        function sendChatMessage() {
+            const message = chatInput.value.trim();
+            if (!message) return;
+            addChatMessage('user', message); // Add user message (will be escaped)
+            chatInput.value = '';
+            state.currentQuestionIndex = -1;
+            // Deactivate info mode on sending message
+            state.isInfoModeActive = false;
+            state.lastInfoPromptMessageId = null;
+            setTimeout(() => {
+                let response = "Processing your request... ";
+                 // Basic response logic based on keywords (no brackets)
+                 if (message.toLowerCase().includes("hello") || message.toLowerCase().includes("hi")) {
+                     response = "Hello there! How can I help you with Chim today?";
+                 } else if (ELEMENT_CATEGORIES.some(cat => cat.elements.some(el => message.toLowerCase().includes(el.name)))) {
+                     // Format response to highlight keywords
+                     let formattedResponse = `Okay, I see you're using Chim elements: "${escapeHtml(message)}". In a real scenario, I would process this prompt.`;
+                      ELEMENT_CATEGORIES.forEach(cat => {
+                          cat.elements.forEach(el => {
+                              const regex = new RegExp(`\\b(${escapeRegExp(el.name)})\\b`, 'gi'); // Case-insensitive match
+                              formattedResponse = formattedResponse.replace(regex, `<code class="chim-keyword-in-chat" style="color: ${cat.colorValue};">[${el.name}]</code>`);
+                          });
+                      });
+                     response = formattedResponse;
+                 } else {
+                     response = `Thanks for your message: "${escapeHtml(message)}". Ask me about Chim syntax or try building a prompt!`;
+                 }
+                addChatMessage('assistant', response); // Add assistant response (will be formatted)
+            }, 600 + Math.random() * 500);
+        }
+
+        function navigateQuestionHistory(direction) {
+            const newIndex = state.currentQuestionIndex + direction;
+            if (newIndex >= -1 && newIndex < QUESTIONS.length) {
+                state.currentQuestionIndex = newIndex;
+                 // Display sample questions without brackets/asterisks
+                 let questionText = (newIndex === -1) ? '' : QUESTIONS[QUESTIONS.length - 1 - newIndex];
+                 chatInput.value = questionText.replace(/\[|\]|\*/g, ''); // Remove brackets and asterisks
+                 chatInput.focus();
+                 chatInput.selectionStart = chatInput.selectionEnd = chatInput.value.length;
+                  // Deactivate info mode when navigating history
+                  state.isInfoModeActive = false;
+                  state.lastInfoPromptMessageId = null;
+            }
+        }
+
+        function openContextDialog(contextToEdit = null) {
+            if (contextToEdit) {
+                contextDialogTitle.textContent = "Edit Context";
+                contextEditId.value = contextToEdit.id;
+                contextContent.value = contextToEdit.content; // Content is already plain text
+                contextComment.value = contextToEdit.comment || '';
+            } else {
+                contextDialogTitle.textContent = "Add New Context";
+                contextEditId.value = ''; contextContent.value = ''; contextComment.value = '';
+            }
+            contextDialog.classList.add('visible'); contextContent.focus();
+        }
+        function closeContextDialog() { contextDialog.classList.remove('visible'); }
+
+        function openPromptDialog(type, itemToEdit = null) {
+            const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+            if (itemToEdit) {
+                promptDialogTitle.textContent = `Edit ${typeName}`;
+                promptEditId.value = itemToEdit.id; promptTypeInput.value = itemToEdit.type;
+                // Display plain content in the dialog
+                promptContent.value = itemToEdit.content || ''; // Already plain text
+                promptComment.value = itemToEdit.comment || '';
+            } else {
+                promptDialogTitle.textContent = `Add New ${typeName}`;
+                promptEditId.value = ''; promptTypeInput.value = type;
+                promptContent.value = ''; promptComment.value = '';
+            }
+            promptDialog.classList.add('visible'); promptContent.focus();
+        }
+        function closePromptDialog() { promptDialog.classList.remove('visible'); }
+
+        function saveContext() {
+            const content = contextContent.value.trim();
+            if (!content) { alert("Context content cannot be empty."); return; }
+            const comment = contextComment.value.trim();
+            const id = parseInt(contextEditId.value);
+            if (id) {
+                const index = savedContexts.findIndex(c => c.id === id);
+                if (index !== -1) {
+                    savedContexts[index].content = content; // Save plain text
+                    savedContexts[index].comment = comment;
+                    // Keep existing name if editing
+                }
+            } else {
+                const newId = Date.now();
+                let maxNum = 0;
+                // Find the highest existing "Context X" number to avoid collisions if user deletes/adds
+                savedContexts.forEach(c => {
+                    const match = (c.name || "").match(/^Context (\d+)$/);
+                    if (match && parseInt(match[1]) > maxNum) maxNum = parseInt(match[1]);
+                });
+                const newName = `Context ${maxNum + 1}`;
+                savedContexts.push({ id: newId, name: newName, content, isPublic: false, comment }); // Save plain text
+            }
+            renderContexts(); closeContextDialog();
+        }
+
+        function savePromptItem() {
+            // Get plain content from dialog
+            const content = promptContent.value.trim();
+            if (!content) { alert("Item content cannot be empty."); return; }
+
+            const comment = promptComment.value.trim();
+            const type = promptTypeInput.value;
+            const id = parseInt(promptEditId.value);
+            const typeName = type.charAt(0).toUpperCase() + type.slice(1);
+
+            if (id) {
+                const index = savedPrompts.findIndex(p => p.id === id);
+                if (index !== -1) {
+                    savedPrompts[index].content = content; // Save plain text
+                    savedPrompts[index].comment = comment;
+                    savedPrompts[index].type = type; // Allow changing type? Maybe not needed.
+                    // Keep existing name if editing
+                }
+            } else {
+                const newId = Date.now();
+                 let maxNum = 0;
+                 // Find highest existing "Type X" number for the specific type
+                 savedPrompts.filter(p => p.type === type).forEach(p => {
+                     const match = (p.name || "").match(new RegExp(`^${typeName} (\\d+)$`));
+                     if (match && parseInt(match[1]) > maxNum) maxNum = parseInt(match[1]);
+                 });
+                 const newName = `${typeName} ${maxNum + 1}`;
+                 savedPrompts.push({ id: newId, type, name: newName, content, isPublic: false, comment }); // Save plain text
+            }
+            renderPromptsByType(type); closePromptDialog();
+        }
+
+
+        function handleKeyDown(e) {
+            if (e.key === 'Tab' && !e.shiftKey && !e.ctrlKey && !e.altKey && !e.metaKey) {
+                 if (!['INPUT', 'TEXTAREA'].includes(document.activeElement.tagName)) {
+                     e.preventDefault(); // Prevent default tab navigation outside inputs
+                 }
+                 // Allow default tab behavior *within* dialogs
+                 if (!e.target.closest('.dialog')) {
+                    state.isTabPressed = true; bodyElement.classList.add('show-shortcuts');
+                 }
+            }
+            else if (state.isTabPressed && SHORTCUT_MAP[e.key]) {
+                e.preventDefault();
+                const { name: elementName } = SHORTCUT_MAP[e.key];
+                const button = $(`[data-shortcut="${e.key}"]`);
+                // *** Check info mode activation before shortcut action ***
+                const allMessages = chatMessages.querySelectorAll('.message');
+                const lastMessageElement = allMessages.length > 0 ? allMessages[allMessages.length - 1] : null;
+                const lastMessageId = lastMessageElement ? lastMessageElement.dataset.messageId : null;
+
+                if (state.isInfoModeActive && lastMessageId === state.lastInfoPromptMessageId) {
+                    // If info mode is active via shortcut, show explanation
+                     handleElementButtonClick(elementName, button); // Reuse button click logic for explanation
+                     // Need to manually release tab state if shortcut used for info
+                     state.isTabPressed = false;
+                     bodyElement.classList.remove('show-shortcuts');
+                     return; // Prevent insertion
+                }
+
+                // If not info mode, proceed with insertion/removal
+                if (button && button.disabled) {
+                     button.animate([ { transform: 'translateX(-3px)' }, { transform: 'translateX(3px)' }, { transform: 'translateX(0)' } ], { duration: 300, iterations: 1 });
+                     return;
+                }
+                toggleBracketedElement(elementName); // *** Use the updated function ***
+                 // Deactivate info mode if user inserts an element via shortcut
+                 state.isInfoModeActive = false;
+                 state.lastInfoPromptMessageId = null;
+            }
+            else if (document.activeElement === chatInput) {
+                if (e.key === 'ArrowUp') { e.preventDefault(); navigateQuestionHistory(1); }
+                else if (e.key === 'ArrowDown') { e.preventDefault(); navigateQuestionHistory(-1); }
+            }
+            else if (e.key === 'Enter' && !e.shiftKey && document.activeElement === chatInput) {
+                e.preventDefault(); sendChatMessage();
+            }
+            else if (e.key === 'Escape') {
+                if (contextDialog.classList.contains('visible')) closeContextDialog();
+                else if (promptDialog.classList.contains('visible')) closePromptDialog();
+                else if (confirmDialog.classList.contains('visible')) hideConfirmDialog();
+                 // Also deactivate info mode on Escape
+                 state.isInfoModeActive = false;
+                 state.lastInfoPromptMessageId = null;
+            }
+        }
+
+        function handleKeyUp(e) {
+            if (e.key === 'Tab') {
+                state.isTabPressed = false; bodyElement.classList.remove('show-shortcuts');
+            }
+        }
+
+        // ======================
+        // === HELPER FUNCTIONS ===
+        // ======================
+
+        // *** UPDATED addChatMessage to correctly format examples ***
+        function addChatMessage(role, content, activateInfoModeOnClick = false) {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${role}`;
+            const messageId = `msg-${Date.now()}-${Math.random().toString(36).substring(2, 9)}`;
+            messageDiv.dataset.messageId = messageId;
+
+            const bubbleDiv = document.createElement('div');
+            bubbleDiv.className = 'message-bubble';
+
+            let formattedContent = escapeHtml(content); // Start by escaping the whole message
+
+            if (role === 'assistant') {
+                // --- Order of operations is important ---
+
+                // 1. Format backticked code first (most specific)
+                 formattedContent = formattedContent.replace(/`([^`]+)`/g, (match, p1) => {
+                     let codeHtml = escapeHtml(p1); // Re-escape inner content
+                     // Optionally color keywords inside backticks
+                     ELEMENT_CATEGORIES.forEach(cat => {
+                         cat.elements.forEach(el => {
+                             const regex = new RegExp(`\\b(${escapeRegExp(el.name)})\\b`, 'g');
+                             codeHtml = codeHtml.replace(regex, `<span style="color: ${cat.colorValue}; font-weight: 500;">[${el.name}]</span>`);
+                         });
+                     });
+                     return `<code class="inline-code-example">${codeHtml}</code>`;
+                 });
+
+                // 2. Format specific examples (JavaScript, Swift, React)
+                const examples = ['JavaScript', 'Swift', 'React'];
+                examples.forEach(ex => {
+                    // Use a regex that handles word boundaries and avoids matching inside existing HTML tags
+                    const exampleRegex = new RegExp(`(?<![\\w<])${escapeRegExp(ex)}(?![\\w>])`, 'g');
+                    formattedContent = formattedContent.replace(exampleRegex, `<code class="inline-code-example">${ex}</code>`);
+                });
+
+                // 3. Format bracketed keywords
+                ELEMENT_CATEGORIES.forEach(cat => {
+                    cat.elements.forEach(el => {
+                        const bracketedElement = `[${el.name}]`;
+                        // Regex for the literal bracketed string, avoiding matches inside tags
+                        const keywordRegex = new RegExp(`(?<!<[^>]*)${escapeRegExp(bracketedElement)}(?![^<]*>)`, 'g');
+                        formattedContent = formattedContent.replace(keywordRegex, `<code class="chim-keyword-in-chat" style="color: ${cat.colorValue};">${bracketedElement}</code>`);
+                    });
+                });
+
+            }
+            // User messages remain escaped plain text unless further formatting is desired
+
+            bubbleDiv.innerHTML = formattedContent; // Set the fully formatted HTML
+
+            messageDiv.appendChild(bubbleDiv);
+            chatMessages.appendChild(messageDiv);
+            chatMessages.scrollTo({ top: chatMessages.scrollHeight, behavior: 'smooth' });
+
+            // Activate/Deactivate info mode state
+             if (activateInfoModeOnClick && role === 'assistant' && content.startsWith('Click on any element button')) { // Make condition more robust
+                 state.isInfoModeActive = true;
+                 state.lastInfoPromptMessageId = messageId;
+             } else if (role === 'user' || (role === 'assistant' && !activateInfoModeOnClick)) {
+                 state.isInfoModeActive = false;
+                 state.lastInfoPromptMessageId = null;
+             }
+        }
+
+
+        // *** UPDATED function to toggle bracketed elements ***
+        function toggleBracketedElement(elementName) {
+            const currentText = promptTextarea.value;
+            const bracketedElement = `[${elementName}]`; // Target string with brackets
+            // Regex to find the literal bracketed string, escaping the brackets
+            const regexBracketed = new RegExp(escapeRegExp(bracketedElement), 'g');
+            const matches = [...currentText.matchAll(regexBracketed)];
+
+            let newText = currentText;
+            let newCursorPos = promptTextarea.selectionStart;
+            const startPos = promptTextarea.selectionStart;
+            const endPos = promptTextarea.selectionEnd;
+
+            let removed = false;
+
+            // Try to remove based on cursor position (touching or inside)
+            if (startPos === endPos && matches.length > 0) {
+                for (const match of matches) {
+                    const matchStart = match.index;
+                    const matchEnd = matchStart + match[0].length;
+                    // Check if cursor is within or immediately adjacent to the bracketed element
+                    if (startPos >= matchStart && startPos <= matchEnd) {
+                        // Adjust removal to include one adjacent space if appropriate
+                        let removalStart = matchStart;
+                        let removalEnd = matchEnd;
+
+                        // Check for space before AND after (and not at start/end of string)
+                        const spaceBefore = matchStart > 0 && currentText[matchStart - 1] === ' ';
+                        const spaceAfter = matchEnd < currentText.length && currentText[matchEnd] === ' ';
+
+                        if (spaceBefore && spaceAfter) {
+                            // Remove element and ONE space (prefer removing the trailing one)
+                            removalEnd = matchEnd + 1;
+                        } else if (spaceBefore && !spaceAfter) {
+                             // Remove element and the preceding space
+                            removalStart = matchStart -1;
+                        } else if (!spaceBefore && spaceAfter) {
+                            // Remove element and the trailing space
+                            removalEnd = matchEnd + 1;
+                        }
+                        // Else (no spaces around), just remove the element itself
+
+                        newText = currentText.substring(0, removalStart) + currentText.substring(removalEnd);
+                        newCursorPos = removalStart;
+                        removed = true;
+                        break; // Remove only the first match at the cursor
+                    }
+                }
+            }
+
+            // If not removed by cursor, try removing the last occurrence as fallback
+            if (!removed && matches.length > 0) {
+                const lastMatch = matches[matches.length - 1];
+                const matchStart = lastMatch.index;
+                const matchEnd = matchStart + lastMatch[0].length;
+                // Same spacing logic as above
+                let removalStart = matchStart;
+                let removalEnd = matchEnd;
+                const spaceBefore = matchStart > 0 && currentText[matchStart - 1] === ' ';
+                const spaceAfter = matchEnd < currentText.length && currentText[matchEnd] === ' ';
+
+                if (spaceBefore && spaceAfter) {
+                    removalEnd = matchEnd + 1;
+                } else if (spaceBefore && !spaceAfter) {
+                    removalStart = matchStart - 1;
+                } else if (!spaceBefore && spaceAfter) {
+                    removalEnd = matchEnd + 1;
+                }
+
+                newText = currentText.substring(0, removalStart) + currentText.substring(removalEnd);
+                // Adjust cursor position based on where the removal happened relative to the original cursor
+                const removedLength = removalEnd - removalStart;
+                if (startPos >= removalEnd) { // Cursor was after the removed part
+                    newCursorPos = startPos - removedLength;
+                } else if (startPos > removalStart) { // Cursor was inside the removed part
+                    newCursorPos = removalStart;
+                } else { // Cursor was before the removed part
+                    newCursorPos = startPos;
+                }
+                removed = true;
+            }
+
+
+            if (!removed) {
+                // Element doesn't exist or wasn't removed, ADD it
+                let prefix = '';
+                const textBeforeCursor = currentText.substring(0, startPos);
+                // Add a space before if needed (not empty and doesn't already end with whitespace)
+                if (textBeforeCursor.length > 0 && !/\s$/.test(textBeforeCursor)) {
+                    prefix = ' ';
+                }
+
+                // Add space AFTER the element tag as well
+                const elementToAdd = prefix + bracketedElement + ' ';
+
+                newText = currentText.substring(0, startPos) + elementToAdd + currentText.substring(endPos);
+                newCursorPos = startPos + elementToAdd.length;
+            }
+
+            // Clean up extra spaces after modification
+            newText = newText.replace(/\s{2,}/g, ' ').trim(); // Consolidate spaces and trim ends
+
+            promptTextarea.value = newText;
+            // Use rAF to ensure cursor position is set after potential reflow
+            requestAnimationFrame(() => {
+                // Recalculate cursor position based on the *final* cleaned text if needed,
+                // but simply clamping is often sufficient unless complex replacements happened.
+                const finalCursorPos = Math.min(newCursorPos, newText.length);
+                promptTextarea.selectionStart = promptTextarea.selectionEnd = finalCursorPos;
+                promptTextarea.focus(); // Keep focus
+                handlePromptChange(); // Trigger highlighting and button state update AFTER text/cursor is set
+            });
+        }
+
+
+        // *** UPDATED updateElementButtonStates to check for brackets ***
+        function updateElementButtonStates() {
+            const currentText = promptTextarea.value;
+            // Regex to find a plain syntax word potentially followed only by whitespace at the end
+            // (Keep this logic for disabling, as user types plain word first)
+            const syntaxEndRegex = /\b([a-zA-Z]+)\s*$/;
+            const match = currentText.match(syntaxEndRegex);
+
+            let isEndingInSyntaxWord = false;
+            let lastElementNamePlain = null;
+
+            if (match) {
+                lastElementNamePlain = match[1]; // The plain word
+                if (ELEMENT_SYNTAX_STATUS[lastElementNamePlain] === true) {
+                    isEndingInSyntaxWord = true;
+                }
+            }
+
+            $$('.element-button').forEach(button => {
+                const elementName = button.dataset.element;
+                const bracketedElement = `[${elementName}]`;
+                // Regex to check if the bracketed element exists anywhere
+                const elementRegexBracketed = new RegExp(escapeRegExp(bracketedElement));
+                const isSelected = elementRegexBracketed.test(currentText);
+
+                // --- Selected State ---
+                button.classList.toggle('selected', isSelected);
+
+                // --- Display Text (Always plain word on button) ---
+                // Find the hint span if it exists
+                const hintSpan = button.querySelector('.shortcut-hint');
+                button.textContent = elementName; // Set text content first
+                if (hintSpan) {
+                    button.appendChild(hintSpan); // Re-append hint if it was there
+                }
+
+
+                // --- Disabled State ---
+                let isDisabled = false;
+                let title = ""; // Default empty title
+
+                // If ending in a plain syntax word, disable ALL OTHER buttons
+                if (isEndingInSyntaxWord && elementName !== lastElementNamePlain) {
+                    isDisabled = true;
+                    title = "Type description after syntax element first";
+                }
+
+                button.disabled = isDisabled;
+                button.title = isDisabled ? title : ""; // Set title only if disabled
+            });
+        }
+
+
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') return unsafe;
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+        // Utility function needs to escape brackets for regex
+        function escapeRegExp(string) {
+             // Escape characters with special meaning in RegExp AND escape brackets
+             return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+         }
+
+        // ============================
+        // === SETUP EVENT LISTENERS ===
+        // ============================
+        function setupEventListeners() {
+            // Prompt Textarea Input & Scroll
+            promptTextarea.addEventListener('input', handlePromptChange);
+            promptTextarea.addEventListener('scroll', () => {
+                // Sync scroll positions using requestAnimationFrame
+                requestAnimationFrame(() => {
+                    highlightContainer.scrollTop = promptTextarea.scrollTop;
+                    highlightContainer.scrollLeft = promptTextarea.scrollLeft;
+                });
+            });
+
+            // Copy Button
+            copyButton.addEventListener('click', () => {
+                navigator.clipboard.writeText(promptTextarea.value).then(() => {
+                    const originalIcon = copyButton.innerHTML;
+                    copyButton.innerHTML = `<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"></polyline></svg>`;
+                    copyButton.title = "Copied!";
+                    setTimeout(() => { copyButton.innerHTML = originalIcon; copyButton.title = "Copy prompt"; }, 1500);
+                }).catch(err => console.error('Failed to copy text: ', err));
+            });
+
+            // Tab Switching
+            handleTabSwitch(mainTabsContainer);
+            handleTabSwitch(contextsTabsContainer);
+            handleTabSwitch(promptsTabsContainer);
+
+            // Chat Input & Buttons
+            sendButton.addEventListener('click', sendChatMessage);
+            prevQuestionButton.addEventListener('click', () => navigateQuestionHistory(1));
+            nextQuestionButton.addEventListener('click', () => navigateQuestionHistory(-1));
+             // *** Updated Info Button Listener ***
+             infoButton?.addEventListener('click', () => {
+                 // Send the prompt message and set the flag to activate info mode
+                 addChatMessage('assistant', 'Click on any element button on the right to learn more about it.', true);
+             });
+            chatInput.addEventListener('keydown', (e) => {
+                 if (e.key === 'Enter' && !e.shiftKey) {
+                     e.preventDefault();
+                     sendChatMessage();
+                 }
+             });
+
+
+            // "Add New" Buttons
+            addContextButton.addEventListener('click', () => openContextDialog());
+            addPromptButton.addEventListener('click', () => openPromptDialog('prompt'));
+            addForgeButton.addEventListener('click', () => openPromptDialog('forge'));
+            addMoldButton.addEventListener('click', () => openPromptDialog('mold'));
+
+            // Dialog Actions
+            contextDialog.addEventListener('click', (e) => {
+                const action = e.target.closest('[data-action]')?.dataset.action;
+                if (action === 'save-context') saveContext();
+                // Close if clicking overlay directly or cancel button
+                if (action === 'cancel-context' || e.target === contextDialog) closeContextDialog();
+            });
+            promptDialog.addEventListener('click', (e) => {
+                const action = e.target.closest('[data-action]')?.dataset.action;
+                if (action === 'save-prompt') savePromptItem();
+                if (action === 'cancel-prompt' || e.target === promptDialog) closePromptDialog();
+            });
+             confirmDialog.addEventListener('click', (e) => {
+                 // Close only if clicking overlay directly
+                 if (e.target === confirmDialog) hideConfirmDialog();
+             });
+
+
+            // Global Keyboard Listeners
+            document.addEventListener('keydown', handleKeyDown);
+            document.addEventListener('keyup', handleKeyUp);
+
+        }
+        // ======================
+        // === START THE APP ===
+        // ======================
+        document.addEventListener('DOMContentLoaded', initialize);
+    </script>
+</body>
+</html>

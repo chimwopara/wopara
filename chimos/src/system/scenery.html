@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Real-Time Daylight Scene</title>
+    <style>
+        body { margin: 0; overflow: hidden; font-family: 'Inter', sans-serif; background-color: #000; color: #fff; }
+        canvas { display: block; }
+        #info {
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            padding: 10px;
+            background-color: rgba(0,0,0,0.5);
+            border-radius: 8px;
+            color: white;
+            font-size: 14px;
+        }
+        /* Basic styling for message box */
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #333;
+            color: white;
+            padding: 15px 25px;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            z-index: 1000;
+            display: none; /* Hidden by default */
+            font-size: 16px;
+            text-align: center;
+        }
+    </style>
+</head><body>
+
+    <div id="info">
+        Current Time: <span id="currentTimeDisplay">Loading...</span><br>
+        Drag to look around. Scroll to zoom.
+    </div>
+    <div id="messageBox" class="message-box"></div>
+
+    <script type="importmap">
+        {
+            "imports": {
+                "three": "https://cdn.jsdelivr.net/npm/three@0.128.0/build/three.module.js",
+                "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.128.0/examples/jsm/"
+            }
+        }
+    </script>
+
+    <script type="module">
+        // Import necessary Three.js modules
+        import * as THREE from 'three';
+        import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+        import { Sky } from 'three/addons/objects/Sky.js';
+
+        // Declare variables for scene, camera, renderer, etc.
+        let scene, camera, renderer, controls;
+        let sky, sun;
+        let ground, river;
+        const trees = [];
+        const animals = [];
+        const cityBuildings = [];
+
+        // DOM Elements
+        const currentTimeDisplay = document.getElementById('currentTimeDisplay');
+        const messageBox = document.getElementById('messageBox');
+
+        // Function to display messages
+        function showMessage(message, duration = 3000) {
+            messageBox.textContent = message;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, duration);
+        }
+
+        // Initialize the 3D scene
+        function init() {
+            // Scene
+            scene = new THREE.Scene();
+
+            // Camera
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+            camera.position.set(0, 20, 50); // Start a bit elevated and back
+
+            // Renderer
+            renderer = new THREE.WebGLRenderer({ antialias: true });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.setPixelRatio(window.devicePixelRatio);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap; // Softer shadows
+            renderer.toneMapping = THREE.ACESFilmicToneMapping; // For better color grading with Sky
+            renderer.toneMappingExposure = 0.5;
+            document.body.appendChild(renderer.domElement);
+
+            // OrbitControls for camera interaction
+            controls = new OrbitControls(camera, renderer.domElement);
+            controls.enableDamping = true; // Smooth camera movement
+            controls.dampingFactor = 0.05;
+            controls.screenSpacePanning = false;
+            controls.minDistance = 5; // Don't get too close
+            controls.maxDistance = 500; // Don't zoom out too far
+            controls.maxPolarAngle = Math.PI / 2 - 0.05; // Don't go below ground
+            controls.target.set(0, 10, 0); // Look slightly up from the origin
+
+            // Lighting
+            // Ambient light provides overall illumination
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.2); // Low intensity, Sky will do most work
+            scene.add(ambientLight);
+
+            // Directional light (simulates the sun, works with Sky object)
+            // This light is mostly for casting shadows from objects other than the Sky's own sun effect
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(50, 200, 100); // Initial position, will be updated by Sky
+            directionalLight.castShadow = true;
+            directionalLight.shadow.mapSize.width = 2048;
+            directionalLight.shadow.mapSize.height = 2048;
+            directionalLight.shadow.camera.near = 0.5;
+            directionalLight.shadow.camera.far = 500;
+            directionalLight.shadow.camera.left = -100;
+            directionalLight.shadow.camera.right = 100;
+            directionalLight.shadow.camera.top = 100;
+            directionalLight.shadow.camera.bottom = -100;
+            scene.add(directionalLight);
+            // scene.add(new THREE.CameraHelper(directionalLight.shadow.camera)); // For debugging shadow camera
+
+            // Sky
+            sky = new Sky();
+            sky.scale.setScalar(450000); // A large sky dome
+            scene.add(sky);
+
+            sun = new THREE.Vector3(); // This vector will represent the sun's direction
+
+            // Ground
+            const groundGeometry = new THREE.PlaneGeometry(1000, 1000);
+            const groundMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x556B2F, // Dark olive green
+                roughness: 0.8,
+                metalness: 0.2 
+            });
+            ground = new THREE.Mesh(groundGeometry, groundMaterial);
+            ground.rotation.x = -Math.PI / 2; // Rotate to be flat
+            ground.receiveShadow = true;
+            scene.add(ground);
+
+            // River
+            const riverGeometry = new THREE.PlaneGeometry(80, 500); // Long and relatively narrow
+            const riverMaterial = new THREE.MeshStandardMaterial({
+                color: 0x30689c, // Bluish color
+                roughness: 0.1,
+                metalness: 0.8,
+                transparent: true,
+                opacity: 0.8,
+                envMapIntensity: 0.5 // Reflect sky a bit
+            });
+            river = new THREE.Mesh(riverGeometry, riverMaterial);
+            river.rotation.x = -Math.PI / 2;
+            river.position.set(0, 0.1, -150); // Position it in front, beyond the initial view
+            river.receiveShadow = true; // Though it won't cast much shadow itself
+            scene.add(river);
+
+
+            // Create scene objects
+            createTrees(50);
+            createAnimals(15);
+            createCity(0, -350, 30); // Place city far beyond the river
+
+            // Update environment based on initial time
+            updateEnvironmentToCurrentTime();
+
+            // Handle window resize
+            window.addEventListener('resize', onWindowResize, false);
+
+            // Start animation loop
+            animate();
+            showMessage("Scene loaded. Welcome!", 3000);
+        }
+
+        // Create trees
+        function createTrees(count) {
+            const treeMaterialTrunk = new THREE.MeshStandardMaterial({ color: 0x8B4513 }); // Brown
+            const treeMaterialLeaves = new THREE.MeshStandardMaterial({ color: 0x228B22 }); // Forest green
+
+            for (let i = 0; i < count; i++) {
+                const treeGroup = new THREE.Group();
+
+                // Trunk
+                const trunkHeight = Math.random() * 10 + 10; // 10 to 20 units high
+                const trunkRadius = trunkHeight / 10;
+                const trunkGeometry = new THREE.CylinderGeometry(trunkRadius * 0.7, trunkRadius, trunkHeight, 8);
+                const trunk = new THREE.Mesh(trunkGeometry, treeMaterialTrunk);
+                trunk.position.y = trunkHeight / 2;
+                trunk.castShadow = true;
+                trunk.receiveShadow = true;
+                treeGroup.add(trunk);
+
+                // Leaves (cone or sphere)
+                const leavesHeight = trunkHeight * (Math.random() * 0.5 + 0.8); // Proportionate to trunk
+                const leavesRadius = trunkRadius * (Math.random() * 2 + 3);
+                let leaves;
+                if (Math.random() > 0.5) {
+                    const coneGeometry = new THREE.ConeGeometry(leavesRadius, leavesHeight, 8);
+                    leaves = new THREE.Mesh(coneGeometry, treeMaterialLeaves);
+                    leaves.position.y = trunkHeight + leavesHeight / 2 - 2; // Adjust to sit on trunk
+                } else {
+                    const sphereGeometry = new THREE.SphereGeometry(leavesRadius * 0.7, 8, 6);
+                    leaves = new THREE.Mesh(sphereGeometry, treeMaterialLeaves);
+                    leaves.position.y = trunkHeight + leavesRadius * 0.5;
+                }
+                leaves.castShadow = true;
+                leaves.receiveShadow = true;
+                treeGroup.add(leaves);
+                
+                // Position tree randomly, avoiding river area for most
+                let posX, posZ;
+                do {
+                    posX = (Math.random() - 0.5) * 600; // Spread them out
+                    posZ = (Math.random() - 0.5) * 600;
+                } while (posZ > river.position.z - 50 && posZ < river.position.z + 50 && Math.abs(posX) < 40); // Avoid placing directly on river path
+
+                treeGroup.position.set(posX, 0, posZ);
+                scene.add(treeGroup);
+                trees.push(treeGroup);
+            }
+        }
+
+        // Create simple "animals" (spheres)
+        function createAnimals(count) {
+            const animalMaterial = new THREE.MeshStandardMaterial({ color: 0x777777 }); // Grey
+            for (let i = 0; i < count; i++) {
+                const animalSize = Math.random() * 1 + 0.5; // Small size
+                const animalGeometry = new THREE.SphereGeometry(animalSize, 8, 6);
+                const animal = new THREE.Mesh(animalGeometry, animalMaterial);
+                
+                let posX, posZ;
+                 do {
+                    posX = (Math.random() - 0.5) * 400; 
+                    posZ = (Math.random() - 0.5) * 400;
+                } while (posZ > river.position.z - 60 && posZ < river.position.z + 60 && Math.abs(posX) < 50);
+
+
+                animal.position.set(posX, animalSize / 2, posZ);
+                animal.castShadow = true;
+                animal.receiveShadow = true;
+
+                // Store movement parameters
+                animal.userData.velocity = new THREE.Vector3(
+                    (Math.random() - 0.5) * 0.1, // Slower movement
+                    0,
+                    (Math.random() - 0.5) * 0.1
+                );
+                animal.userData.wanderTime = 0;
+                animal.userData.maxWanderTime = Math.random() * 100 + 100; // Change direction every few seconds
+
+                scene.add(animal);
+                animals.push(animal);
+            }
+        }
+        
+        // Update animal positions
+        function updateAnimals(deltaTime) {
+            const cameraAvoidDistance = 30; // Animals stay this far from camera's XZ position
+            const worldBoundary = 300; // Keep animals within this range from origin
+
+            animals.forEach(animal => {
+                animal.userData.wanderTime += deltaTime * 60; // Assuming deltaTime is in seconds, roughly
+                if (animal.userData.wanderTime > animal.userData.maxWanderTime) {
+                    animal.userData.velocity.set(
+                        (Math.random() - 0.5) * 0.1,
+                        0,
+                        (Math.random() - 0.5) * 0.1
+                    );
+                    animal.userData.wanderTime = 0;
+                    animal.userData.maxWanderTime = Math.random() * 100 + 200;
+                }
+
+                animal.position.add(animal.userData.velocity);
+
+                // Boundary checks (simple bounce)
+                if (Math.abs(animal.position.x) > worldBoundary) animal.userData.velocity.x *= -1;
+                if (Math.abs(animal.position.z) > worldBoundary) animal.userData.velocity.z *= -1;
+                
+                // River avoidance (simple)
+                if (animal.position.z > river.position.z - 45 && animal.position.z < river.position.z + 45 && Math.abs(animal.position.x) < 45) {
+                    animal.userData.velocity.z *= -1; // Turn around if hits river general area
+                    animal.position.add(animal.userData.velocity); // Move out a bit
+                }
+
+
+                // Avoid camera (player) - simple XZ check
+                const distToCameraXZ = Math.sqrt(
+                    Math.pow(animal.position.x - camera.position.x, 2) +
+                    Math.pow(animal.position.z - camera.position.z, 2)
+                );
+
+                if (distToCameraXZ < cameraAvoidDistance) {
+                    // Move away from camera
+                    const awayVector = new THREE.Vector3().subVectors(animal.position, camera.position).normalize();
+                    animal.userData.velocity.set(awayVector.x * 0.1, 0, awayVector.z * 0.1);
+                }
+                 // Ensure they stay on ground
+                animal.position.y = animal.geometry.parameters.radius || 0.5;
+            });
+        }
+
+        // Create distant city
+        function createCity(centerX, centerZ, buildingCount) {
+            const buildingMaterial = new THREE.MeshStandardMaterial({ 
+                color: 0x333344, // Dark grey/blue
+                roughness: 0.7,
+                metalness: 0.3
+            });
+            const citySpread = 300; // How spread out the city is
+
+            for (let i = 0; i < buildingCount; i++) {
+                const width = Math.random() * 20 + 10; // 10 to 30
+                const depth = Math.random() * 20 + 10; // 10 to 30
+                const height = Math.random() * 150 + 50; // 50 to 200 (skyscrapers)
+
+                const buildingGeometry = new THREE.BoxGeometry(width, height, depth);
+                const building = new THREE.Mesh(buildingGeometry, buildingMaterial);
+
+                const angle = Math.random() * Math.PI * 2;
+                const radius = Math.random() * citySpread / 2 + citySpread / 4; // Place in a rough circle/area
+
+                building.position.set(
+                    centerX + Math.cos(angle) * radius + (Math.random() - 0.5) * 50, // Add some jitter
+                    height / 2, // Base on ground
+                    centerZ + Math.sin(angle) * radius + (Math.random() - 0.5) * 50  // Place it far away
+                );
+                building.castShadow = true;
+                building.receiveShadow = true;
+                scene.add(building);
+                cityBuildings.push(building);
+            }
+        }
+
+        // Update environment based on time
+        function updateEnvironment(hours, minutes) {
+            const totalMinutes = hours * 60 + minutes; // Time in minutes from midnight
+            const dayFraction = totalMinutes / (24 * 60); // Fraction of the day (0 to 1)
+
+            // Sun inclination (angle above/below horizon)
+            // Simple model: peaks at noon, below horizon at night
+            // 0.0 = horizon, 0.5 = zenith (directly overhead)
+            // We map 0-24h to a sine wave for elevation.
+            // Sunrise around 6 AM (0.25), sunset around 6 PM (0.75)
+            const inclination = 0.5 - Math.cos(dayFraction * Math.PI * 2) * 0.51; // 0.51 to dip slightly below horizon
+
+            // Sun azimuth (direction: 0 = south, 0.25 = west, 0.5 = north, 0.75 = east)
+            // Simple model: rises in east (0.75 at sunrise), sets in west (0.25 at sunset)
+            // This is a bit counter-intuitive for Sky shader's azimuth, let's adjust.
+            // Sky shader: 0 = North, 0.25 = East, 0.5 = South, 0.75 = West
+            // So we want sun to move from East (0.25) to West (0.75)
+            let azimuth = dayFraction + 0.25; // Starts East-ish, moves through South to West-ish
+            if (azimuth > 1) azimuth -=1;
+
+
+            // Sky shader parameters
+            const effectController = {
+                turbidity: 10,       // Cloudiness/haziness
+                rayleigh: 2,         // Atmospheric scattering (sky color)
+                mieCoefficient: 0.005, // Aerosol scattering (sun disk haze)
+                mieDirectionalG: 0.8,  // Aerosol scattering direction
+                elevation: THREE.MathUtils.radToDeg(Math.asin(Math.max(0, Math.min(1, inclination * 2 - 1)))), // Convert our inclination to degrees for Sky
+                azimuth: THREE.MathUtils.radToDeg(azimuth * 360 - 90), // Convert to degrees, adjust for Sky's 0 = North
+                exposure: renderer.toneMappingExposure
+            };
+            
+            // Adjust parameters for night time to make it darker
+            if (hours < 5 || hours > 20) { // Deep night
+                effectController.turbidity = 5;
+                effectController.rayleigh = 0.1;
+                effectController.mieCoefficient = 0.001;
+                effectController.exposure = 0.1; // Much darker
+                renderer.toneMappingExposure = 0.1;
+                scene.getObjectByName("AmbientLight")?.intensity = 0.05; // Dim ambient
+            } else if (hours < 7 || hours > 18) { // Dawn / Dusk
+                effectController.turbidity = 8;
+                effectController.rayleigh = 1;
+                effectController.exposure = 0.3;
+                renderer.toneMappingExposure = 0.3;
+                 scene.getObjectByName("AmbientLight")?.intensity = 0.1;
+            } else { // Daytime
+                renderer.toneMappingExposure = 0.5; // Default exposure
+                 scene.getObjectByName("AmbientLight")?.intensity = 0.2;
+            }
+
+
+            const uniforms = sky.material.uniforms;
+            uniforms['turbidity'].value = effectController.turbidity;
+            uniforms['rayleigh'].value = effectController.rayleigh;
+            uniforms['mieCoefficient'].value = effectController.mieCoefficient;
+            uniforms['mieDirectionalG'].value = effectController.mieDirectionalG;
+
+            // Calculate sun position for Sky shader
+            const phi = THREE.MathUtils.degToRad(90 - effectController.elevation);
+            const theta = THREE.MathUtils.degToRad(effectController.azimuth);
+            sun.setFromSphericalCoords(1, phi, theta);
+            uniforms['sunPosition'].value.copy(sun);
+
+            // Update directional light to match sun
+            const dirLight = scene.getObjectByProperty('isDirectionalLight', true);
+            if (dirLight) {
+                dirLight.position.copy(sun).multiplyScalar(200); // Place light source far away in sun's direction
+                dirLight.intensity = (effectController.exposure / 0.5) * 0.8; // Scale intensity with exposure
+                if (effectController.elevation < 5) { // If sun is low or below horizon
+                    dirLight.intensity = Math.max(0, dirLight.intensity * (effectController.elevation / 5)); // Fade out light
+                    dirLight.castShadow = effectController.elevation > 0; // No shadows if sun is below horizon
+                } else {
+                    dirLight.castShadow = true;
+                }
+            }
+            
+            // Update river reflection - this is tricky without raytracing or complex shaders
+            // For now, the standard material's envMap (skybox) will provide some reflection
+            // We can adjust its intensity based on light
+            river.material.envMapIntensity = Math.max(0.1, effectController.exposure);
+            river.material.needsUpdate = true;
+        }
+
+        // Function to get current time and update environment
+        function updateEnvironmentToCurrentTime() {
+            // Use the fixed time provided in the prompt for initial setup
+            // Wednesday, May 7, 2025 at 2:15 AM MDT
+            const now = new Date(2025, 4, 7, 2, 15, 0); // Month is 0-indexed (4 = May)
+            
+            // For a real-time clock, you would use:
+            // const now = new Date();
+
+            const hours = now.getHours();
+            const minutes = now.getMinutes();
+            const seconds = now.getSeconds();
+
+            currentTimeDisplay.textContent = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')} MDT (Simulated)`;
+            updateEnvironment(hours, minutes);
+        }
+
+
+        // Animation loop
+        let lastTime = 0;
+        function animate(currentTime) {
+            requestAnimationFrame(animate);
+            
+            const deltaTime = (currentTime - lastTime) * 0.001 || 0; // Time difference in seconds
+            lastTime = currentTime;
+
+            controls.update(); // Only if enableDamping or autoRotate are set to true
+            updateAnimals(deltaTime);
+            
+            // Periodically update the environment to reflect time changes (e.g., every minute)
+            // For this demo, it's static after initial setup. 
+            // To make it truly "real-time" dynamically, you'd call updateEnvironmentToCurrentTime() here
+            // based on a timer, e.g., every 60 seconds.
+            // For now, we'll just call it once at init. If you want it to update:
+            // if (Math.floor(currentTime / 60000) !== Math.floor(lastTime / 60000)) { // Update every minute
+            //     updateEnvironmentToCurrentTime(); 
+            // }
+
+
+            renderer.render(scene, camera);
+        }
+
+        // Handle window resize
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+
+        // Start everything
+        init();
+        // Show a message that time is fixed for this demo
+        showMessage("Daylight is fixed to 2:15 AM for this simulation.", 5000);
+
+    </script>
+</body>
+</html>

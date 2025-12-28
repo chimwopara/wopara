@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Application Form</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            overflow: hidden; /* Prevent scrollbars if video slightly overflows */
+        }
+
+        /* Fullscreen Video Background Styles */
+        #bgVideo {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            min-width: 100%;
+            min-height: 100%;
+            width: auto;
+            height: auto;
+            z-index: -100; /* Place video behind all other content */
+            transform: translateX(-50%) translateY(-50%);
+            background-size: cover;
+            object-fit: cover; /* Cover the screen without stretching */
+        }
+
+        /* Gold Shimmer Button Styles */
+        .btn-gold-shimmer {
+            background-color: #DAA520; /* Base gold color (DarkGoldenRod) */
+            /* A more complex gold gradient can be used instead:
+               background: linear-gradient(145deg, #BF953F, #FCF6BA, #B38728, #FBF5B7, #AA771C);
+               background-size: 250% 250%;
+            */
+            position: relative; /* Needed for the pseudo-element */
+            overflow: hidden;   /* Keep the shimmer within button bounds */
+            transition: all 0.3s ease; /* Smooth transition for hover effects */
+            /* Text color and opacity will be handled by Tailwind classes on the <a> tag */
+        }
+
+        .btn-gold-shimmer:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.25), 0 6px 6px rgba(0,0,0,0.22);
+            background-color: #C7901A; /* Slightly darker gold on hover */
+        }
+
+        /* Shimmer Animation Effect */
+        .btn-gold-shimmer::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: -100%; /* Start off-screen to the left */
+            width: 75%;  /* Width of the shimmer highlight */
+            height: 100%;
+            background: linear-gradient(
+                to right,
+                rgba(255, 255, 255, 0) 0%,       /* Transparent start */
+                rgba(255, 255, 255, 0.3) 50%,  /* White highlight, semi-transparent */
+                rgba(255, 255, 255, 0) 100%      /* Transparent end */
+            );
+            transform: skewX(-25deg); /* Angled shimmer */
+            animation: shimmer-sweep 2.5s infinite linear; /* Loop the animation */
+        }
+
+        @keyframes shimmer-sweep {
+            0% {
+                left: -100%; /* Start position (off-screen left) */
+            }
+            50% {
+                left: 125%; /* End position (off-screen right) */
+            }
+            100% { /* This part of the keyframe ensures the animation loops smoothly by defining the state at 100% identical to 50% or by resetting. For a continuous sweep, the animation can be simpler. Let's adjust for a full sweep and repeat. */
+                left: 125%;
+            }
+        }
+         /* Ensure content is above video */
+        .content-container {
+            position: relative;
+            z-index: 1;
+        }
+    </style>
+</head>
+<body class="bg-black flex flex-col items-center justify-center min-h-screen p-4">
+
+    <video autoplay loop muted playsinline id="bgVideo">
+        <source src="supply.mp4" type="video/mp4">
+        Your browser does not support the video tag. (Fallback text if video cannot play)
+    </video>
+
+    <div class="content-container bg-transparent shadow-xl rounded-lg overflow-hidden max-w-xl w-full">
+
+        <header class="p-6 sm:p-8">
+            <div class="flex justify-between items-start">
+                <img src="logo.jpg"
+                     alt="Company Logo"
+                     class="h-12 sm:h-16 w-auto rounded-md"
+                     onerror="this.onerror=null; this.src='https://placehold.co/64x64/00000000/FFFFFFB3?text=LOGO&font=inter'; this.alt='Logo missing';">
+                     <h1 class="text-2xl sm:text-3xl lg:text-4xl font-bold text-white opacity-75 ml-4 text-right leading-tight">
+                    your product matters
+                </h1>
+            </div>
+        </header>
+
+        <main class="p-6 sm:p-8 pt-0 sm:pt-4 text-center">
+
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSeMsJJxgs7OKG_6-bx-_ecmRIc1aBc33ZSjrQxZT5SwNfsOFw/viewform?usp=header"
+               target="_blank"
+               rel="noopener noreferrer"
+               class="btn-gold-shimmer block w-full text-white text-opacity-75 font-bold py-6 sm:py-10 px-6 rounded-lg text-xl sm:text-2xl shadow-lg focus:outline-none focus:ring-4 focus:ring-yellow-300 focus:ring-opacity-50">
+               Begin Application
+            </a>
+        </main>
+    </div>
+
+</body>
+</html>

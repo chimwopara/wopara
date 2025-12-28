@@ -1,0 +1,3422 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>A⁴ - African Agricultural Auditing Alliance | Revolutionary Farm Intelligence</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&family=JetBrains+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+    --primary-blue: #00d4ff;
+    --secondary-blue: #0099cc;
+    --dark-bg: #0a0f1f;
+    --darker-bg: #050a15;
+    --glass-bg: rgba(255, 255, 255, 0.1); /* Changed to a translucent white */
+    --accent-green: #00ff88;
+    --warning-orange: #ff6b35;
+    --danger-red: #ff3366;
+}
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, var(--dark-bg) 0%, var(--darker-bg) 100%);
+            color: #e0e6ed;
+            overflow-x: hidden;
+            line-height: 1.6;
+        }
+        .mono {
+            font-family: 'JetBrains Mono', monospace;
+        }
+        #bg-canvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: -1;
+            background: radial-gradient(ellipse at center, rgba(0, 212, 255, 0.1) 0%, transparent 70%);
+        }
+       .liquid-glass {
+    background: var(--glass-bg);
+    backdrop-filter: blur(32px) saturate(1.8); /* Increased blur from 20px to 32px */
+    -webkit-backdrop-filter: blur(32px) saturate(1.8); /* Increased blur from 20px to 32px */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Changed border to translucent white */
+    border-radius: 1.5rem;
+    box-shadow: 
+        0 8px 32px rgba(0, 0, 0, 0.4),
+        inset 0 1px 0 rgba(255, 255, 255, 0.1);
+    position: relative;
+    overflow: hidden;
+}
+        .liquid-glass::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+            transition: left 0.8s ease;
+        }
+        .liquid-glass:hover::before {
+            left: 100%;
+        }
+        .lightning-blue {
+    color: white;
+    text-shadow: 0 0 10px rgba(0, 212, 255, 0.5);
+}
+        .accent-green {
+            color: var(--accent-green);
+            text-shadow: 0 0 8px rgba(0, 255, 136, 0.4);
+        }
+        .warning-orange {
+            color: var(--warning-orange);
+        }
+        .danger-red {
+            color: var(--danger-red);
+        }
+        .btn-primary {
+    background: #2d4a1e; /* Changed to dark green */
+    color: white; /* Changed to white text */
+    font-weight: 600;
+    padding: 0.5rem 1.5rem; /* Reduced padding to make it smaller */
+    border-radius: 3rem;
+    border: none;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
+    position: relative;
+    overflow: hidden;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+.btn-primary::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent); /* Neutral shimmer */
+    transition: left 0.6s ease;
+}
+.btn-primary:hover {
+    background: #3c622a; /* Slightly lighter green on hover */
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.4);
+}
+.btn-primary:hover::before {
+    left: 100%;
+}
+        .btn-secondary {
+    background: rgba(255, 255, 255, 0.05); /* Changed to a neutral background */
+    border: 2px solid rgba(255, 255, 255, 0.4); /* Changed to a neutral border */
+    color: white; /* Changed to white text */
+    padding: 0.75rem 1.5rem;
+    border-radius: 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 500;
+}
+.btn-secondary:hover {
+    background: rgba(255, 255, 255, 0.15); /* Fills with a translucent white on hover */
+    border-color: rgba(255, 255, 255, 0.7);
+    color: white;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2); /* Changed to a neutral shadow */
+}
+        .section-title {
+            background: linear-gradient(135deg, var(--primary-blue), var(--accent-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: none;
+            font-weight: 800;
+            letter-spacing: -0.02em;
+        }
+        .hero-section {
+            min-height: 100vh;
+            position: relative;
+        }
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        .stat-card {
+            background: var(--glass-bg);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s ease;
+            backdrop-filter: blur(10px);
+        }
+        .stat-card:hover {
+    transform: translateY(-5px);
+    border-color: rgba(255, 255, 255, 0.4); /* Changed to a white highlight */
+    box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2); /* Changed to a neutral shadow */
+}
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin: 1rem 0;
+        }
+        .weather-widget {
+            background: var(--glass-bg);
+            border: 1px solid rgba(0, 212, 255, 0.2);
+            border-radius: 1rem;
+            padding: 1rem;
+            margin: 1rem 0;
+            backdrop-filter: blur(10px);
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+            margin: 0.5rem 0;
+        }
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary-blue), var(--accent-green));
+            border-radius: 4px;
+            transition: width 0.8s ease;
+        }
+        .floating-particle {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background: var(--primary-blue);
+            border-radius: 50%;
+            animation: float 6s infinite linear;
+            opacity: 0.6;
+        }
+        @keyframes float {
+            0% {
+                transform: translateY(100vh) rotate(0deg);
+                opacity: 0;
+            }
+            10% {
+                opacity: 0.6;
+            }
+            90% {
+                opacity: 0.6;
+            }
+            100% {
+                transform: translateY(-100px) rotate(360deg);
+                opacity: 0;
+            }
+        }
+        .pulse {
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.5;
+            }
+        }
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid var(--primary-blue);
+            white-space: nowrap;
+            animation: typewriter 4s steps(40) 1s 1 normal both, blinkCursor 1s steps(2) infinite;
+        }
+        @keyframes typewriter {
+            from {
+                width: 0;
+            }
+            to {
+                width: 100%;
+            }
+        }
+        @keyframes blinkCursor {
+            from, to {
+                border-color: transparent;
+            }
+            50% {
+                border-color: var(--primary-blue);
+            }
+        }
+       #stats-container, #logo-container {
+            transition: opacity 0.3s ease;
+        }
+        #logo-container,
+#stats-container {
+    opacity: 0.7;
+}
+        .data-stream {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            color: var(--accent-green);
+            line-height: 1.2;
+            white-space: pre;
+            overflow: hidden;
+        }
+        
+        .holographic {
+    background: linear-gradient(135deg, 
+        rgba(255, 255, 255, 0.05) 0%, 
+        rgba(255, 255, 255, 0.0) 100%); /* Changed to a neutral background */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Changed border to match other windows */
+    position: relative;
+    overflow: hidden;
+}
+        
+        @keyframes rotate {
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+        .video-placeholder {
+            background: linear-gradient(135deg, #000 0%, #1a1a2e 100%);
+            border: 2px dashed rgba(0, 212, 255, 0.4);
+            aspect-ratio: 16 / 9;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            margin-top: 1rem;
+            border-radius: 1rem;
+            position: relative;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .video-placeholder:hover {
+    border-color: rgba(255, 255, 255, 0.6); /* Changed to a white highlight */
+    box-shadow: 0 0 20px rgba(0, 0, 0, 0.2); /* Changed to a neutral shadow */
+}
+        .video-placeholder::before {
+            content: '▶';
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+/* Replace the old classes with this single, more powerful one */
+.initial-text-black,
+.initial-text-black * {
+    color: black !important;
+    text-shadow: none !important;
+}
+        @media (max-width: 768px) {
+            .hero-section {
+                min-height: 80vh;
+            }
+        }
+        /* Loading screen styles removed */
+    </style>
+</head>
+<body>
+    <!-- Loading screen removed -->
+    <!-- 3D Background Canvas -->
+    <canvas id="bg-canvas"></canvas>
+    <!-- Floating Particles -->
+    <div id="particles-container"></div>
+    <!-- Header -->
+    <header class="p-4 md:p-6 fixed w-full z-50">
+     <div class="w-full px-4 md:px-6 transition-opacity duration-300" id="logo-container">
+            <h1 class="text-4xl md:text-6xl font-bold tracking-wider text-left">
+                A<sup class="lightning-blue text-3xl md:text-4xl">4</sup>
+            </h1>
+            
+            
+        </div>
+        
+    </header>
+   
+    <main class="container mx-auto px-4 pt-24 relative z-10">
+        <!-- Hero Section -->
+        <section class="hero-section flex flex-col justify-center items-center text-center">
+            <div class="hero-content max-w-6xl mx-auto">
+   <div class="mb-8 pb-24">
+    <h2 class="text-5xl md:text-7xl font-bold mb-6 text-white opacity-30 leading-tight">
+        African Agricultural Auditing Alliance
+    </h2>
+    <div class="text-3xl md:text-5xl mb-8 max-w-4xl mx-auto font-light opacity-20">
+        <span class="typewriter">We protect your assets using AI and IoT</span>
+    </div>
+</div>
+                
+              <div class="fixed top-4 right-4 pr-6 flex gap-6 z-50 text-center transition-opacity duration-300" id="stats-container">
+    <div>
+        <div class="text-2xl font-bold text-white mb-1" data-counter="47" style="text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);">0</div>
+        <div class="text-xs opacity-80">Farms Monitored</div>
+    </div>
+    <div>
+        <div class="text-2xl font-bold text-white mb-1" data-counter="156" style="text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);">0</div>
+        <div class="text-xs opacity-80">Certified Auditors</div>
+    </div>
+    <div>
+        <div class="text-2xl font-bold text-white mb-1" data-counter-decimal="2.4" style="text-shadow: 0 0 10px rgba(255, 255, 255, 0.8);">$0.0M</div>
+        <div class="text-xs opacity-80">FDI Facilitated</div>
+    </div>
+</div>
+                
+            </div>
+        </section>
+        <!-- Mission Section -->
+        <section id="mission" class="py-20">
+            <div class="liquid-glass p-8 md:p-16 holographic">
+                <h3 class="text-4xl md:text-5xl font-bold mb-8 section-title text-center">
+    What are we ?
+</h3>
+                <div class="grid md:grid-cols-2 gap-12 items-center">
+                    <div class="space-y-6">
+                        <p class="text-lg leading-relaxed">
+                            A⁴ pioneers the transformation of African agriculture through cutting-edge technology and transparent auditing systems. We bridge the credibility gap between <span class="font-bold lightning-blue">African farms</span> and <span class="font-bold accent-green">global investors</span>, unlocking unprecedented opportunities.
+                        </p>
+                        <p class="text-lg leading-relaxed">
+                            Our comprehensive auditing system for <span class="font-bold">Fromsupply Farms</span> provides real-time, transparent data that showcases the immense potential and proven ROI of African agriculture.
+                        </p>
+                        <div class="space-y-4">
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-blue-500 rounded-full pulse"></div>
+                                <span>Real-time farm monitoring & data collection</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-green-500 rounded-full pulse" style="animation-delay: 0.5s;"></div>
+                                <span>Advanced agricultural intelligence systems</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-orange-500 rounded-full pulse" style="animation-delay: 1s;"></div>
+                                <span>Certified auditor training programs</span>
+                            </div>
+                            <div class="flex items-center space-x-4">
+                                <div class="w-4 h-4 bg-purple-500 rounded-full pulse" style="animation-delay: 1.5s;"></div>
+                                <span>3D visualization & investment platforms</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="space-y-6">
+                        <div class="weather-widget">
+                            <h4 class="font-bold mb-4 lightning-blue">Live Farm Environment</h4>
+                            <div class="grid grid-cols-2 gap-4 text-sm">
+                                <div>
+                                    <div class="opacity-70">Temperature</div>
+                                    <div class="text-xl font-bold accent-green" id="temp-display">28°C</div>
+                                </div>
+                                <div>
+                                    <div class="opacity-70">Humidity</div>
+                                    <div class="text-xl font-bold lightning-blue" id="humidity-display">72%</div>
+                                </div>
+                                <div>
+                                    <div class="opacity-70">Soil pH</div>
+                                    <div class="text-xl font-bold warning-orange" id="ph-display">6.8</div>
+                                </div>
+                                <div>
+                                    <div class="opacity-70">Rainfall</div>
+                                    <div class="text-xl font-bold" id="rain-display">15mm</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="liquid-glass p-4">
+                            <h4 class="font-bold mb-3">Impact Metrics</h4>
+                            <div class="space-y-3">
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">Crop Yield Increase</span>
+                                        <span class="text-sm accent-green">+23%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 23%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">Investment Attraction</span>
+                                        <span class="text-sm lightning-blue">+187%</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 87%"></div>
+                                    </div>
+                                </div>
+                                <div>
+                                    <div class="flex justify-between mb-1">
+                                        <span class="text-sm">Auditor Employment</span>
+                                        <span class="text-sm warning-orange">+156</span>
+                                    </div>
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: 78%"></div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Farm Intelligence Section -->
+        <section id="intelligence" class="py-20">
+            <h3 class="text-4xl md:text-5xl font-bold mb-16 section-title text-center">
+                Advanced Farm Intelligence Systems
+            </h3>
+            
+            <div class="grid md:grid-cols-3 gap-8 mb-16">
+                <div class="liquid-glass p-8 text-center">
+                    <div class="text-4xl mb-4">🛰️</div>
+                    <h4 class="text-xl font-bold mb-4 lightning-blue">Satellite Monitoring</h4>
+                    <p class="text-sm leading-relaxed">Real-time satellite imagery analysis for crop health assessment, growth pattern recognition, and yield prediction using advanced AI algorithms.</p>
+                    <div class="mt-4 p-3 bg-blue-900/20 rounded-lg">
+                        <div class="data-stream text-xs">
+NDVI: 0.85 | NDRE: 0.72 | NIR: 0.91
+Crop_Health: EXCELLENT
+Growth_Stage: FLOWERING
+Est_Yield: +18% above baseline
+                        </div>
+                    </div>
+                </div>
+                <div class="liquid-glass p-8 text-center">
+                    <div class="text-4xl mb-4">🌡️</div>
+                    <h4 class="text-xl font-bold mb-4 accent-green">IoT Sensor Networks</h4>
+                    <p class="text-sm leading-relaxed">Comprehensive environmental monitoring through distributed sensor networks measuring soil conditions, microclimate, and resource utilization.</p>
+                    <div class="mt-4 p-3 bg-green-900/20 rounded-lg">
+                        <div class="data-stream text-xs">
+Sensors_Active: 247/250
+Soil_Moisture: 68% | pH: 6.8
+Air_Temp: 28.3°C | Humidity: 72%
+Status: OPTIMAL_CONDITIONS
+                        </div>
+                    </div>
+                </div>
+                <div class="liquid-glass p-8 text-center">
+                    <div class="text-4xl mb-4">🤖</div>
+                    <h4 class="text-xl font-bold mb-4 warning-orange">AI-Powered Analytics</h4>
+                    <p class="text-sm leading-relaxed">Machine learning models for predictive analytics, disease detection, optimal harvest timing, and resource allocation optimization.</p>
+                    <div class="mt-4 p-3 bg-orange-900/20 rounded-lg">
+                        <div class="data-stream text-xs">
+ML_Models: 12 ACTIVE
+Disease_Risk: LOW (12%)
+Harvest_Optimal: 14 DAYS
+Resource_Efficiency: 94.2%
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Live Data Dashboard -->
+            <div class="liquid-glass p-8">
+                <h4 class="text-2xl font-bold mb-6 text-center lightning-blue">Live Farm Data Dashboard</h4>
+                <div class="grid md:grid-cols-2 gap-8">
+                    <div>
+                        <h5 class="text-lg font-semibold mb-4">Crop Performance Analytics</h5>
+                        <div class="chart-container">
+                            <canvas id="cropChart"></canvas>
+                        </div>
+                    </div>
+                    <div>
+                        <h5 class="text-lg font-semibold mb-4">Livestock Health Monitoring</h5>
+                        <div class="chart-container">
+                            <canvas id="livestockChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+        <!-- Auditor Program Section -->
+        <section id="auditors" class="py-20">
+            <h3 class="text-4xl md:text-5xl font-bold mb-16 section-title text-center">
+                Professional Auditor Certification Program
+            </h3>
+            
+            <div class="grid md:grid-cols-2 gap-12">
+                <!-- Plant Auditors -->
+                <div class="liquid-glass p-8 holographic">
+                    <div class="flex items-center mb-6">
+                        <div class="text-3xl mr-4">🌱</div>
+                        <h4 class="text-2xl font-bold lightning-blue">Certified Plant Auditors</h4>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <p class="text-lg leading-relaxed">
+                            Become the frontline of agricultural intelligence. Plant Auditors are trained in comprehensive crop assessment, utilizing advanced technology and scientific methodologies.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <h5 class="font-bold accent-green">Core Responsibilities:</h5>
+                            <ul class="space-y-2 text-sm">
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                    <span>Crop health assessment using spectral analysis</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                    <span>Growth cycle monitoring & phenological staging</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                    <span>Seed & fertilizer inventory management</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                    <span>Equipment maintenance & calibration</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-green-400 rounded-full"></span>
+                                    <span>Digital data collection & verification</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="liquid-glass p-4">
+                            <h5 class="font-bold mb-3">Certification Requirements:</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Agricultural Background</span>
+                                    <span class="accent-green">✓ Required</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Technical Training (120hrs)</span>
+                                    <span class="warning-orange">In Progress</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Field Experience (6 months)</span>
+                                    <span class="lightning-blue">Provided</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Digital Literacy Certification</span>
+                                    <span class="accent-green">✓ Included</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-placeholder" onclick="playVideo('plants')">
+                            <span class="text-lg font-semibold">Plant Auditor Training Preview</span>
+                            <span class="text-sm opacity-70">a4plants_comprehensive.mp4</span>
+                        </div>
+                       <div class="flex justify-center items-center gap-4">
+    <a href="#apply" class="btn-primary justify-center">
+        Apply
+    </a>
+    <a href="#" class="btn-primary">
+        Share
+    </a>
+    <a href="#contact" class="btn-primary">
+        Contact
+    </a>
+</div>
+                    </div>
+                </div>
+                <!-- Animal Auditors -->
+                <div class="liquid-glass p-8 holographic">
+                    <div class="flex items-center mb-6">
+                        <div class="text-3xl mr-4">🐄</div>
+                        <h4 class="text-2xl font-bold lightning-blue">Certified Animal Auditors</h4>
+                    </div>
+                    
+                    <div class="space-y-6">
+                        <p class="text-lg leading-relaxed">
+                            Specialize in livestock management and animal welfare monitoring. Animal Auditors ensure optimal health, productivity, and ethical treatment of farm animals.
+                        </p>
+                        
+                        <div class="space-y-4">
+                            <h5 class="font-bold accent-green">Core Responsibilities:</h5>
+                            <ul class="space-y-2 text-sm">
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                    <span>Animal health monitoring & disease prevention</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                    <span>Breeding program tracking & genetics</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                    <span>Feed inventory & nutrition optimization</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                    <span>Housing & equipment maintenance</span>
+                                </li>
+                                <li class="flex items-center space-x-3">
+                                    <span class="w-2 h-2 bg-blue-400 rounded-full"></span>
+                                    <span>Welfare standards compliance</span>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="liquid-glass p-4">
+                            <h5 class="font-bold mb-3">Specialization Tracks:</h5>
+                            <div class="space-y-2 text-sm">
+                                <div class="flex justify-between">
+                                    <span>Cattle & Large Ruminants</span>
+                                    <span class="accent-green">Available</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Poultry & Small Animals</span>
+                                    <span class="accent-green">Available</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Swine & Specialty Livestock</span>
+                                    <span class="lightning-blue">Coming Soon</span>
+                                </div>
+                                <div class="flex justify-between">
+                                    <span>Aquaculture Systems</span>
+                                    <span class="warning-orange">Beta Program</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="video-placeholder" onclick="playVideo('animals')">
+                            <span class="text-lg font-semibold">Animal Auditor Training Preview</span>
+                            <span class="text-sm opacity-70">a4animals_comprehensive.mp4</span>
+                        </div>
+                      <div class="flex justify-center items-center gap-4">
+    <a href="#apply" class="btn-primary justify-center">
+        Apply
+    </a>
+    <a href="#" class="btn-primary">
+        Share
+    </a>
+    <a href="#contact" class="btn-primary">
+        Contact
+    </a>
+</div>
+                    </div>
+                </div>
+            </div>
+        
+            
+        </section>
+        <!-- 3D Platform Section -->
+        <section id="platform" class="py-20">
+            <h3 class="text-4xl md:text-5xl font-bold mb-8 section-title text-center">
+                Immersive 3D Visualization Platform
+            </h3>
+            
+            <div class="text-center mb-12">
+                <p class="text-xl max-w-4xl mx-auto leading-relaxed">
+                    Experience the future of agricultural investment through our groundbreaking 3D platform. Transform raw farm data into living, breathing virtual environments that investors can explore, analyze, and interact with in real-time.
+                </p>
+            </div>
+            <div class="grid md:grid-cols-2 gap-12 items-center mb-16">
+                <div class="space-y-6">
+                    <h4 class="text-2xl font-bold lightning-blue">Revolutionary Features</h4>
+                    <div class="space-y-4">
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 bg-blue-500 rounded-lg flex items-center justify-center text-sm font-bold">1</div>
+                            <div>
+                                <h5 class="font-semibold">Real-Time Data Integration</h5>
+                                <p class="text-sm opacity-80">Live streaming of sensor data, weather conditions, and agricultural metrics directly into the 3D environment.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center text-sm font-bold">2</div>
+                            <div>
+                                <h5 class="font-semibold">Predictive Modeling</h5>
+                                <p class="text-sm opacity-80">AI-powered simulations showing potential outcomes, yield predictions, and risk assessments.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 bg-orange-500 rounded-lg flex items-center justify-center text-sm font-bold">3</div>
+                            <div>
+                                <h5 class="font-semibold">Investment Analytics</h5>
+                                <p class="text-sm opacity-80">Comprehensive ROI calculations, market analysis, and investment opportunity identification.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start space-x-4">
+                            <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center text-sm font-bold">4</div>
+                            <div>
+                                <h5 class="font-semibold">Secure Trading Environment</h5>
+                                <p class="text-sm opacity-80">Blockchain-secured transactions and smart contracts for transparent, trustworthy investments.</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="liquid-glass p-8 min-h-[32rem] flex flex-col items-center justify-center holographic">
+                    <div class="text-center space-y-6">
+                        <div class="text-4xl mb-4">🌐</div>
+                        <h4 class="text-2xl font-bold lightning-blue">IMMERSIVE 3D ENVIRONMENT</h4>
+                        <p class="text-lg">Experience farms like never before</p>
+                        <div class="space-y-3 text-sm">
+                            <div class="data-stream">
+Rendering Engine: WebGL 2.0 Advanced
+Polygon Count: 2.4M+ optimized meshes
+Texture Resolution: 4K+ with compression
+Physics Engine: Real-time collision detection
+Lighting: Dynamic HDR with weather simulation
+                            </div>
+                        </div>
+                        <div class="flex space-x-4 justify-center">
+                            <button class="btn-secondary" onclick="initDemo()">
+                                <span>🚀</span>
+                                Launch Demo
+                            </button>
+                            <button class="btn-secondary" onclick="toggleVR()">
+                                <span>🥽</span>
+                                VR Mode
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="liquid-glass p-8">
+    <h4 class="text-2xl font-bold mb-8 text-center lightning-blue">Key Advantages of the A⁴ Alliance</h4>
+    <div class="grid md:grid-cols-3 gap-8 text-center">
+        <div>
+            <div class="text-4xl mb-4">📊</div>
+            <h5 class="font-bold mb-4 accent-green">Data-Driven Decisions</h5>
+            <p class="text-sm leading-relaxed">
+                Real-time analytics and predictive modeling enable investors to make informed decisions based on concrete data rather than speculation.
+            </p>
+        </div>
+        <div>
+            <div class="text-4xl mb-4">🔒</div>
+            <h5 class="font-bold mb-4 warning-orange">Unprecedented Security</h5>
+            <p class="text-sm leading-relaxed">
+                Blockchain-secured data integrity and smart contract automation ensure transparent, tamper-proof transactions and complete confidence.
+            </p>
+        </div>
+        <div>
+            <div class="text-4xl mb-4">💡</div>
+            <h5 class="font-bold mb-4 lightning-blue">ROI Optimization</h5>
+            <p class="text-sm leading-relaxed">
+                Advanced algorithms analyze market trends, weather patterns, and agricultural cycles to identify optimal investment opportunities.
+            </p>
+        </div>
+        <div>
+            <div class="text-3xl mb-4">💰</div>
+            <h5 class="font-bold mb-2">Competitive Compensation</h5>
+            <p class="text-sm">Benefit from a career with performance bonuses and significant advancement opportunities in a growing industry.</p>
+        </div>
+        <div>
+            <div class="text-3xl mb-4">🌍</div>
+            <h5 class="font-bold mb-2">Global Impact</h5>
+            <p class="text-sm">Contribute to food security, environmental sustainability, and economic development across the African continent.</p>
+        </div>
+        <div>
+            <div class="text-3xl mb-4">🎯</div>
+            <h5 class="font-bold mb-2">Career Growth</h5>
+            <p class="text-sm">Gain advanced certifications, leadership roles, and specialization opportunities in emerging agricultural technologies.</p>
+        </div>
+    </div>
+</div>
+            </div>
+        </section>
+        <!-- Analytics Section -->
+        <section id="analytics" class="py-20">
+            <h3 class="text-4xl md:text-5xl font-bold mb-16 section-title text-center">
+                Advanced Agricultural Analytics
+            </h3>
+            <div class="grid md:grid-cols-2 gap-12 mb-16">
+                <div class="liquid-glass p-8">
+                    <h4 class="text-xl font-bold mb-6 lightning-blue">Investment Performance Metrics</h4>
+                    <div class="chart-container">
+                        <canvas id="investmentChart"></canvas>
+                    </div>
+                    <div class="mt-4 grid grid-cols-3 gap-4 text-center text-sm">
+                        <div>
+                            <div class="text-2xl font-bold accent-green">+23%</div>
+                            <div class="opacity-70">Avg ROI Increase</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold lightning-blue">$2.4M</div>
+                            <div class="opacity-70">Total FDI</div>
+                        </div>
+                        <div>
+                            <div class="text-2xl font-bold warning-orange">89</div>
+                            <div class="opacity-70">Active Projects</div>
+                        </div>
+                    </div>
+                </div>
+                <div class="liquid-glass p-8">
+                    <h4 class="text-xl font-bold mb-6 accent-green">Regional Impact Analysis</h4>
+                    <div class="chart-container">
+                        <canvas id="regionalChart"></canvas>
+                    </div>
+                    <div class="mt-4 space-y-2 text-sm">
+                        <div class="flex justify-between">
+                            <span>East Africa Market Share</span>
+                            <span class="accent-green font-bold">34%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>West Africa Expansion</span>
+                            <span class="lightning-blue font-bold">28%</span>
+                        </div>
+                        <div class="flex justify-between">
+                            <span>Southern Africa Penetration</span>
+                            <span class="warning-orange font-bold">19%</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+        </section>
+    </main>
+    
+    <div id="swipe-indicator" class="fixed bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center z-50 transition-opacity duration-500" style="opacity: 0; pointer-events: none;">
+    <svg class="w-6 h-6 text-white animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7"></path></svg>
+    <p class="text-white text-sm mt-2 tracking-wider">Swipe up to explore</p>
+</div>
+    <script>
+        // Global variables for Three.js scene
+let scene, camera, renderer, clouds, rain, rainGeo, lightning;
+let animals = [], plants = [], cars = [], windmills = [], rainDrops = []; // <-- Add rainDrops here
+let isRaining = false, isDayTime = true;
+let sunLight, moonLight;
+let collectionTruck = null;
+
+let lastTruckVisit = 0;
+let farmStats = {
+    temperature: 28.3,
+    humidity: 72,
+    ph: 6.8,
+    rainfall: 15,
+    yield: 18,
+    alerts: 2
+};
+        // Utility functions
+        function getRandomInRange(min, max) {
+            return Math.random() * (max - min) + min;
+        }
+        function createFloatingParticles() {
+            const container = document.getElementById('particles-container');
+            setInterval(() => {
+                if (container.children.length < 10) {
+                    const particle = document.createElement('div');
+                    particle.className = 'floating-particle';
+                    particle.style.left = Math.random() * 100 + 'vw';
+                    particle.style.animationDuration = (Math.random() * 3 + 3) + 's';
+                    container.appendChild(particle);
+                    
+                    setTimeout(() => {
+                        if (particle.parentNode) {
+                            particle.parentNode.removeChild(particle);
+                        }
+                    }, 6000);
+                }
+            }, 1000);
+        }
+        
+        function animateCounter(element, target, duration = 2000) {
+            const start = 0;
+            const increment = target / (duration / 16);
+            let current = start;
+            
+            const timer = setInterval(() => {
+                current += increment;
+                if (current >= target) {
+                    element.textContent = target;
+                    clearInterval(timer);
+                } else {
+                    element.textContent = Math.floor(current);
+                }
+            }, 16);
+        }
+        function animateDecimalCounter(element, target, duration = 2000) {
+    const start = 0;
+    const increment = target / (duration / 16);
+    let current = start;
+
+    const timer = setInterval(() => {
+        current += increment;
+        if (current >= target) {
+            element.textContent = '$' + target.toFixed(1) + 'M';
+            clearInterval(timer);
+        } else {
+            element.textContent = '$' + current.toFixed(1) + 'M';
+        }
+    }, 16);
+}
+        function updateLiveData() {
+            // Simulate real-time data updates
+            farmStats.temperature += (Math.random() - 0.5) * 0.2;
+            farmStats.humidity += (Math.random() - 0.5) * 2;
+            farmStats.ph += (Math.random() - 0.5) * 0.1;
+            
+            // Update displays
+            document.getElementById('temp-display').textContent = farmStats.temperature.toFixed(1) + '°C';
+            document.getElementById('humidity-display').textContent = Math.round(farmStats.humidity) + '%';
+            document.getElementById('ph-display').textContent = farmStats.ph.toFixed(1);
+            document.getElementById('rain-display').textContent = farmStats.rainfall + 'mm';
+            
+            // Update live analytics
+            document.getElementById('live-temp').textContent = farmStats.temperature.toFixed(1) + '°C';
+            document.getElementById('live-humidity').textContent = Math.round(farmStats.humidity) + '%';
+            document.getElementById('live-yield').textContent = '+' + farmStats.yield + '%';
+            document.getElementById('live-alerts').textContent = farmStats.alerts;
+            
+            // Update data feed
+            const now = new Date();
+            const timestamp = now.toISOString().substring(0, 19).replace('T', ' ');
+            const feedElement = document.getElementById('data-feed');
+            const currentData = feedElement.textContent;
+            const newLine = `[${timestamp}] LIVE_UPDATE: Temp:${farmStats.temperature.toFixed(1)}°C | Humidity:${Math.round(farmStats.humidity)}% | Status:MONITORING\n`;
+            
+            const lines = currentData.split('\n');
+            lines.unshift(newLine);
+            if (lines.length > 6) lines.pop();
+            feedElement.textContent = lines.join('\n');
+        }
+        // Three.js Enhanced Farm Simulation
+        function initializeScene() {
+            // Core setup
+scene = new THREE.Scene();
+scene.fog = new THREE.FogExp2(0x000511, 0.0008); // Natural horizon fog
+            camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 2000);
+camera.position.set(0, 100, 200); // Moved camera closer and lower
+camera.lookAt(0, 0, 0);
+            const canvas = document.getElementById('bg-canvas');
+            renderer = new THREE.WebGLRenderer({ 
+                canvas: canvas, 
+                antialias: true, 
+                alpha: true,
+                powerPreference: "high-performance"
+            });
+            renderer.setSize(window.innerWidth, window.innerHeight);
+            renderer.shadowMap.enabled = true;
+            renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+            renderer.setClearColor(0x87CEEB, 1.0); // Start with bright day sky
+            // Enhanced Lighting System
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.2); // Reduced for better night atmosphere
+scene.add(ambientLight);
+            // Sun (Day light) - starts off
+sunLight = new THREE.DirectionalLight(0xffffff, 1.2);
+sunLight.position.set(100, 200, 50);
+sunLight.castShadow = true;
+sunLight.shadow.mapSize.width = 2048;
+sunLight.shadow.mapSize.height = 2048;
+sunLight.shadow.camera.near = 0.5;
+sunLight.shadow.camera.far = 500;
+sunLight.shadow.camera.left = -200;
+sunLight.shadow.camera.right = 200;
+sunLight.shadow.camera.top = 200;
+sunLight.shadow.camera.bottom = -200;
+sunLight.intensity = 1.2; // Start with full daylight
+scene.add(sunLight);
+
+// Moon (Night light) - starts off
+moonLight = new THREE.DirectionalLight(0x9999ff, 0.8);
+moonLight.position.set(-100, 150, -50);
+moonLight.castShadow = true;
+moonLight.shadow.mapSize.width = 1024;
+moonLight.shadow.mapSize.height = 1024;
+moonLight.shadow.camera.near = 0.5;
+moonLight.shadow.camera.far = 500;
+moonLight.shadow.camera.left = -200;
+moonLight.shadow.camera.right = 200;
+moonLight.shadow.camera.top = 200;
+moonLight.shadow.camera.bottom = -200;
+moonLight.intensity = 0; // Start with no moon light
+scene.add(moonLight);
+            // Lightning system
+            lightning = new THREE.PointLight(0x99ccff, 0, 1000, 2);
+            lightning.position.set(0, 150, 0);
+            scene.add(lightning);
+            // Enhanced Ground System
+createEnhancedGround();
+
+            
+            // Farm Infrastructure
+createFarmBuildings();
+// createIrrigationSystem(); // This line is now disabled
+createFencingSystem();
+            
+            // Enhanced Farm Sections
+            createAdvancedFarmSections();
+            
+            // Weather System
+            createAdvancedWeatherSystem();
+            
+            // Equipment and Vehicles
+createFarmEquipment();
+// Initialize collection truck system
+initCollectionTruckSystem();
+
+// Initialize car traffic system
+initCarTrafficSystem();
+            // Event listeners
+            window.addEventListener('resize', onWindowResize, false);
+            document.addEventListener('scroll', onScroll, { passive: true });
+            
+            // Mouse movement detection for header fade
+           // Header fade system
+            let isScrolledDown = false;
+            
+            function updateHeaderVisibility() {
+                const statsContainer = document.getElementById('stats-container');
+                const logoContainer = document.getElementById('logo-container');
+                
+                if (isScrolledDown) {
+                    statsContainer.style.opacity = '0.1';
+                    logoContainer.style.opacity = '0.1';
+                } else {
+                    statsContainer.style.opacity = '1';
+                    logoContainer.style.opacity = '1';
+                }
+            }
+            
+            document.addEventListener('scroll', () => {
+                const scrollY = window.scrollY;
+                isScrolledDown = scrollY > 100;
+                updateHeaderVisibility();
+            });
+            
+            document.addEventListener('mousemove', (e) => {
+                const statsContainer = document.getElementById('stats-container');
+                const logoContainer = document.getElementById('logo-container');
+                
+                if (isScrolledDown && e.clientY < 120) { // Mouse in top 120px
+                    statsContainer.style.opacity = '1';
+                    logoContainer.style.opacity = '1';
+                } else if (isScrolledDown) {
+                    statsContainer.style.opacity = '0.1';
+                    logoContainer.style.opacity = '0.1';
+                }
+            });
+            // Start animation loop
+            animate();
+        }
+function createEnhancedGround() {
+    // Create large flat ground at level 0
+    const groundGeometry = new THREE.CircleGeometry(4000, 128); // This creates a large, smooth circle
+    const groundMaterial = new THREE.MeshLambertMaterial({ 
+        color: 0x2d4a1e
+    }); 
+    
+    // Add subtle height variation to ground
+    const vertices = groundGeometry.attributes.position.array;
+    for (let i = 0; i < vertices.length; i += 3) {
+        vertices[i + 2] += Math.random() * 0.5 - 0.25; // Very subtle variation
+    }
+    groundGeometry.computeVertexNormals();
+    
+    const ground = new THREE.Mesh(groundGeometry, groundMaterial);
+    ground.rotation.x = -Math.PI / 2;
+    ground.position.y = 0; // Ensure ground is at level 0
+    ground.receiveShadow = true;
+    scene.add(ground);
+    
+    // Create grass FIRST (will be covered by road overlays)
+    createDetailedGrass();
+    
+    // THEN create roads as overlays that sit above grass
+    createFarmRoads();
+}
+
+function createDetailedGrass() {
+    const grassTypes = [
+        { color: 0x2d5a1e, height: 0.8, density: 1500 }, // Further reduced density
+        { color: 0x3d6a2e, height: 1.2, density: 1200 },
+        { color: 0x4d7a3e, height: 1.0, density: 1300 }
+    ];
+    
+    // Create grass BEFORE roads are placed, then roads will overlay on top
+    grassTypes.forEach(grassType => {
+        const grassGeometry = new THREE.CylinderGeometry(0.02, 0.05, grassType.height, 4);
+        const grassMaterial = new THREE.MeshLambertMaterial({ color: grassType.color });
+        
+        for (let i = 0; i < grassType.density; i++) {
+            const grass = new THREE.Mesh(grassGeometry, grassMaterial);
+            
+            // Simple placement - roads will cover grass as overlays
+            const xPos = (Math.random() - 0.5) * 1400;
+            const zPos = (Math.random() - 0.5) * 1400;
+            
+            // Only exclude building areas from grass placement
+            const tooCloseToBuilding = isNearBuilding(xPos, zPos);
+            
+            if (!tooCloseToBuilding) {
+                grass.position.set(xPos, grassType.height / 2, zPos);
+                grass.rotation.y = Math.random() * Math.PI * 2;
+                grass.scale.y = 0.8 + Math.random() * 0.4;
+                grass.castShadow = true;
+                scene.add(grass);
+            }
+        }
+    });
+}
+function createTree(x, z) {
+    const trunkHeight = 10 + Math.random() * 5;
+    const trunkGeometry = new THREE.CylinderGeometry(0.5, 0.8, trunkHeight, 8);
+    const trunkMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 }); // Brown
+    const trunk = new THREE.Mesh(trunkGeometry, trunkMaterial);
+    trunk.position.set(x, trunkHeight / 2, z);
+    trunk.castShadow = true;
+    scene.add(trunk);
+
+    const foliageSize = 4 + Math.random() * 2;
+    const foliageGeometry = new THREE.SphereGeometry(foliageSize, 8, 6);
+    const foliageMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 }); // Dark Green
+    const foliage = new THREE.Mesh(foliageGeometry, foliageMaterial);
+    foliage.position.set(x, trunkHeight, z);
+    foliage.castShadow = true;
+    scene.add(foliage);
+}
+function createShrub(x, z) {
+    const shrubSize = 1 + Math.random() * 1.5;
+    const shrubGeometry = new THREE.SphereGeometry(shrubSize, 6, 4);
+    const colors = [0xff6b35, 0xff3366, 0x00ff88, 0xFFD700, 0x800080]; // Orange, Red, Green, Yellow, Purple
+    const shrubMaterial = new THREE.MeshLambertMaterial({
+        color: colors[Math.floor(Math.random() * colors.length)]
+    });
+    const shrub = new THREE.Mesh(shrubGeometry, shrubMaterial);
+    shrub.position.set(x, shrubSize / 2, z);
+    shrub.castShadow = true;
+    scene.add(shrub);
+}
+function createWindmill(x, z) {
+    const towerHeight = 50;
+    const towerGeometry = new THREE.CylinderGeometry(2, 3, towerHeight, 12);
+    const towerMaterial = new THREE.MeshLambertMaterial({ color: 0xf5f5f5 });
+    const tower = new THREE.Mesh(towerGeometry, towerMaterial);
+    tower.position.set(x, towerHeight / 2, z);
+    tower.castShadow = true;
+    scene.add(tower);
+
+    const nacelleGeometry = new THREE.BoxGeometry(5, 4, 6);
+    const nacelle = new THREE.Mesh(nacelleGeometry, towerMaterial);
+    nacelle.position.set(x, towerHeight, z);
+    scene.add(nacelle);
+
+    const blades = new THREE.Group();
+    for (let i = 0; i < 3; i++) {
+        const bladeGeometry = new THREE.BoxGeometry(1, 25, 0.5);
+        const bladeMaterial = new THREE.MeshLambertMaterial({ color: 0xdddddd });
+        const blade = new THREE.Mesh(bladeGeometry, bladeMaterial);
+        blade.position.y = 10; // Offset from center
+        const angle = (i * 2 * Math.PI) / 3;
+        blade.rotation.z = angle;
+        blades.add(blade);
+    }
+    blades.position.set(x, towerHeight, z - 4);
+    scene.add(blades);
+    windmills.push(blades); // Add blades to array for animation
+}
+    function createFarmRoads() {
+    const roadHeight = 0.25;
+    const roadLength = 3600;
+    const laneWidth = 16;
+    const medianWidth = 12;
+    const sidewalkWidth = 8;
+    const treeSpacing = 40;
+    const shrubSpacing = 15;
+
+    // 1. Create the Median Strip (Grass, Trees, and Shrubs)
+    const medianGeometry = new THREE.PlaneGeometry(medianWidth, roadLength);
+    const medianMaterial = new THREE.MeshLambertMaterial({ color: '#2d4a1e' });
+    const median = new THREE.Mesh(medianGeometry, medianMaterial);
+    median.rotation.x = -Math.PI / 2;
+    median.position.set(0, roadHeight - 0.1, 0);
+    scene.add(median);
+
+    // Add trees and shrubs to the median
+    for (let z = -roadLength / 2; z < roadLength / 2; z += treeSpacing) {
+        createTree(0, z + (Math.random() - 0.5) * 5);
+    }
+    for (let z = -roadLength / 2; z < roadLength / 2; z += shrubSpacing) {
+        createShrub((Math.random() - 0.5) * (medianWidth - 2), z);
+    }
+
+    // 2. Create the two road lanes
+    const roadMaterial = new THREE.MeshLambertMaterial({ color: 0x404040 });
+    const laneGeometry = new THREE.PlaneGeometry(laneWidth, roadLength);
+    const leftLanePositionX = -(medianWidth / 2 + laneWidth / 2);
+    const rightLanePositionX = medianWidth / 2 + laneWidth / 2;
+
+    const leftLane = new THREE.Mesh(laneGeometry, roadMaterial);
+    leftLane.rotation.x = -Math.PI / 2;
+    leftLane.position.set(leftLanePositionX, roadHeight, 0);
+    leftLane.receiveShadow = true;
+    scene.add(leftLane);
+    
+    const rightLane = new THREE.Mesh(laneGeometry, roadMaterial);
+    rightLane.rotation.x = -Math.PI / 2;
+    rightLane.position.set(rightLanePositionX, roadHeight, 0);
+    rightLane.receiveShadow = true;
+    scene.add(rightLane);
+
+    // 3. Create Sidewalks on each side
+    const sidewalkMaterial = new THREE.MeshLambertMaterial({ color: 0x999999 });
+    const sidewalkGeometry = new THREE.PlaneGeometry(sidewalkWidth, roadLength);
+    
+    const leftSidewalk = new THREE.Mesh(sidewalkGeometry, sidewalkMaterial);
+    leftSidewalk.rotation.x = -Math.PI / 2;
+    leftSidewalk.position.set(-(medianWidth / 2 + laneWidth + sidewalkWidth / 2), roadHeight + 0.1, 0);
+    leftSidewalk.receiveShadow = true;
+    scene.add(leftSidewalk);
+
+    const rightSidewalk = new THREE.Mesh(sidewalkGeometry, sidewalkMaterial);
+    rightSidewalk.rotation.x = -Math.PI / 2;
+    rightSidewalk.position.set(medianWidth / 2 + laneWidth + sidewalkWidth / 2, roadHeight + 0.1, 0);
+    rightSidewalk.receiveShadow = true;
+    scene.add(rightSidewalk);
+
+    // 4. Add dashed line demarcations for each lane
+    const lineMaterial = new THREE.MeshBasicMaterial({ color: 0xFFD700 });
+    for (let z = -roadLength / 2; z < roadLength / 2; z += 40) {
+        const lineGeometry = new THREE.PlaneGeometry(0.4, 15);
+        const leftLine = new THREE.Mesh(lineGeometry, lineMaterial);
+        leftLine.rotation.x = -Math.PI / 2;
+        leftLine.position.set(leftLanePositionX, roadHeight + 0.01, z);
+        scene.add(leftLine);
+        const rightLine = new THREE.Mesh(lineGeometry, lineMaterial);
+        rightLine.rotation.x = -Math.PI / 2;
+        rightLine.position.set(rightLanePositionX, roadHeight + 0.01, z);
+        scene.add(rightLine);
+    }
+    
+    // 5. Add trees along the outer sides of the sidewalks
+    const sideTreeXPosition = medianWidth / 2 + laneWidth + sidewalkWidth + 8;
+    for (let z = -roadLength / 2; z < roadLength / 2; z += treeSpacing * 1.2) {
+        createTree(-sideTreeXPosition, z + (Math.random() - 0.5) * 10);
+        createTree(sideTreeXPosition, z + (Math.random() - 0.5) * 10);
+    }
+
+    // Make the cross-roads wider to span the new boulevard
+    const crossRoadGeometry = new THREE.PlaneGeometry(sideTreeXPosition * 2.5, 24);
+    const crossRoad1 = new THREE.Mesh(crossRoadGeometry, roadMaterial);
+    crossRoad1.rotation.x = -Math.PI / 2;
+    crossRoad1.position.set(0, roadHeight, -150);
+    crossRoad1.receiveShadow = true;
+    scene.add(crossRoad1);
+    const crossRoad2 = new THREE.Mesh(crossRoadGeometry, roadMaterial);
+    crossRoad2.rotation.x = -Math.PI / 2;
+    crossRoad2.position.set(0, roadHeight, 150);
+    crossRoad2.receiveShadow = true;
+    scene.add(crossRoad2);
+}
+function createFarmBuildings() {
+    // Enhanced main farmhouse complex
+    const houseGeometry = new THREE.BoxGeometry(30, 18, 40);
+    const houseMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+    const farmhouse = new THREE.Mesh(houseGeometry, houseMaterial);
+    farmhouse.position.set(-80, 9, -220);
+    farmhouse.castShadow = true;
+    farmhouse.receiveShadow = true;
+    scene.add(farmhouse);
+    
+    // Enhanced roof
+    const roofGeometry = new THREE.ConeGeometry(25, 10, 4);
+    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(-80, 23, -220);
+    roof.rotation.y = Math.PI / 4;
+    roof.castShadow = true;
+    scene.add(roof);
+
+    // More farmhouses around the area
+    const farmHousePositions = [
+        { x: -180, z: -120, w: 22, h: 12, d: 28, color: 0x8B4513 },
+        { x: 180, z: -120, w: 20, h: 14, d: 25, color: 0x654321 },
+        { x: -150, z: 180, w: 25, h: 13, d: 30, color: 0x8B7355 },
+        { x: -100, z: 100, w: 18, h: 11, d: 22, color: 0x8B4513 },
+        { x: 120, z: -80, w: 21, h: 12, d: 26, color: 0x654321 },
+        { x: 200, z: 160, w: 19, h: 10, d: 24, color: 0x8B7355 },
+        { x: -200, z: 80, w: 23, h: 13, d: 29, color: 0x8B4513 },
+        { x: 80, z: 200, w: 17, h: 9, d: 21, color: 0x654321 },
+        // New farm buildings
+        { x: 400, z: 350, w: 20, h: 12, d: 25, color: 0x8B4513 },
+        { x: -450, z: 250, w: 25, h: 14, d: 30, color: 0x654321 },
+        { x: 300, z: -300, w: 22, h: 13, d: 28, color: 0x8B7355 },
+        { x: -350, z: -400, w: 18, h: 11, d: 22, color: 0x8B4513 },
+    ];
+
+    farmHousePositions.forEach(pos => {
+        createFarmHouse(pos.x, pos.z, pos.w, pos.h, pos.d, pos.color);
+    });
+
+    // Storage facilities
+    createSilo(-140, -170);
+    createSilo(140, -170);
+    createSilo(-60, 220);
+    createSilo(160, 120);
+
+    // Barns
+    createBarn(-120, -50);
+    createBarn(130, -200);
+    createBarn(-180, 120);
+
+    // Add four windmills to the scene
+    createWindmill(-500, -400);
+    createWindmill(500, -350);
+    createWindmill(-450, 450);
+    createWindmill(400, 500);
+}
+    function createBarn(x, z) {
+    const barnGeometry = new THREE.BoxGeometry(35, 20, 50);
+    const barnMaterial = new THREE.MeshLambertMaterial({ color: 0x8B0000 });
+    const barn = new THREE.Mesh(barnGeometry, barnMaterial);
+    barn.position.set(x, 10, z);
+    barn.castShadow = true;
+    barn.receiveShadow = true;
+    scene.add(barn);
+
+    // Barn roof
+    const roofGeometry = new THREE.BoxGeometry(38, 3, 53);
+    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x4a4a4a });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(x, 21.5, z);
+    roof.castShadow = true;
+    scene.add(roof);
+
+    // Add solar panels to the barn roof
+    const panelGeometry = new THREE.BoxGeometry(10, 0.4, 15);
+    const panelMaterial = new THREE.MeshLambertMaterial({ color: 0x050a15 });
+    for (let i = -1; i <= 1; i++) {
+        const solarPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+        solarPanel.position.set(x + i * 12, 23.2, z);
+        scene.add(solarPanel);
+    }
+
+    // Large barn doors
+    const doorGeometry = new THREE.BoxGeometry(15, 16, 0.5);
+    const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x4B2F20 });
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(x, 8, z + 25);
+    scene.add(door);
+}
+    function createFarmHouse(x, z, width, height, depth, color) {
+    // Main house structure
+    const houseGeometry = new THREE.BoxGeometry(width, height, depth);
+    const houseMaterial = new THREE.MeshLambertMaterial({ color: color });
+    const house = new THREE.Mesh(houseGeometry, houseMaterial);
+    house.position.set(x, height/2, z);
+    house.castShadow = true;
+    house.receiveShadow = true;
+    scene.add(house);
+    
+    // Triangular roof
+    const roofGeometry = new THREE.ConeGeometry(width * 0.7, height * 0.6, 4);
+    const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x654321 });
+    const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+    roof.position.set(x, height + height * 0.3, z);
+    roof.rotation.y = Math.PI / 4;
+    roof.castShadow = true;
+    scene.add(roof);
+
+    // Add a solar panel to the roof
+    const panelGeometry = new THREE.BoxGeometry(width * 0.7, 0.2, depth * 0.5);
+    const panelMaterial = new THREE.MeshLambertMaterial({ color: 0x050a15 });
+    const solarPanel = new THREE.Mesh(panelGeometry, panelMaterial);
+    solarPanel.position.set(x, height + (height * 0.1), z);
+    solarPanel.rotation.y = Math.PI / 4;
+    solarPanel.rotation.x = -Math.PI / 6; // Angle to match roof slope
+    scene.add(solarPanel);
+    
+    // Door
+    const doorGeometry = new THREE.BoxGeometry(width * 0.2, height * 0.6, 0.5);
+    const doorMaterial = new THREE.MeshLambertMaterial({ color: 0x4B2F20 });
+    const door = new THREE.Mesh(doorGeometry, doorMaterial);
+    door.position.set(x, height * 0.3, z + depth/2);
+    scene.add(door);
+    
+    // Windows
+    const windowGeometry = new THREE.BoxGeometry(width * 0.15, height * 0.25, 0.3);
+    const windowMaterial = new THREE.MeshLambertMaterial({ color: 0x87CEEB });
+    
+    const window1 = new THREE.Mesh(windowGeometry, windowMaterial);
+    window1.position.set(x - width * 0.25, height * 0.4, z + depth/2);
+    scene.add(window1);
+    
+    const window2 = new THREE.Mesh(windowGeometry, windowMaterial);
+    window2.position.set(x + width * 0.25, height * 0.4, z + depth/2);
+    scene.add(window2);
+    
+    // Chimney
+    const chimneyGeometry = new THREE.BoxGeometry(width * 0.1, height * 0.4, width * 0.1);
+    const chimneyMaterial = new THREE.MeshLambertMaterial({ color: 0x8B0000 });
+    const chimney = new THREE.Mesh(chimneyGeometry, chimneyMaterial);
+    chimney.position.set(x + width * 0.3, height + height * 0.5, z - depth * 0.2);
+    chimney.castShadow = true;
+    scene.add(chimney);
+}
+        function createSilo(x, z) {
+            const siloGeometry = new THREE.CylinderGeometry(8, 8, 30, 12);
+            const siloMaterial = new THREE.MeshLambertMaterial({ color: 0xC0C0C0 });
+            const silo = new THREE.Mesh(siloGeometry, siloMaterial);
+            silo.position.set(x, 15, z);
+            silo.castShadow = true;
+            scene.add(silo);
+            // Silo dome
+            const domeGeometry = new THREE.SphereGeometry(8, 12, 6, 0, Math.PI * 2, 0, Math.PI / 2);
+            const dome = new THREE.Mesh(domeGeometry, siloMaterial);
+            dome.position.set(x, 30, z);
+            dome.castShadow = true;
+            scene.add(dome);
+        }
+        function createIrrigationSystem() {
+            // Enhanced irrigation pipes
+            const pipeGeometry = new THREE.CylinderGeometry(0.5, 0.5, 120, 8);
+            const pipeMaterial = new THREE.MeshLambertMaterial({ color: 0x228B22 });
+            
+            for (let i = -4; i <= 4; i++) {
+                const pipe = new THREE.Mesh(pipeGeometry, pipeMaterial);
+                pipe.position.set(i * 50, 1, 0);
+                pipe.rotation.z = Math.PI / 2;
+                scene.add(pipe);
+            }
+
+// Optimized sprinklers with proper road avoidance and fewer total sprinklers
+for (let i = -200; i <= 200; i += 80) { // Increased spacing
+    for (let j = -200; j <= 200; j += 80) {
+        // Skip sprinklers on road area and near buildings
+        if (Math.abs(i) > 50 && !isNearBuilding(i, j)) {
+            createSprinkler(i, j);
+        }
+    }
+}
+        }
+
+function isNearBuilding(x, z) {
+    const buildingZones = [
+        { x: -80, z: -220, radius: 60 },
+        { x: -180, z: -120, radius: 50 },
+        { x: 180, z: -120, radius: 50 },
+        { x: -150, z: 180, radius: 50 },
+        { x: 120, z: -80, radius: 50 }
+    ];
+    
+    return buildingZones.some(zone => {
+        const dist = Math.sqrt((x - zone.x) ** 2 + (z - zone.z) ** 2);
+        return dist < zone.radius;
+    });
+}
+        function createSprinkler(x, z) {
+            const sprinklerGeometry = new THREE.CylinderGeometry(0.3, 0.3, 3, 6);
+            const sprinklerMaterial = new THREE.MeshLambertMaterial({ color: 0x000080 });
+            const sprinkler = new THREE.Mesh(sprinklerGeometry, sprinklerMaterial);
+            sprinkler.position.set(x, 1.5, z);
+            scene.add(sprinkler);
+            // Water effect (when active)
+            if (Math.random() > 0.7) {
+                const waterParticles = new THREE.Group();
+                for (let i = 0; i < 20; i++) {
+                    const dropGeometry = new THREE.SphereGeometry(0.1);
+                    const dropMaterial = new THREE.MeshBasicMaterial({ 
+                        color: 0x87CEEB, 
+                        transparent: true, 
+                        opacity: 0.6 
+                    });
+                    const drop = new THREE.Mesh(dropGeometry, dropMaterial);
+                    drop.position.set(
+                        x + (Math.random() - 0.5) * 10,
+                        2 + Math.random() * 3,
+                        z + (Math.random() - 0.5) * 10
+                    );
+                    waterParticles.add(drop);
+                }
+                scene.add(waterParticles);
+            }
+        }
+        function createFencingSystem() {
+            const fenceHeight = 2;
+            
+            // Enhanced sections with more livestock areas
+const sections = [
+    { center: { x: -100, z: -180 }, size: 80 }, // Expanded pig section
+    { center: { x: 120, z: -180 }, size: 90 }, // Expanded cow section  
+    { center: { x: -120, z: 180 }, size: 70 }, // Chicken section
+    { center: { x: 180, z: 100 }, size: 60 }, // New sheep section
+    { center: { x: -180, z: 50 }, size: 65 }, // New goat section
+];
+            sections.forEach(section => {
+                createSectionFence(section.center, section.size, fenceHeight);
+            });
+        }
+        function createSectionFence(center, size, height) {
+            const fenceGeometry = new THREE.BoxGeometry(1, height, 0.3);
+            const fenceMaterial = new THREE.MeshLambertMaterial({ color: 0x8B4513 });
+            // Create fence posts around perimeter
+            const halfSize = size / 2;
+            const postSpacing = 8;
+            
+            for (let x = -halfSize; x <= halfSize; x += postSpacing) {
+                // Top and bottom fences
+                const topFence = new THREE.Mesh(fenceGeometry, fenceMaterial);
+                topFence.position.set(center.x + x, height/2, center.z - halfSize);
+                topFence.castShadow = true;
+                scene.add(topFence);
+                
+                const bottomFence = new THREE.Mesh(fenceGeometry, fenceMaterial);
+                bottomFence.position.set(center.x + x, height/2, center.z + halfSize);
+                bottomFence.castShadow = true;
+                scene.add(bottomFence);
+            }
+            
+            for (let z = -halfSize; z <= halfSize; z += postSpacing) {
+                // Left and right fences
+                const leftFence = new THREE.Mesh(fenceGeometry, fenceMaterial);
+                leftFence.position.set(center.x - halfSize, height/2, center.z + z);
+                leftFence.rotation.y = Math.PI / 2;
+                leftFence.castShadow = true;
+                scene.add(leftFence);
+                
+                const rightFence = new THREE.Mesh(fenceGeometry, fenceMaterial);
+                rightFence.position.set(center.x + halfSize, height/2, center.z + z);
+                rightFence.rotation.y = Math.PI / 2;
+                rightFence.castShadow = true;
+                scene.add(rightFence);
+            }
+        }
+        function createAdvancedFarmSections() {
+    // Existing animal sections
+    createEnhancedAnimalSection('pig', 25, { x: -100, z: -180 }, 70);
+    createEnhancedAnimalSection('cow', 20, { x: 120, z: -180 }, 80);
+    createEnhancedAnimalSection('chicken', 40, { x: -120, z: 180 }, 60);
+    createEnhancedAnimalSection('sheep', 18, { x: 180, z: 100 }, 50);
+    createEnhancedAnimalSection('goat', 15, { x: -180, z: 50 }, 55);
+
+    // Existing crop sections
+    createCropSection('plantain', 120, { x: 150, z: 180 }, 90);
+    createCropSection('maize', 150, { x: -220, z: 280 }, 80);
+    createCropSection('cassava', 100, { x: 220, z: 280 }, 70);
+    createCropSection('rice', 130, { x: -250, z: -50 }, 85);
+    createCropSection('coffee', 80, { x: 250, z: -250 }, 75);
+    createCropSection('cocoa', 70, { x: -200, z: -280 }, 65);
+
+    // --- Add new farmland along the roadside ---
+    createCropSection('maize', 200, { x: 300, z: 0 }, 120);
+    createCropSection('rice', 250, { x: -300, z: 500 }, 150);
+    createCropSection('coffee', 150, { x: 350, z: -600 }, 100);
+    createEnhancedAnimalSection('sheep', 30, { x: -250, z: -400 }, 80);
+    createCropSection('plantain', 150, { x: 280, z: 800 }, 120);
+    createCropSection('cassava', 180, { x: -320, z: -900 }, 140);
+}
+        function createEnhancedAnimal(type) {
+            const group = new THREE.Group();
+            let body, head, legs = [];
+            switch(type) {
+                case 'pig':
+                    // More detailed pig model
+                    body = new THREE.Mesh(
+                        new THREE.SphereGeometry(1.5, 12, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xffc0cb })
+                    );
+                    body.scale.set(1.2, 0.9, 1.8);
+                    
+                    head = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.8, 12, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xffc0cb })
+                    );
+                    head.position.set(0, 0.2, -2.2);
+                    head.scale.set(1, 0.8, 1.2);
+                    
+                    // Snout
+                    const snout = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.3, 0.4, 0.6, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xf0a0b0 })
+                    );
+                    snout.position.set(0, -0.2, -2.8);
+                    snout.rotation.x = Math.PI / 2;
+                    
+                    // Ears
+                    const ear1 = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.3, 0.6, 6),
+                        new THREE.MeshLambertMaterial({ color: 0xffc0cb })
+                    );
+                    ear1.position.set(-0.4, 0.6, -2.2);
+                    ear1.rotation.z = -0.3;
+                    
+                    const ear2 = ear1.clone();
+                    ear2.position.set(0.4, 0.6, -2.2);
+                    ear2.rotation.z = 0.3;
+                    
+                    // Tail
+                    const pigTail = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.1, 0.05, 1, 4),
+                        new THREE.MeshLambertMaterial({ color: 0xffc0cb })
+                    );
+                    pigTail.position.set(0, 0.5, 2);
+                    pigTail.rotation.x = 0.5;
+                    
+                    group.add(body, head, snout, ear1, ear2, pigTail);
+                    break;
+                case 'cow':
+                    // Detailed cow model
+                    body = new THREE.Mesh(
+                        new THREE.BoxGeometry(4, 2.5, 6),
+                        new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+                    );
+                    
+                    head = new THREE.Mesh(
+                        new THREE.BoxGeometry(2, 2, 2.5),
+                        new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+                    );
+                    head.position.set(0, 1, -4);
+                    
+                    // Horns
+                    const horn1 = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.1, 0.8, 6),
+                        new THREE.MeshLambertMaterial({ color: 0x654321 })
+                    );
+                    horn1.position.set(-0.6, 2.5, -4);
+                    
+                    const horn2 = horn1.clone();
+                    horn2.position.set(0.6, 2.5, -4);
+                    
+                    // Udder
+                    const udder = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.8, 8, 6),
+                        new THREE.MeshLambertMaterial({ color: 0xffc0cb })
+                    );
+                    udder.position.set(0, -2, 1);
+                    udder.scale.set(1, 0.6, 1.2);
+                    
+                    // Legs
+                    for (let i = 0; i < 4; i++) {
+                        const leg = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.3, 0.4, 3, 6),
+                            new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+                        );
+                        leg.position.set(
+                            i < 2 ? -1.5 : 1.5,
+                            -2.8,
+                            i % 2 === 0 ? -2 : 2
+                        );
+                        legs.push(leg);
+                        group.add(leg);
+                    }
+                    
+                    // Spots
+                    for (let i = 0; i < 8; i++) {
+                        const spot = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3 + Math.random() * 0.3, 8, 6),
+                            new THREE.MeshLambertMaterial({ color: 0x000000 })
+                        );
+                        spot.position.set(
+                            (Math.random() - 0.5) * 3,
+                            (Math.random() - 0.5) * 2,
+                            (Math.random() - 0.5) * 5
+                        );
+                        spot.scale.set(1, 0.1, 1);
+                        group.add(spot);
+                    }
+                    
+                    group.add(body, head, horn1, horn2, udder);
+                    break;
+                case 'chicken':
+                    // Detailed chicken model
+                    body = new THREE.Mesh(
+                        new THREE.SphereGeometry(1, 8, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+                    );
+                    body.scale.set(1, 1.2, 1.5);
+                    
+                    head = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.5, 8, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+                    );
+                    head.position.set(0, 1.2, -1);
+                    
+                    // Beak
+                    const beak = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.1, 0.4, 6),
+                        new THREE.MeshLambertMaterial({ color: 0xFFA500 })
+                    );
+                    beak.position.set(0, 1.2, -1.4);
+                    beak.rotation.x = Math.PI / 2;
+                    
+                    // Comb
+                    const comb = new THREE.Mesh(
+                        new THREE.BoxGeometry(0.3, 0.4, 0.1),
+                        new THREE.MeshLambertMaterial({ color: 0xFF0000 })
+                    );
+                    comb.position.set(0, 1.6, -1);
+                    
+                    // Wings
+                    const wing1 = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.6, 6, 4),
+                        new THREE.MeshLambertMaterial({ color: 0xF5F5DC })
+                    );
+                    wing1.position.set(-0.8, 0, 0);
+                    wing1.scale.set(0.8, 0.4, 1.2);
+                    
+                    const wing2 = wing1.clone();
+                    wing2.position.set(0.8, 0, 0);
+                    
+                    // Tail feathers
+                    const chickenTail = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.4, 1.5, 6),
+                        new THREE.MeshLambertMaterial({ color: 0xF5F5DC })
+                    );
+                    chickenTail.position.set(0, 0.5, 1.2);
+                    chickenTail.rotation.x = -0.5;
+                    
+                    // Legs
+                    for (let i = 0; i < 2; i++) {
+                        const leg = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.05, 0.05, 0.8, 4),
+                            new THREE.MeshLambertMaterial({ color: 0xFFA500 })
+                        );
+                        leg.position.set(i === 0 ? -0.3 : 0.3, -1.2, 0);
+                        legs.push(leg);
+                        group.add(leg);
+                    }
+                    
+                    group.add(body, head, beak, comb, wing1, wing2, chickenTail);
+                    break;
+
+                case 'sheep':
+                    // Detailed sheep model
+                    body = new THREE.Mesh(
+                        new THREE.SphereGeometry(1.8, 12, 8),
+                        new THREE.MeshLambertMaterial({ color: 0xFFFAFA })
+                    );
+                    body.scale.set(1, 0.8, 1.4);
+                    
+                    head = new THREE.Mesh(
+                        new THREE.SphereGeometry(0.7, 12, 8),
+                        new THREE.MeshLambertMaterial({ color: 0x000000 })
+                    );
+                    head.position.set(0, 0.5, -2.5);
+                    
+                    // Wool texture effect
+                    for (let i = 0; i < 15; i++) {
+                        const wool = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3, 6, 4),
+                            new THREE.MeshLambertMaterial({ color: 0xFFFAFA })
+                        );
+                        wool.position.set(
+                            (Math.random() - 0.5) * 3,
+                            (Math.random() - 0.5) * 2,
+                            (Math.random() - 0.5) * 3
+                        );
+                        group.add(wool);
+                    }
+                    
+                    // Legs
+                    for (let i = 0; i < 4; i++) {
+                        const leg = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.2, 0.25, 2, 6),
+                            new THREE.MeshLambertMaterial({ color: 0x000000 })
+                        );
+                        leg.position.set(
+                            i < 2 ? -1 : 1,
+                            -2,
+                            i % 2 === 0 ? -1.5 : 1.5
+                        );
+                        legs.push(leg);
+                        group.add(leg);
+                    }
+                    
+                    group.add(body, head);
+                    break;
+
+                case 'goat':
+                    // Detailed goat model
+                    body = new THREE.Mesh(
+                        new THREE.BoxGeometry(3, 2, 5),
+                        new THREE.MeshLambertMaterial({ color: 0xDEB887 })
+                    );
+                    
+                    head = new THREE.Mesh(
+                        new THREE.BoxGeometry(1.5, 1.5, 2),
+                        new THREE.MeshLambertMaterial({ color: 0xDEB887 })
+                    );
+                    head.position.set(0, 1, -3.5);
+                    
+                    // Horns
+                    const goatHorn1 = new THREE.Mesh(
+                        new THREE.ConeGeometry(0.08, 1, 6),
+                        new THREE.MeshLambertMaterial({ color: 0x654321 })
+                    );
+                    goatHorn1.position.set(-0.4, 2.2, -3.5);
+                    goatHorn1.rotation.z = -0.2;
+                    
+                    const goatHorn2 = goatHorn1.clone();
+                    goatHorn2.position.set(0.4, 2.2, -3.5);
+                    goatHorn2.rotation.z = 0.2;
+                    
+                    // Beard
+                    const beard = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.1, 0.05, 0.8, 6),
+                        new THREE.MeshLambertMaterial({ color: 0xFFFFFF })
+                    );
+                    beard.position.set(0, 0.2, -4.5);
+                    
+                    // Legs
+                    for (let i = 0; i < 4; i++) {
+                        const leg = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.2, 0.25, 2.5, 6),
+                            new THREE.MeshLambertMaterial({ color: 0xDEB887 })
+                        );
+                        leg.position.set(
+                            i < 2 ? -1.2 : 1.2,
+                            -2.25,
+                            i % 2 === 0 ? -1.5 : 1.5
+                        );
+                        legs.push(leg);
+                        group.add(leg);
+                    }
+                    
+                    group.add(body, head, goatHorn1, goatHorn2, beard);
+                    break;
+            }
+            
+            // Add shadow casting
+            group.children.forEach(child => {
+                child.castShadow = true;
+                child.receiveShadow = true;
+            });
+            return group;
+        }
+        function createEnhancedAnimalSection(type, count, center, range) {
+            for (let i = 0; i < count; i++) {
+                const animal = createEnhancedAnimal(type);
+                animal.position.set(
+                    center.x + (Math.random() - 0.5) * range,
+                    type === 'chicken' ? 0.5 : 1.5,
+                    center.z + (Math.random() - 0.5) * range
+                );
+                
+                // Slower movement system - reduced velocity significantly
+                animal.userData = {
+                    velocity: new THREE.Vector3(
+                        (Math.random() - 0.5) * 0.0008, // Much slower movement
+                        0,
+                        (Math.random() - 0.5) * 0.0008
+                    ),
+                    bounds: {
+                        xMin: center.x - range / 2,
+                        xMax: center.x + range / 2,
+                        zMin: center.z - range / 2,
+                        zMax: center.z + range / 2
+                    },
+                    type: type,
+                    health: 85 + Math.random() * 15,
+                    age: Math.random() * 365,
+                    lastFed: Date.now() - Math.random() * 3600000,
+                    behavior: 'grazing'
+                };
+                
+                animals.push(animal);
+                scene.add(animal);
+            }
+        }
+        function createCropSection(type, count, center, range) {
+            for (let i = 0; i < count; i++) {
+                const crop = createCropPlant(type);
+                
+                // Enhanced placement system avoiding roads and buildings
+                let xPos, zPos;
+                let attempts = 0;
+                do {
+                    xPos = center.x + (Math.random() - 0.5) * range;
+                    zPos = center.z + (Math.random() - 0.5) * range;
+                    attempts++;
+                    if (attempts > 100) break;
+                } while (
+                    // Avoid main road
+                    (Math.abs(xPos) < 60) ||
+                    // Avoid cross roads
+                    (Math.abs(zPos - 150) < 25 && Math.abs(xPos) < 200) ||
+                    (Math.abs(zPos + 150) < 25 && Math.abs(xPos) < 200) ||
+                    // Avoid building areas
+                    isNearBuilding(xPos, zPos)
+                );
+                
+                crop.position.set(xPos, 0, zPos);
+                
+                crop.userData = {
+                    type: type,
+                    growthStage: Math.random(),
+                    health: 80 + Math.random() * 20,
+                    soilQuality: 70 + Math.random() * 25,
+                    waterLevel: 60 + Math.random() * 30,
+                    lastWatered: Date.now() - Math.random() * 86400000,
+                    harvestReady: Math.random() > 0.8
+                };
+                
+                plants.push(crop);
+                scene.add(crop);
+            }
+        }
+        function createCropPlant(type) {
+            const group = new THREE.Group();
+            
+            switch(type) {
+                case 'plantain':
+                    // Main stem
+                    const stem = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.8, 1.2, 8, 8),
+                        new THREE.MeshLambertMaterial({ color: 0x228B22 })
+                    );
+                    stem.position.y = 4;
+                    stem.castShadow = true;
+                    group.add(stem);
+                    
+                    // Leaves
+                    for (let i = 0; i < 8; i++) {
+                        const leafGeometry = new THREE.PlaneGeometry(3, 8);
+                        const leafMaterial = new THREE.MeshLambertMaterial({ 
+                            color: 0x32CD32, 
+                            side: THREE.DoubleSide,
+                            transparent: true,
+                            opacity: 0.8
+                        });
+                        const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+                        leaf.position.set(
+                            Math.cos(i * Math.PI / 4) * 2,
+                            6 + Math.random() * 2,
+                            Math.sin(i * Math.PI / 4) * 2
+                        );
+                        leaf.rotation.y = i * Math.PI / 4;
+                        leaf.rotation.x = -0.2 + Math.random() * 0.4;
+                        leaf.castShadow = true;
+                        group.add(leaf);
+                    }
+                    
+                    // Banana bunch (if mature)
+                    if (Math.random() > 0.6) {
+                        const bunch = new THREE.Group();
+                        for (let i = 0; i < 12; i++) {
+                            const banana = new THREE.Mesh(
+                                new THREE.CylinderGeometry(0.3, 0.2, 2, 6),
+                                new THREE.MeshLambertMaterial({ color: 0xFFD700 })
+                            );
+                            banana.position.set(
+                                Math.cos(i * Math.PI / 6) * 0.8,
+                                -0.5 - i * 0.1,
+                                Math.sin(i * Math.PI / 6) * 0.8
+                            );
+                            banana.rotation.x = 0.3;
+                            bunch.add(banana);
+                        }
+                        bunch.position.set(0, 8, 0);
+                        group.add(bunch);
+                    }
+                    break;
+                    
+                case 'maize':
+                    // Corn stalk
+                    const stalk = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.2, 0.3, 6, 8),
+                        new THREE.MeshLambertMaterial({ color: 0x90EE90 })
+                    );
+                    stalk.position.y = 3;
+                    stalk.castShadow = true;
+                    group.add(stalk);
+                    
+                    // Corn leaves
+                    for (let i = 0; i < 6; i++) {
+                        const leafGeometry = new THREE.PlaneGeometry(0.8, 4);
+                        const leafMaterial = new THREE.MeshLambertMaterial({ 
+                            color: 0x228B22, 
+                            side: THREE.DoubleSide 
+                        });
+                        const leaf = new THREE.Mesh(leafGeometry, leafMaterial);
+                        leaf.position.set(
+                            Math.cos(i * Math.PI / 3) * 0.5,
+                            2 + i * 0.8,
+                            Math.sin(i * Math.PI / 3) * 0.5
+                        );
+                        leaf.rotation.y = i * Math.PI / 3;
+                        leaf.rotation.z = 0.2;
+                        group.add(leaf);
+                    }
+                    
+                    // Corn cobs
+                    if (Math.random() > 0.5) {
+                        for (let i = 0; i < 2; i++) {
+                            const cob = new THREE.Mesh(
+                                new THREE.CylinderGeometry(0.4, 0.3, 2, 8),
+                                new THREE.MeshLambertMaterial({ color: 0xFFD700 })
+                            );
+                            cob.position.set(
+                                (i === 0 ? -0.6 : 0.6),
+                                4 + i * 0.3,
+                                0
+                            );
+                            cob.rotation.z = i === 0 ? -0.3 : 0.3;
+                            group.add(cob);
+                        }
+                    }
+                    break;
+                    
+                case 'cassava':
+                    // Cassava stem
+                    const cassavaStem = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.3, 0.4, 4, 6),
+                        new THREE.MeshLambertMaterial({ color: 0x8FBC8F })
+                    );
+                    cassavaStem.position.y = 2;
+                    cassavaStem.castShadow = true;
+                    group.add(cassavaStem);
+                    
+                    // Cassava leaves (star-shaped)
+                    for (let i = 0; i < 5; i++) {
+                        const branch = new THREE.Group();
+                        
+                        // Branch stem
+                        const branchStem = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.05, 0.08, 1.5, 4),
+                            new THREE.MeshLambertMaterial({ color: 0x8FBC8F })
+                        );
+                        branchStem.position.y = 0.75;
+                        branch.add(branchStem);
+                        
+                        // Star leaves
+                        for (let j = 0; j < 7; j++) {
+                            const leaflet = new THREE.Mesh(
+                                new THREE.PlaneGeometry(0.5, 2),
+                                new THREE.MeshLambertMaterial({ 
+                                    color: 0x32CD32, 
+                                    side: THREE.DoubleSide 
+                                })
+                            );
+                            leaflet.position.set(
+                                Math.cos(j * Math.PI / 3.5) * 0.8,
+                                1.5,
+                                Math.sin(j * Math.PI / 3.5) * 0.8
+                            );
+                            leaflet.rotation.y = j * Math.PI / 3.5;
+                            branch.add(leaflet);
+                        }
+                        
+                        branch.position.set(
+                            Math.cos(i * Math.PI * 2 / 5) * 0.5,
+                            3 + i * 0.2,
+                            Math.sin(i * Math.PI * 2 / 5) * 0.5
+                        );
+                        branch.rotation.y = i * Math.PI * 2 / 5;
+                        group.add(branch);
+                    }
+                    break;
+
+                case 'rice':
+                    // Rice stalks
+                    for (let i = 0; i < 5; i++) {
+                        const riceStalk = new THREE.Mesh(
+                            new THREE.CylinderGeometry(0.02, 0.05, 3, 4),
+                            new THREE.MeshLambertMaterial({ color: 0x9ACD32 })
+                        );
+                        riceStalk.position.set(
+                            (Math.random() - 0.5) * 0.8,
+                            1.5,
+                            (Math.random() - 0.5) * 0.8
+                        );
+                        riceStalk.castShadow = true;
+                        group.add(riceStalk);
+                        
+                        // Rice grains
+                        if (Math.random() > 0.6) {
+                            for (let j = 0; j < 10; j++) {
+                                const grain = new THREE.Mesh(
+                                    new THREE.SphereGeometry(0.02, 4, 3),
+                                    new THREE.MeshLambertMaterial({ color: 0xFFD700 })
+                                );
+                                grain.position.set(
+                                    riceStalk.position.x + (Math.random() - 0.5) * 0.2,
+                                    2.5 + j * 0.1,
+                                    riceStalk.position.z + (Math.random() - 0.5) * 0.2
+                                );
+                                group.add(grain);
+                            }
+                        }
+                    }
+                    break;
+
+                case 'coffee':
+                    // Coffee bush
+                    const coffeeBush = new THREE.Mesh(
+                        new THREE.SphereGeometry(1.5, 8, 6),
+                        new THREE.MeshLambertMaterial({ color: 0x228B22 })
+                    );
+                    coffeeBush.position.y = 1.5;
+                    coffeeBush.scale.y = 0.8;
+                    coffeeBush.castShadow = true;
+                    group.add(coffeeBush);
+                    
+                    // Coffee cherries
+                    for (let i = 0; i < 20; i++) {
+                        const cherry = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.1, 6, 4),
+                            new THREE.MeshLambertMaterial({ color: 0xDC143C })
+                        );
+                        cherry.position.set(
+                            (Math.random() - 0.5) * 3,
+                            1 + Math.random() * 2,
+                            (Math.random() - 0.5) * 3
+                        );
+                        group.add(cherry);
+                    }
+                    break;
+
+                case 'cocoa':
+                    // Cocoa tree trunk
+                    const cocoaTrunk = new THREE.Mesh(
+                        new THREE.CylinderGeometry(0.4, 0.5, 6, 8),
+                        new THREE.MeshLambertMaterial({ color: 0x8B4513 })
+                    );
+                    cocoaTrunk.position.y = 3;
+                    cocoaTrunk.castShadow = true;
+                    group.add(cocoaTrunk);
+                    
+                    // Cocoa leaves
+                    for (let i = 0; i < 12; i++) {
+                        const leaf = new THREE.Mesh(
+                            new THREE.PlaneGeometry(1, 2.5),
+                            new THREE.MeshLambertMaterial({ 
+                                color: 0x006400, 
+                                side: THREE.DoubleSide 
+                            })
+                        );
+                        leaf.position.set(
+                            Math.cos(i * Math.PI / 6) * 1.5,
+                            5 + Math.random() * 1,
+                            Math.sin(i * Math.PI / 6) * 1.5
+                        );
+                        leaf.rotation.y = i * Math.PI / 6;
+                        group.add(leaf);
+                    }
+                    
+                    // Cocoa pods
+                    for (let i = 0; i < 5; i++) {
+                        const pod = new THREE.Mesh(
+                            new THREE.SphereGeometry(0.3, 8, 6),
+                            new THREE.MeshLambertMaterial({ color: 0x8B4513 })
+                        );
+                        pod.position.set(
+                            Math.cos(i * Math.PI / 2.5) * 0.6,
+                            2 + Math.random() * 3,
+                            Math.sin(i * Math.PI / 2.5) * 0.6
+                        );
+                        pod.scale.set(1, 1.5, 1);
+                        group.add(pod);
+                    }
+                    break;
+            }
+            
+            // Add growth variation
+            const growthFactor = 0.6 + Math.random() * 0.8;
+            group.scale.multiplyScalar(growthFactor);
+            
+            return group;
+        }
+        function createAdvancedWeatherSystem() {
+            // Enhanced cloud system
+            clouds = new THREE.Group();
+            scene.add(clouds);
+            
+            // Realistic rain system with individual droplets
+            createRealisticRainSystem();
+            
+            // Rain splash system
+            createRainSplashSystem();
+            
+            // Wind effect system
+            createWindSystem();
+        }
+
+        function createRealisticRainSystem() {
+    // This function now creates individual teardrop-shaped meshes instead of points.
+    const rainCount = 1500;
+    const rainMaterial = new THREE.MeshBasicMaterial({
+        color: 0x87CEEB,
+        transparent: true,
+        opacity: 0.6
+    });
+    // A tall, thin cone makes a great teardrop shape.
+    const rainGeometry = new THREE.ConeGeometry(0.1, 2.5, 6);
+
+    for (let i = 0; i < rainCount; i++) {
+        const drop = new THREE.Mesh(rainGeometry, rainMaterial);
+
+        // Set an initial random position high up in the scene
+        drop.position.set(
+            (Math.random() - 0.5) * 1200,
+            200 + Math.random() * 200,
+            (Math.random() - 0.5) * 1200
+        );
+
+        // Store a velocity vector for each drop with a much faster fall speed
+        drop.userData.velocity = new THREE.Vector3(
+            0,
+            -25 - Math.random() * 15, // Increased fall speed
+            0
+        );
+        
+        drop.visible = false; // Start with the drops hidden
+        rainDrops.push(drop);
+        scene.add(drop);
+    }
+}
+function createRainSplashSystem() {
+    // Create splash particle system
+    window.rainSplashes = [];
+    
+    // Generate a dramatic number of splashes very frequently
+    setInterval(() => {
+        if (isRaining && window.rainSplashes.length < 500) { // Increased max splashes on screen
+            // Create 8 splashes per interval instead of 4
+            for(let i=0; i<8; i++) {
+                createSplash();
+            }
+        }
+    }, 20); // Decreased interval to create them much faster
+}
+        
+       function createSplash() {
+    const splashGroup = new THREE.Group();
+    
+    // Random position on ground
+    const x = (Math.random() - 0.5) * 1000;
+    const z = (Math.random() - 0.5) * 1000;
+    
+    // Create splash particles
+    for (let i = 0; i < 15; i++) {
+        // Reduced the size of each droplet
+        const droplet = new THREE.Mesh(
+            new THREE.SphereGeometry(0.15, 6, 4),
+            new THREE.MeshBasicMaterial({ 
+                color: 0x87CEEB, 
+                transparent: true, 
+                opacity: 1.0
+            })
+        );
+        
+        // Reduced the radius of the splash spread
+        droplet.position.set(
+            x + (Math.random() - 0.5) * 1.5,
+            0.5,
+            z + (Math.random() - 0.5) * 1.5
+        );
+        
+        droplet.userData = {
+            velocity: new THREE.Vector3(
+                (Math.random() - 0.5) * 0.8,
+                Math.random() * 0.8 + 0.4,
+                (Math.random() - 0.5) * 0.8
+            ),
+            life: 1.0
+        };
+        
+        splashGroup.add(droplet);
+    }
+    
+    splashGroup.position.set(x, 0, z);
+    scene.add(splashGroup);
+    window.rainSplashes.push(splashGroup);
+}
+        
+        function updateRainSplashes() {
+    if (!window.rainSplashes) return;
+    
+    for (let i = window.rainSplashes.length - 1; i >= 0; i--) {
+        const splash = window.rainSplashes[i];
+        
+        splash.children.forEach(droplet => {
+            droplet.position.add(droplet.userData.velocity);
+            droplet.userData.velocity.y -= 0.02;
+            
+            // Increased life depletion, making splashes disappear faster
+            droplet.userData.life -= 0.06; 
+            droplet.material.opacity = droplet.userData.life;
+            
+            if (droplet.position.y <= 0.2) {
+                droplet.position.y = 0.2;
+                droplet.userData.velocity.y = 0;
+                droplet.userData.velocity.x *= 0.8;
+                droplet.userData.velocity.z *= 0.8;
+            }
+        });
+        
+        // Remove the splash group from the scene when its life is over
+        if (splash.children.length > 0 && splash.children[0].userData.life <= 0) {
+            scene.remove(splash);
+            window.rainSplashes.splice(i, 1);
+        }
+    }
+}
+
+        function createWindSystem() {
+            // Optimized wind indicators with less frequent updates
+            setInterval(() => {
+                // Animate grass swaying - only update a subset each frame
+                let grassCount = 0;
+                scene.children.forEach(child => {
+                    if (child.geometry && child.geometry.type === 'CylinderGeometry' && child.scale.y < 2) {
+                        if (grassCount % 5 === 0) { // Only update every 5th grass blade
+                            child.rotation.z = Math.sin(Date.now() * 0.002) * 0.1;
+                        }
+                        grassCount++;
+                    }
+                });
+                
+                // Animate plant leaves - less frequent updates
+                if (Math.random() > 0.7) { // Only animate 30% of the time
+                    plants.forEach((plant, index) => {
+                        if (index % 3 === 0) { // Only update every 3rd plant
+                            plant.children.forEach(child => {
+                                if (child.geometry && child.geometry.type === 'PlaneGeometry') {
+                                    child.rotation.x += Math.sin(Date.now() * 0.003) * 0.02;
+                                    child.rotation.z += Math.cos(Date.now() * 0.002) * 0.01;
+                                }
+                            });
+                        }
+                    });
+                }
+            }, 100); // Reduced frequency from 50ms to 100ms
+        }
+        function createFarmEquipment() {
+            // Tractor
+            const tractor = createTractor();
+            tractor.position.set(-50, 2, -50);
+            tractor.rotation.y = Math.PI / 4;
+            scene.add(tractor);
+            
+            // Harvester
+            const harvester = createHarvester();
+            harvester.position.set(180, 2, 80);
+            scene.add(harvester);
+            
+            // Water tank truck
+            const waterTruck = createWaterTruck();
+            waterTruck.position.set(50, 1, -80);
+            scene.add(waterTruck);
+            
+            // Additional equipment
+            const seedDrill = createSeedDrill();
+            seedDrill.position.set(-120, 1, 60);
+            scene.add(seedDrill);
+            
+            const fertilizer = createFertilizerSpreader();
+            fertilizer.position.set(90, 1, 120);
+            scene.add(fertilizer);
+        }
+        
+        function createSeedDrill() {
+            const group = new THREE.Group();
+            
+            // Main frame
+            const frame = new THREE.Mesh(
+                new THREE.BoxGeometry(8, 2, 12),
+                new THREE.MeshLambertMaterial({ color: 0x32CD32 })
+            );
+            frame.position.y = 1;
+            frame.castShadow = true;
+            group.add(frame);
+            
+            // Seed hoppers
+            for (let i = 0; i < 4; i++) {
+                const hopper = new THREE.Mesh(
+                    new THREE.CylinderGeometry(1, 0.8, 2, 8),
+                    new THREE.MeshLambertMaterial({ color: 0x4169E1 })
+                );
+                hopper.position.set(-3 + i * 2, 3, 0);
+                group.add(hopper);
+            }
+            
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(1, 1, 0.5, 8);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x222222 });
+            
+            const wheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheel1.position.set(-3, 0, -5);
+            wheel1.rotation.z = Math.PI / 2;
+            
+            const wheel2 = wheel1.clone();
+            wheel2.position.set(3, 0, -5);
+            
+            group.add(wheel1, wheel2);
+            return group;
+        }
+        
+        function createFertilizerSpreader() {
+            const group = new THREE.Group();
+            
+            // Main body
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(6, 3, 8),
+                new THREE.MeshLambertMaterial({ color: 0xFF4500 })
+            );
+            body.position.y = 1.5;
+            body.castShadow = true;
+            group.add(body);
+            
+            // Fertilizer tank
+            const tank = new THREE.Mesh(
+                new THREE.CylinderGeometry(2, 2, 4, 8),
+                new THREE.MeshLambertMaterial({ color: 0x228B22 })
+            );
+            tank.position.y = 4;
+            tank.castShadow = true;
+            group.add(tank);
+            
+            // Spreader disc
+            const disc = new THREE.Mesh(
+                new THREE.CylinderGeometry(1.5, 1.5, 0.2, 16),
+                new THREE.MeshLambertMaterial({ color: 0x444444 })
+            );
+            disc.position.set(0, 0.5, -4);
+            disc.rotation.x = Math.PI / 2;
+            group.add(disc);
+            
+            return group;
+        }
+        
+        function initCollectionTruckSystem() {
+            setInterval(() => {
+                if (!collectionTruck) {
+                    sendCollectionTruck();
+                }
+            }, 20000); // Every 20 seconds
+        }
+        
+        function sendCollectionTruck() {
+            collectionTruck = createCollectionTruck();
+            collectionTruck.position.set(-10, 2, -400); // Start on road, at negative Z
+            collectionTruck.rotation.y = Math.PI; // Turn truck around to face correct direction
+            scene.add(collectionTruck);
+            
+           
+            
+            // Animate truck movement
+            animateTruckCollection();
+        }
+        
+        function createCollectionTruck() {
+            const group = new THREE.Group();
+            
+            // Truck cabin
+            const cabin = new THREE.Mesh(
+                new THREE.BoxGeometry(4, 3, 6),
+                new THREE.MeshLambertMaterial({ color: 0x228B22 })
+            );
+            cabin.position.set(0, 1.5, -3);
+            cabin.castShadow = true;
+            group.add(cabin);
+            
+            // Truck bed with cage
+            const bed = new THREE.Mesh(
+                new THREE.BoxGeometry(6, 2, 8),
+                new THREE.MeshLambertMaterial({ color: 0x8B4513 })
+            );
+            bed.position.set(0, 1, 4);
+            bed.castShadow = true;
+            group.add(bed);
+            
+            // Cage bars
+            for (let i = 0; i < 5; i++) {
+                const bar = new THREE.Mesh(
+                    new THREE.CylinderGeometry(0.1, 0.1, 3, 6),
+                    new THREE.MeshLambertMaterial({ color: 0x444444 })
+                );
+                bar.position.set(-2.5 + i * 1.25, 2.5, 4);
+                group.add(bar);
+            }
+            
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(1.2, 1.2, 0.8, 8);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x222222 });
+            
+            [-3, 3].forEach(z => {
+                [-2, 2].forEach(x => {
+                    const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                    wheel.position.set(x, 0.5, z);
+                    wheel.rotation.z = Math.PI / 2;
+                    group.add(wheel);
+                });
+            });
+            return group;
+        }
+        
+        function animateTruckCollection() {
+            let stage = 'arriving';
+            
+            const moveInterval = setInterval(() => {
+                if (!collectionTruck) {
+                    clearInterval(moveInterval);
+                    return;
+                }
+                
+                switch(stage) {
+                    case 'arriving':
+                        collectionTruck.position.z += 3; // Move forward along Z-axis
+                        if (collectionTruck.position.z >= 0) {
+                            stage = 'collecting';
+                            setTimeout(() => {
+                                collectAnimals();
+                                stage = 'leaving';
+                            }, 3000);
+                        }
+                        break;
+                        
+                    case 'leaving':
+                        collectionTruck.position.z += 3; // Continue forward along road
+                        if (collectionTruck.position.z > 400) {
+                            scene.remove(collectionTruck);
+                            collectionTruck = null;
+                            clearInterval(moveInterval);
+                        }
+                        break;
+                }
+            }, 50);
+        }
+        
+        function collectAnimals() {
+            let collectedCount = 0;
+            let collectedValue = 0;
+            
+            // Collect some animals (randomly)
+            for (let i = animals.length - 1; i >= 0 && collectedCount < 3; i--) {
+                if (Math.random() > 0.7) {
+                    const animal = animals[i];
+                    const type = animal.userData.type;
+                    
+                    // Calculate value based on animal type and health
+                    let baseValue = 0;
+                    switch(type) {
+                        case 'cow': baseValue = 1200; break;
+                        case 'pig': baseValue = 800; break;
+                        case 'chicken': baseValue = 25; break;
+                        case 'sheep': baseValue = 600; break;
+                        case 'goat': baseValue = 450; break;
+                    }
+                    
+                    const healthMultiplier = animal.userData.health / 100;
+                    const animalValue = Math.floor(baseValue * healthMultiplier);
+                    
+                    
+                    
+                    // Remove animal from scene and array
+                    scene.remove(animal);
+                    animals.splice(i, 1);
+                    collectedCount++;
+                }
+            }
+            
+            if (collectedCount > 0) {
+               
+                
+            }
+        }
+        
+        
+
+        // Car Traffic System - Optimized
+        function initCarTrafficSystem() {
+            setInterval(() => {
+                if (cars.length < 2 && Math.random() > 0.6) { // Reduced max cars and spawn rate
+                    spawnCar();
+                }
+            }, 12000); // Increased interval to every 12 seconds
+        }
+        
+        function spawnCar() {
+    const car = createCar();
+    const direction = Math.random() > 0.5 ? 1 : -1; // 1 for positive Z, -1 for negative Z
+
+    // Define lane positions to match the boulevard layout
+    const laneWidth = 16;
+    const medianWidth = 12;
+    const rightLanePositionX = medianWidth / 2 + laneWidth / 2;
+    const leftLanePositionX = -(medianWidth / 2 + laneWidth / 2);
+
+    // Assign the car to the correct lane based on its direction
+    const startX = direction === 1 ? rightLanePositionX : leftLanePositionX;
+
+    car.position.set(
+        startX,
+        1.5,
+        direction === 1 ? -1800 : 1800 // Start at opposite ends of the road
+    );
+
+    car.userData = {
+        speed: 2 + Math.random() * 2,
+        direction: direction,
+        lane: startX
+    };
+
+    // Make the car face the correct direction
+    if (direction < 0) {
+        car.rotation.y = Math.PI;
+    }
+
+    cars.push(car);
+    scene.add(car);
+}
+        
+        function createCar() {
+            const group = new THREE.Group();
+            
+            // Car body
+            const bodyGeometry = new THREE.BoxGeometry(4, 2, 8);
+            const carColors = [0xFF0000, 0x0000FF, 0x00FF00, 0xFFFF00, 0xFF00FF, 0x00FFFF, 0xFFA500, 0x800080];
+            const bodyMaterial = new THREE.MeshLambertMaterial({ 
+                color: carColors[Math.floor(Math.random() * carColors.length)]
+            });
+            const body = new THREE.Mesh(bodyGeometry, bodyMaterial);
+            body.position.y = 1;
+            body.castShadow = true;
+            group.add(body);
+            
+            // Car roof
+            const roofGeometry = new THREE.BoxGeometry(3, 1.5, 5);
+            const roofMaterial = new THREE.MeshLambertMaterial({ color: 0x333333 });
+            const roof = new THREE.Mesh(roofGeometry, roofMaterial);
+            roof.position.y = 2.25;
+            roof.castShadow = true;
+            group.add(roof);
+            
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(0.8, 0.8, 0.4, 8);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x222222 });
+            
+            const wheelPositions = [
+                [-1.8, 0, -3],
+                [1.8, 0, -3],
+                [-1.8, 0, 3],
+                [1.8, 0, 3]
+            ];
+            
+            wheelPositions.forEach(pos => {
+                const wheel = new THREE.Mesh(wheelGeometry, wheelMaterial);
+                wheel.position.set(pos[0], pos[1], pos[2]);
+                wheel.rotation.z = Math.PI / 2;
+                group.add(wheel);
+            });
+            
+            // Headlights
+            const lightGeometry = new THREE.SphereGeometry(0.3, 8, 6);
+            const lightMaterial = new THREE.MeshLambertMaterial({ color: 0xFFFFFF, emissive: 0x444444 });
+            
+            const light1 = new THREE.Mesh(lightGeometry, lightMaterial);
+            light1.position.set(-1.5, 1.2, -4);
+            group.add(light1);
+            
+            const light2 = new THREE.Mesh(lightGeometry, lightMaterial);
+            light2.position.set(1.5, 1.2, -4);
+            group.add(light2);
+            
+            return group;
+        }
+        
+        function updateCars() {
+            for (let i = cars.length - 1; i >= 0; i--) {
+                const car = cars[i];
+                const userData = car.userData;
+                
+                // Move car forward
+                car.position.z += userData.speed * userData.direction;
+                
+                // Remove cars that have gone too far
+                if (Math.abs(car.position.z) > 500) {
+                    scene.remove(car);
+                    cars.splice(i, 1);
+                }
+                
+                // Animate wheels
+                car.children.forEach(child => {
+                    if (child.geometry && child.geometry.type === 'CylinderGeometry') {
+                        child.rotation.x += userData.speed * 0.1;
+                    }
+                });
+            }
+        }
+        
+        function createTractor() {
+            const group = new THREE.Group();
+            
+            // Main body
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(8, 4, 12),
+                new THREE.MeshLambertMaterial({ color: 0xFF0000 })
+            );
+            body.position.y = 2;
+            body.castShadow = true;
+            group.add(body);
+            
+            // Cabin
+            const cabin = new THREE.Mesh(
+                new THREE.BoxGeometry(4, 3, 4),
+                new THREE.MeshLambertMaterial({ color: 0x333333 })
+            );
+            cabin.position.set(0, 4.5, -2);
+            cabin.castShadow = true;
+            group.add(cabin);
+            
+            // Wheels
+            const wheelGeometry = new THREE.CylinderGeometry(2, 2, 1, 12);
+            const wheelMaterial = new THREE.MeshLambertMaterial({ color: 0x222222 });
+            
+            const wheel1 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheel1.position.set(-4.5, 0, -4);
+            wheel1.rotation.z = Math.PI / 2;
+            
+            const wheel2 = wheel1.clone();
+            wheel2.position.set(4.5, 0, -4);
+            
+            const wheel3 = new THREE.Mesh(wheelGeometry, wheelMaterial);
+            wheel3.position.set(-4.5, 0, 4);
+            wheel3.rotation.z = Math.PI / 2;
+            wheel3.scale.set(1.5, 1.5, 1.5);
+            
+            const wheel4 = wheel3.clone();
+            wheel4.position.set(4.5, 0, 4);
+            
+            group.add(wheel1, wheel2, wheel3, wheel4);
+            
+            // Exhaust pipe
+            const exhaust = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.3, 0.3, 4, 8),
+                new THREE.MeshLambertMaterial({ color: 0x444444 })
+            );
+            exhaust.position.set(-2, 6, 0);
+            group.add(exhaust);
+            return group;
+        }
+        function createHarvester() {
+            const group = new THREE.Group();
+            
+            // Main body
+            const body = new THREE.Mesh(
+                new THREE.BoxGeometry(6, 5, 15),
+                new THREE.MeshLambertMaterial({ color: 0x228B22 })
+            );
+            body.position.y = 2.5;
+            body.castShadow = true;
+            group.add(body);
+            
+            // Cutting header
+            const header = new THREE.Mesh(
+                new THREE.BoxGeometry(12, 2, 3),
+                new THREE.MeshLambertMaterial({ color: 0x888888 })
+            );
+            header.position.set(0, 1, -9);
+            header.castShadow = true;
+            group.add(header);
+            
+            // Grain tank
+            const tank = new THREE.Mesh(
+                new THREE.CylinderGeometry(3, 3, 6, 8),
+                new THREE.MeshLambertMaterial({ color: 0xDAA520 })
+            );
+            tank.position.set(0, 5.5, 2);
+            tank.castShadow = true;
+            group.add(tank);
+            
+            // Unloading auger
+            const auger = new THREE.Mesh(
+                new THREE.CylinderGeometry(0.3, 0.3, 8, 8),
+                new THREE.MeshLambertMaterial({ color: 0x444444 })
+            );
+            auger.position.set(3, 6, 2);
+            auger.rotation.z = Math.PI / 4;
+            group.add(auger);
+            return group;
+        }
+        function createWaterTruck() {
+            const group = new THREE.Group();
+            
+            // Truck chassis
+            const chassis = new THREE.Mesh(
+                new THREE.BoxGeometry(3, 2, 8),
+                new THREE.MeshLambertMaterial({ color: 0x0000FF })
+            );
+            chassis.position.y = 1;
+            chassis.castShadow = true;
+            group.add(chassis);
+            
+            // Water tank
+            const tank = new THREE.Mesh(
+                new THREE.CylinderGeometry(2.5, 2.5, 6, 12),
+                new THREE.MeshLambertMaterial({ color: 0x87CEEB })
+            );
+            tank.position.set(0, 2.5, 0);
+            tank.rotation.z = Math.PI / 2;
+            tank.castShadow = true;
+            group.add(tank);
+            
+            // Water hose reel
+            const reel = new THREE.Mesh(
+                new THREE.CylinderGeometry(1, 1, 0.5, 8),
+                new THREE.MeshLambertMaterial({ color: 0x444444 })
+            );
+            reel.position.set(0, 4, -3);
+            reel.rotation.x = Math.PI / 2;
+            group.add(reel);
+            return group;
+        }
+        function updateAnimals() {
+            animals.forEach(animal => {
+                // Enhanced movement AI with much slower speeds
+                const userData = animal.userData;
+                const currentTime = Date.now();
+                
+                // Behavioral AI
+                if (currentTime - userData.lastFed > 14400000) { // 4 hours
+                    userData.behavior = 'seeking_food';
+                    userData.velocity.multiplyScalar(1.1); // Slightly faster when hungry 
+                } else if (Math.random() > 0.98) {
+                    const behaviors = ['grazing', 'resting', 'socializing', 'exploring'];
+                    userData.behavior = behaviors[Math.floor(Math.random() * behaviors.length)];
+                }
+                
+                // Movement based on behavior (all much slower)
+                switch (userData.behavior) {
+                    case 'grazing':
+                        userData.velocity.multiplyScalar(0.3); // Much slower movement
+                        break;
+                    case 'resting':
+                        userData.velocity.multiplyScalar(0.05); // Almost stationary
+                        break;
+                    case 'exploring':
+                        userData.velocity.multiplyScalar(0.8); // Still slower than before
+                        break;
+                }
+                
+                // Apply movement
+                animal.position.add(userData.velocity);
+                
+                // Boundary checking with realistic behavior
+                if (animal.position.x < userData.bounds.xMin || animal.position.x > userData.bounds.xMax) {
+                    userData.velocity.x *= -1;
+                    // Add some randomness to prevent predictable patterns
+                    userData.velocity.z += (Math.random() - 0.5) * 0.01;
+                }
+                if (animal.position.z < userData.bounds.zMin || animal.position.z > userData.bounds.zMax) {
+                    userData.velocity.z *= -1;
+                    userData.velocity.x += (Math.random() - 0.5) * 0.01;
+                }
+                
+                // Rotate to face movement direction
+                animal.rotation.y = Math.atan2(userData.velocity.x, userData.velocity.z);
+                
+                // Random direction changes (less frequent)
+                if (Math.random() > 0.997) {
+                    userData.velocity.x += (Math.random() - 0.5) * 0.015;
+                    userData.velocity.z += (Math.random() - 0.5) * 0.015;
+                    
+                    // Limit maximum velocity (much slower)
+                    const maxSpeed = userData.type === 'chicken' ? 0.002 : (userData.type === 'cow' ? 0.001 : 0.0015);
+                    if (userData.velocity.length() > maxSpeed) {
+                        userData.velocity.normalize().multiplyScalar(maxSpeed);
+                    }
+                }
+                
+                // Health simulation
+                if (Math.random() > 0.9999) {
+                    userData.health += (Math.random() - 0.3) * 2;
+                    userData.health = Math.max(0, Math.min(100, userData.health));
+                    
+                    if (userData.health < 30) {
+                        
+                    }
+                }
+            });
+        }
+        function updateCrops() {
+            plants.forEach(plant => {
+                const userData = plant.userData;
+                const currentTime = Date.now();
+                
+                // Growth simulation
+                if (currentTime - userData.lastWatered < 86400000) { // Within 24 hours
+                    userData.growthStage += 0.00001; // Slow growth
+                    userData.growthStage = Math.min(1, userData.growthStage);
+                    
+                    // Update plant scale based on growth
+                    const scale = 0.5 + userData.growthStage * 0.5;
+                    plant.scale.set(scale, scale, scale);
+                }
+                
+                // Stress factors
+                if (userData.waterLevel < 30) {
+                    userData.health -= 0.01;
+                    plant.children.forEach(child => {
+                        if (child.material && child.material.color) {
+                            child.material.color.lerp(new THREE.Color(0x8B4513), 0.001); // Brown color for drought stress
+                        }
+                    });
+                }
+                
+                // Harvest readiness
+                if (userData.growthStage > 0.9 && !userData.harvestReady) {
+                    userData.harvestReady = true;
+                    
+                }
+                
+                // Environmental effects
+                if (isRaining) {
+                    userData.waterLevel = Math.min(100, userData.waterLevel + 0.1);
+                }
+            });
+        }
+   function updateWeatherSystem() {
+    // Cloud movement
+    clouds.children.forEach(cloud => {
+        cloud.position.add(cloud.userData.velocity);
+        
+        // Wrap around boundaries
+        if (cloud.position.x > 1000) cloud.position.x = -1000;
+        if (cloud.position.x < -1000) cloud.position.x = 1000;
+        if (cloud.position.z > 1000) cloud.position.z = -1000;
+        if (cloud.position.z < -1000) cloud.position.z = 1000;
+        
+        // Random velocity changes
+        if (Math.random() > 0.999) {
+            cloud.userData.velocity.x += (Math.random() - 0.5) * 0.02;
+            cloud.userData.velocity.z += (Math.random() - 0.5) * 0.02;
+        }
+    });
+
+    // --- New Rain Animation Logic ---
+    if (isRaining) {
+        // When it's raining, loop through each drop
+        rainDrops.forEach(drop => {
+            drop.visible = true; // Make the drop visible
+            drop.position.add(drop.userData.velocity); // Move the drop based on its velocity
+
+            // If a drop has fallen below the ground, reset its position to the top
+            if (drop.position.y < -10) {
+                drop.position.y = 250;
+                drop.position.x = (Math.random() - 0.5) * 1200;
+                drop.position.z = (Math.random() - 0.5) * 1200;
+            }
+        });
+
+        // Lightning effects
+        if (Math.random() > 0.992) {
+            lightning.intensity = 50;
+            lightning.color.setHex(0xffffff);
+            lightning.position.set(
+                (Math.random() - 0.5) * 500,
+                150 + Math.random() * 100,
+                (Math.random() - 0.5) * 500
+            );
+            
+            setTimeout(() => { lightning.intensity = 20; }, 50);
+            setTimeout(() => { lightning.intensity = 40; }, 150);
+            setTimeout(() => { lightning.intensity = 0; }, 300);
+        }
+
+    } else {
+        // If it's not raining, make sure all drops are hidden
+        rainDrops.forEach(drop => {
+            drop.visible = false;
+        });
+    }
+}
+
+        function createRainClouds() {
+    // This function creates more complex, clumpy clouds made of multiple parts.
+    const cloudMaterial = new THREE.MeshLambertMaterial({
+        color: 0x555555, // A slightly lighter, more natural grey
+        transparent: true,
+    });
+
+    // Create 15 large cloud clusters
+    for (let i = 0; i < 15; i++) {
+        const cloudCluster = new THREE.Group();
+
+        // Each cloud is a cluster of smaller, overlapping "puffs"
+        const numPuffs = 6 + Math.floor(Math.random() * 6);
+        for (let j = 0; j < numPuffs; j++) {
+            const puffGeometry = new THREE.SphereGeometry(15 + Math.random() * 10, 8, 6);
+            
+            // Clone the material so each puff can have a different opacity
+            const puffMaterial = cloudMaterial.clone();
+            puffMaterial.opacity = 0.4 + Math.random() * 0.3; // Vary opacity for a softer look
+
+            const puff = new THREE.Mesh(puffGeometry, puffMaterial);
+
+            // Position the puffs randomly to form an irregular clump
+            puff.position.set(
+                (Math.random() - 0.5) * 50,
+                (Math.random() - 0.5) * 20,
+                (Math.random() - 0.5) * 40
+            );
+            cloudCluster.add(puff);
+        }
+
+        // Position the entire cloud cluster randomly in the sky
+        cloudCluster.position.set(
+            (Math.random() - 0.5) * 1200,
+            120 + Math.random() * 50,
+            (Math.random() - 0.5) * 1200
+        );
+
+        // Give the cloud cluster a random velocity for movement
+        cloudCluster.userData = {
+            velocity: new THREE.Vector3(
+                (Math.random() - 0.5) * 0.4,
+                0,
+                (Math.random() - 0.5) * 0.4
+            )
+        };
+
+        clouds.add(cloudCluster);
+    }
+}
+       function updateDayNightCycle() {
+    const scrollY = window.scrollY;
+    const scrollMax = document.body.scrollHeight - window.innerHeight;
+    let scrollPercent = 0;
+
+    // Check if scrollMax is positive to prevent division by zero
+    if (scrollMax > 0) {
+        scrollPercent = Math.min(scrollY / scrollMax, 1);
+    }
+    
+    // DayProgress will be 1 (day) at the top and 0 (night) at the bottom
+    const dayProgress = 1 - scrollPercent;
+
+    // --- Update lighting based on dayProgress ---
+    sunLight.intensity = dayProgress * 1.2;
+    moonLight.intensity = (1 - dayProgress) * 0.8;
+    
+    // --- Update sun/moon positions to arc across the sky ---
+    const angle = dayProgress * Math.PI; // Move from 180deg (day) to 0deg (night)
+    sunLight.position.set(0, Math.sin(angle) * 300, Math.cos(angle) * 200);
+    moonLight.position.set(0, -Math.sin(angle) * 300, -Math.cos(angle) * 200);
+    
+    // --- Update sky color for a smooth day-to-night transition ---
+    const skyColor = new THREE.Color();
+    const dayColor = new THREE.Color(0x87CEEB);     // Bright sky blue
+    const sunsetColor = new THREE.Color(0xFF6347); // Sunset orange
+    const nightColor = new THREE.Color(0x191970);  // Dark navy blue
+
+    if (dayProgress > 0.5) {
+        // Transition from Day to Sunset
+        const transitionProgress = (dayProgress - 0.5) * 2;
+        skyColor.lerpColors(sunsetColor, dayColor, transitionProgress);
+    } else {
+        // Transition from Sunset to Night
+        const transitionProgress = dayProgress * 2;
+        skyColor.lerpColors(nightColor, sunsetColor, transitionProgress);
+    }
+    
+    scene.fog.color.copy(skyColor);
+    renderer.setClearColor(skyColor, 1.0);
+    
+    isDayTime = dayProgress > 0.5;
+}
+        function onWindowResize() {
+            camera.aspect = window.innerWidth / window.innerHeight;
+            camera.updateProjectionMatrix();
+            renderer.setSize(window.innerWidth, window.innerHeight);
+        }
+       function onScroll() {
+            const scrollY = window.scrollY;
+            const scrollMax = document.body.scrollHeight - window.innerHeight;
+            const scrollPercent = Math.min(scrollY / scrollMax, 1);
+            
+            // Dynamic camera movement
+            camera.position.y = 200 - scrollPercent * 180;
+            camera.position.z = 100 + scrollPercent * 80;
+            camera.position.x = Math.sin(scrollPercent * Math.PI) * 50;
+            camera.lookAt(0, 0, 0);
+            
+            // Dynamic camera movement
+            camera.position.y = 200 - scrollPercent * 180;
+            camera.position.z = 100 + scrollPercent * 80;
+            camera.position.x = Math.sin(scrollPercent * Math.PI) * 50;
+            camera.lookAt(0, 0, 0);
+            
+            // Weather activation only during night transition (when scroll > 300)
+            isRaining = scrollY > 300;
+            if (rain && rain.material) {
+                rain.material.opacity = scrollY > 300 ? Math.min((scrollY - 300) / 400, 0.9) : 0;
+            }
+            
+            // Update farm statistics based on scroll
+            if (scrollY > 500) {
+                farmStats.temperature += Math.sin(scrollY * 0.001) * 0.1;
+                farmStats.humidity += Math.cos(scrollY * 0.001) * 0.5;
+            }
+        }
+ const clock = new THREE.Clock();
+function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+    
+    // Animate windmill blades
+    windmills.forEach(blades => {
+        blades.rotation.z -= 0.01;
+    });
+
+    // This line updates the rain splash animation, making them temporary
+    updateRainSplashes();
+
+    // Update all other systems
+    updateAnimals();
+    updateCrops();
+    updateWeatherSystem();
+    updateDayNightCycle();
+    updateCars(); // Update car traffic
+    
+    // Render the scene
+    renderer.render(scene, camera);
+}
+        // Chart.js Integration
+        function initializeCharts() {
+            // Crop Performance Chart
+            const cropCtx = document.getElementById('cropChart').getContext('2d');
+            new Chart(cropCtx, {
+                type: 'line',
+                data: {
+                    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
+                    datasets: [{
+                        label: 'Yield (tons/hectare)',
+                        data: [2.1, 2.3, 2.8, 3.2, 3.7, 4.1, 4.5],
+                        borderColor: '#00bfff',
+                        backgroundColor: 'rgba(0, 191, 255, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }, {
+                        label: 'Quality Score',
+                        data: [78, 82, 85, 88, 91, 94, 96],
+                        borderColor: '#00ff88',
+                        backgroundColor: 'rgba(0, 255, 136, 0.1)',
+                        tension: 0.4,
+                        fill: true
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e0e6ed' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#e0e6ed' },
+                            grid: { color: 'rgba(224, 230, 237, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#e0e6ed' },
+                            grid: { color: 'rgba(224, 230, 237, 0.1)' }
+                        }
+                    }
+                }
+            });
+            // Livestock Health Chart
+            const livestockCtx = document.getElementById('livestockChart').getContext('2d');
+            new Chart(livestockCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Excellent', 'Good', 'Fair', 'Monitoring'],
+                    datasets: [{
+                        data: [68, 25, 5, 2],
+                        backgroundColor: ['#00ff88', '#00bfff', '#ffa500', '#ff3366'],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: { 
+                                color: '#e0e6ed',
+                                padding: 20
+                            }
+                        }
+                    }
+                }
+            });
+            // Investment Performance Chart
+            const investmentCtx = document.getElementById('investmentChart').getContext('2d');
+            new Chart(investmentCtx, {
+                type: 'bar',
+                data: {
+                    labels: ['Q1 2024', 'Q2 2024', 'Q3 2024', 'Q4 2024', 'Q1 2025'],
+                    datasets: [{
+                        label: 'ROI (%)',
+                        data: [15.2, 18.7, 22.1, 25.8, 28.3],
+                        backgroundColor: 'rgba(0, 191, 255, 0.8)',
+                        borderColor: '#00bfff',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e0e6ed' }
+                        }
+                    },
+                    scales: {
+                        x: { 
+                            ticks: { color: '#e0e6ed' },
+                            grid: { color: 'rgba(224, 230, 237, 0.1)' }
+                        },
+                        y: { 
+                            ticks: { color: '#e0e6ed' },
+                            grid: { color: 'rgba(224, 230, 237, 0.1)' }
+                        }
+                    }
+                }
+            });
+            // Regional Impact Chart
+            const regionalCtx = document.getElementById('regionalChart').getContext('2d');
+            new Chart(regionalCtx, {
+                type: 'radar',
+                data: {
+                    labels: ['East Africa', 'West Africa', 'Central Africa', 'Southern Africa', 'North Africa'],
+                    datasets: [{
+                        label: 'Market Penetration (%)',
+                        data: [34, 28, 15, 19, 8],
+                        borderColor: '#00ff88',
+                        backgroundColor: 'rgba(0, 255, 136, 0.2)',
+                        pointBackgroundColor: '#00ff88'
+                    }, {
+                        label: 'Investment Volume ($M)',
+                        data: [0.8, 0.6, 0.3, 0.5, 0.2],
+                        borderColor: '#00bfff',
+                        backgroundColor: 'rgba(0, 191, 255, 0.2)',
+                        pointBackgroundColor: '#00bfff'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            labels: { color: '#e0e6ed' }
+                        }
+                    },
+                    scales: {
+                        r: {
+                            ticks: { 
+                                color: '#e0e6ed',
+                                backdropColor: 'transparent'
+                            },
+                            grid: { color: 'rgba(224, 230, 237, 0.2)' },
+                            angleLines: { color: 'rgba(224, 230, 237, 0.2)' }
+                        }
+                    }
+                }
+            });
+        }
+        // Direct initialization without loading screen
+        function initializeApp() {
+    // Initialize everything immediately
+    initializeScene();
+    initializeCharts();
+    
+    // Start data updates with optimized frequency
+    setInterval(updateLiveData, 3000); // Reduced from 2000ms to 3000ms
+            
+            // Show welcome notification
+            setTimeout(() => {
+               
+            }, 1000);
+            
+            // Animate all stat counters
+document.querySelectorAll('[data-counter]').forEach(el => {
+    const target = parseInt(el.dataset.counter);
+    animateCounter(el, target);
+});
+document.querySelectorAll('[data-counter-decimal]').forEach(el => {
+    const target = parseFloat(el.dataset.counterDecimal);
+    animateDecimalCounter(el, target);
+});
+    // --- START: Initial Header Color Logic ---
+    // This selector now ONLY targets the logo and the stats container
+    const headerElementsToBlack = document.querySelectorAll(
+        'header h1, #stats-container'
+    );
+
+    // 1. Apply the black class to all selected elements on load.
+    headerElementsToBlack.forEach(el => el.classList.add('initial-text-black'));
+
+    // 2. Listen for the first scroll to revert the colors back to normal.
+    window.addEventListener('scroll', function revertHeaderColors() {
+        headerElementsToBlack.forEach(el => el.classList.remove('initial-text-black'));
+    }, { once: true }); // This ensures the function only runs once for efficiency.
+    // --- END: New Initial Header Color Logic ---
+}
+        // Additional Interactive Functions
+        function playVideo(type) {
+            
+            // In a real implementation, this would open a video player
+        }
+        function initDemo() {
+           
+            // Enhanced camera movement for demo
+            camera.position.set(50, 50, 50);
+            camera.lookAt(0, 0, 0);
+        }
+        function toggleVR() {
+            
+            // VR implementation would go here
+        }
+        // Event Listeners
+        document.addEventListener('DOMContentLoaded', function() {
+            // Mobile menu functionality
+            
+            
+            // Smooth scrolling for navigation
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({ 
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                   
+                });
+            });
+            
+            // Initialize the application
+            initializeApp();
+            // --- START: New Swipe Indicator Logic ---
+    const swipeIndicator = document.getElementById('swipe-indicator');
+
+    // 1. After a brief delay, fade in the indicator
+    setTimeout(() => {
+        if (window.scrollY < 30) { // Only show if user hasn't already scrolled
+            swipeIndicator.style.opacity = '1';
+            swipeIndicator.style.pointerEvents = 'auto';
+        }
+    }, 2000); // 2-second delay
+
+    // 2. Listen for a scroll event to fade it out
+    window.addEventListener('scroll', function hideIndicator() {
+        swipeIndicator.style.opacity = '0';
+        swipeIndicator.style.pointerEvents = 'none';
+
+        // Optional: Remove the listener after it runs once for performance
+        window.removeEventListener('scroll', hideIndicator);
+    });
+            
+        });
+        // Performance optimization for mobile
+        if (window.innerWidth < 768) {
+            // Reduce particle count and complexity for mobile devices
+            const originalAnimate = animate;
+            animate = function() {
+                // Run at 30fps instead of 60fps on mobile
+                setTimeout(() => {
+                    requestAnimationFrame(animate);
+                }, 1000 / 30);
+                
+                // Simplified updates
+                if (animals.length > 0) {
+                    // Update only every other frame
+                    animals.forEach((animal, index) => {
+                        if (index % 2 === 0) {
+                            animal.position.add(animal.userData.velocity);
+                        }
+                    });
+                }
+                
+                renderer.render(scene, camera);
+            };
+        }
+        
+    </script>
+</body>
+</html>

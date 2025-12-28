@@ -1,0 +1,1734 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mall Builder - Submit Your Products</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <style>
+        html, body {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    font-family: 'Space Grotesk', sans-serif;
+    background: rgba(17, 24, 39, 1);
+}
+
+        body {
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.95), rgba(31, 41, 55, 0.9));
+            position: relative;
+        }
+/* Management dashboard container */
+#managementDashboard {
+    min-height: 100vh;
+    padding-bottom: 2rem;
+}
+
+#productCardsContainer {
+    columns: 1;
+    column-gap: 20px;
+    padding: 16px;
+    column-fill: balance;
+}
+
+@media (min-width: 640px) {
+    #productCardsContainer {
+        columns: 2;
+        column-gap: 16px;
+    }
+}
+
+@media (min-width: 1024px) {
+    #productCardsContainer {
+        columns: 3;
+    }
+}
+
+@media (min-width: 1280px) {
+    #productCardsContainer {
+        columns: 3;
+        column-gap: 20px;
+    }
+}
+
+/* Ensure body can scroll when in dashboard mode */
+body.dashboard-mode {
+    overflow-y: auto;
+}
+/* Terms section styling */
+#termsSection {
+    min-height: 60vh;
+    max-height: 80vh;
+    width: 100%;
+    position: relative;
+    overflow-y: auto;
+    border-radius: 0 0 30px 30px;
+    background: rgba(31, 41, 55, 0.9);
+    backdrop-filter: blur(8px);
+    padding: 2rem;
+    display: none;
+}
+
+.terms-content {
+    color: #e5e7eb;
+    max-width: 800px;
+    margin: 0 auto;
+    line-height: 1.6;
+}
+
+.terms-agree-bottom {
+    position: sticky;
+    bottom: 0;
+    background: rgba(31, 41, 55, 0.95);
+    padding: 1rem;
+    text-align: center;
+    border-top: 1px solid rgba(55, 65, 81, 0.4);
+    margin-top: 2rem;
+}
+
+.terms-agree-btn {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(103, 232, 249, 0.2));
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    backdrop-filter: blur(8px);
+    color: #e5e7eb;
+    border-radius: 12px;
+    padding: 1rem 2rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+    font-size: 1rem;
+}
+
+.terms-agree-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.4), rgba(103, 232, 249, 0.3));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(34, 211, 238, 0.3);
+}
+
+.terms-agreed-btn {
+    background: linear-gradient(135deg, rgba(34, 197, 94, 0.3), rgba(110, 231, 183, 0.2)) !important;
+    border-color: rgba(34, 197, 94, 0.5) !important;
+    color: #22c55e !important;
+}
+        /* Ambient background with inspired colors */
+        .ambient-background {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background: linear-gradient(135deg, rgba(17, 24, 39, 0.8), rgba(31, 41, 55, 0.9));
+        }
+
+        .blue-swirl {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(120px);
+            backdrop-filter: blur(8px);
+            animation: swirl 8s ease-in-out infinite;
+            opacity: 0;
+        }
+
+        .blue-swirl:nth-child(1) {
+            width: 400px;
+            height: 400px;
+            top: 10%;
+            left: 15%;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.03), rgba(103, 232, 249, 0.015), transparent);
+            animation-delay: 0s;
+            animation-duration: 12s;
+        }
+
+        .blue-swirl:nth-child(2) {
+            width: 300px;
+            height: 300px;
+            top: 60%;
+            right: 20%;
+            background: radial-gradient(circle, rgba(110, 231, 183, 0.025), rgba(34, 211, 238, 0.012), transparent);
+            animation-delay: 2s;
+            animation-duration: 10s;
+        }
+
+        .blue-swirl:nth-child(3) {
+            width: 250px;
+            height: 250px;
+            bottom: 20%;
+            left: 10%;
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.035), rgba(110, 231, 183, 0.018), transparent);
+            animation-delay: 4s;
+            animation-duration: 14s;
+        }
+
+        .blue-swirl:nth-child(4) {
+            width: 350px;
+            height: 350px;
+            top: 30%;
+            right: 40%;
+            background: radial-gradient(circle, rgba(103, 232, 249, 0.028), rgba(34, 211, 238, 0.014), transparent);
+            animation-delay: 6s;
+            animation-duration: 11s;
+        }
+
+        .blue-swirl:nth-child(5) {
+            width: 200px;
+            height: 200px;
+            top: 75%;
+            left: 60%;
+            background: radial-gradient(circle, rgba(110, 231, 183, 0.032), rgba(103, 232, 249, 0.016), transparent);
+            animation-delay: 8s;
+            animation-duration: 13s;
+        }
+
+        @keyframes swirl {
+            0%, 100% { 
+                opacity: 0; 
+                transform: scale(0.8) rotate(0deg) translate(0, 0);
+            }
+            25% { 
+                opacity: 0.6; 
+                transform: scale(1.1) rotate(90deg) translate(20px, -30px);
+            }
+            50% { 
+                opacity: 0.8; 
+                transform: scale(1.2) rotate(180deg) translate(-15px, 25px);
+            }
+            75% { 
+                opacity: 0.4; 
+                transform: scale(0.9) rotate(270deg) translate(30px, 15px);
+            }
+        }
+
+        /* Frosted glass effect - inspired theme */
+        .glass-container {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(55, 65, 81, 0.4);
+            border-radius: 20px;
+            box-shadow: 0 8px 32px 0 rgba(34, 211, 238, 0.1);
+        }
+
+        .glass-input {
+            background: rgba(31, 41, 55, 0.6);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(55, 65, 81, 0.4);
+            border-radius: 12px;
+            color: #e5e7eb;
+            transition: all 0.3s ease;
+        }
+        
+
+        .glass-input:focus {
+            background: rgba(31, 41, 55, 0.8);
+            border-color: rgba(34, 211, 238, 0.6);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            outline: none;
+        }
+
+        .glass-input::placeholder {
+            color: #9ca3af;
+        }
+
+        /* Remove number input spinners/adjusters - Enhanced */
+        .glass-input[type="number"]::-webkit-outer-spin-button,
+        .glass-input[type="number"]::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            appearance: none;
+            margin: 0;
+            display: none;
+        }
+
+        .glass-input[type="number"] {
+            -moz-appearance: textfield;
+            appearance: textfield;
+        }
+
+        /* Remove dropdown arrow */
+        .dropdown-btn-no-arrow {
+            appearance: none;
+            -webkit-appearance: none;
+            -moz-appearance: none;
+            background-image: none;
+        }
+
+        .dropdown-btn-no-arrow::-ms-expand {
+            display: none;
+        }
+
+        .product-card * {
+    box-sizing: border-box;
+}
+
+.product-card:last-child {
+    margin-bottom: 0;
+}
+
+/* Remove any inherited margins that might create chins */
+.product-card h3,
+.product-card p,
+.product-card div {
+    margin-bottom: 0;
+}
+
+.product-card h3:not(:last-child),
+.product-card p:not(:last-child),
+.product-card div:not(:last-child) {
+    margin-bottom: 0.5rem;
+}
+
+        .product-card {
+    background: rgba(31, 41, 55, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(55, 65, 81, 0.4);
+    border-radius: 20px;
+    transition: all 0.3s ease;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2), 0 4px 16px rgba(34, 211, 238, 0.05);
+    display: inline-block;
+    width: 100%;
+    margin-bottom: 24px;
+    break-inside: avoid;
+    overflow: hidden;
+    page-break-inside: avoid;
+}
+
+       .product-card:hover {
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.3), 0 8px 25px rgba(34, 211, 238, 0.2);
+    border-color: rgba(34, 211, 238, 0.5);
+}
+        
+   .product-video-container {
+    width: 100%;
+    background-color: #000;
+    border-radius: 20px 20px 0 0;
+    overflow: hidden;
+    position: relative;
+}
+
+    .product-video-container iframe {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 16/9;
+    border: none;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+    opacity: 0.9;
+    display: block;
+}
+
+
+.product-card:hover .product-video-container iframe {
+    opacity: 1;
+}
+
+    .product-card-content {
+    padding: 1rem 1.2rem 1.2rem 1.2rem;
+    border-radius: 0 0 20px 20px;
+}
+
+        .product-card-title {
+    color: #e5e7eb;
+    font-size: 1rem;
+    font-weight: 600;
+    margin-bottom: 0.4rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.product-card-meta {
+    color: #9ca3af;
+    font-size: 0.75rem;
+    margin-bottom: 0;
+}
+
+        .product-card-buttons {
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    margin-top: 0.75rem;
+}
+
+        .card-btn {
+            flex: 1;
+            min-width: 60px;
+            padding: 0.5rem 1rem; /* Increased padding */
+            border-radius: 8px;
+            font-size: 0.875rem; /* Increased from 0.75rem */
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            border: 1px solid;
+            text-align: center;
+        }
+
+        .update-btn {
+            background: rgba(34, 211, 238, 0.1);
+            border-color: rgba(34, 211, 238, 0.3);
+            color: #22d3ee;
+        }
+
+        .update-btn:hover {
+            background: rgba(34, 211, 238, 0.2);
+            transform: scale(1.05);
+        }
+
+        .stats-btn {
+            background: rgba(110, 231, 183, 0.1);
+            border-color: rgba(110, 231, 183, 0.3);
+            color: #6ee7b7;
+        }
+
+        .stats-btn:hover {
+            background: rgba(110, 231, 183, 0.2);
+            transform: scale(1.05);
+        }
+
+        .pause-btn {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+
+        .pause-btn:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: scale(1.05);
+        }
+
+        .pause-btn.paused {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+/* --- Video Overlay for Text Readability --- */
+#video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 5;
+    pointer-events: none;
+}
+
+/* --- Typing Text Overlay --- */
+#typing-text-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 20;
+    text-align: center;
+    pointer-events: none;
+}
+
+#typing-text {
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 700;
+    color: #ffffff;
+    text-shadow: 
+        0 0 20px rgba(255, 255, 255, 0.5),
+        0 0 40px rgba(255, 255, 255, 0.3),
+        0 0 60px rgba(255, 255, 255, 0.2);
+    margin: 0;
+    padding: 0;
+    font-family: 'Space Grotesk', sans-serif;
+    letter-spacing: 0.05em;
+    display: inline-block;
+    background: linear-gradient(45deg, #ffffff, #e2e8f0, #ffffff);
+    background-size: 200% 200%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: shimmer 3s ease-in-out infinite;
+}
+
+#typing-cursor {
+    display: inline-block;
+    font-size: clamp(3rem, 10vw, 8rem);
+    font-weight: 300;
+    color: #ffffff;
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.8);
+    margin-left: 2px;
+    animation: blink 1s infinite;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+@keyframes shimmer {
+    0% { background-position: 0% 50%; }
+    50% { background-position: 100% 50%; }
+    100% { background-position: 0% 50%; }
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    #typing-text-overlay {
+        padding: 0 20px;
+    }
+    
+    #typing-text {
+        line-height: 1.1;
+    }
+}
+
+.video-error {
+    background-color: #030712;
+    background-image: url('https://placehold.co/1920x1080/030712/6B7280?text=Video+Unavailable');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+}
+
+.video-error video {
+    display: none;
+}
+ /* Dashboard specific grid layout */
+#managementDashboard .form-grid {
+    height: auto;
+    min-height: auto;
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+    padding: 32px;
+    overflow-y: auto;
+}
+
+        .col-span-3 {
+            grid-column: span 3;
+        }
+
+      .new-product-card {
+    background: rgba(31, 41, 55, 0.4);
+    backdrop-filter: blur(8px);
+    border: 2px dashed rgba(34, 211, 238, 0.4);
+    border-radius: 20px;
+    padding: 2rem;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    display: inline-flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-bottom: 24px;
+    break-inside: avoid;
+    min-height: 300px;
+    aspect-ratio: 1;
+}
+
+        .new-product-card:hover {
+    border-color: rgba(34, 211, 238, 0.7);
+    background: rgba(31, 41, 55, 0.6);
+    transform: translateY(-8px);
+    box-shadow: 0 12px 40px rgba(0, 0, 0, 0.2), 0 8px 25px rgba(34, 211, 238, 0.15);
+}
+
+        .new-product-plus {
+            font-size: 4rem; /* Increased size */
+            color: #22d3ee;
+            margin-bottom: 1rem;
+            line-height: 1;
+        }
+        
+        .new-product-text {
+            color: #e5e7eb;
+            font-size: 1rem;
+            font-weight: 500;
+        }
+
+        .action-buttons {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: auto;
+    width: 100%;
+    align-items: stretch;
+}
+
+     .cancel-btn, .clear-btn, .draft-btn, .submit-btn {
+    flex: 1;
+    padding: 0.75rem 0.75rem;
+    border-radius: 8px;
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border: 1px solid;
+    text-align: center;
+    min-width: 0;
+    box-sizing: border-box;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+        .cancel-btn {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .cancel-btn:hover {
+            background: rgba(239, 68, 68, 0.2);
+            transform: scale(1.05);
+        }
+
+        .clear-btn {
+            background: rgba(156, 163, 175, 0.1);
+            border-color: rgba(156, 163, 175, 0.3);
+            color: #9ca3af;
+        }
+
+        .clear-btn:hover {
+            background: rgba(156, 163, 175, 0.2);
+            transform: scale(1.05);
+        }
+
+        .draft-btn {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+
+        .draft-btn:hover {
+            background: rgba(245, 158, 11, 0.2);
+            transform: scale(1.05);
+        }
+
+        /* Draft card styling */
+        .product-card.draft {
+            border-color: rgba(245, 158, 11, 0.4);
+            background: rgba(31, 41, 55, 0.4);
+        }
+
+        .product-card.draft:hover {
+            border-color: rgba(245, 158, 11, 0.6);
+            box-shadow: 0 8px 25px rgba(245, 158, 11, 0.15);
+        }
+
+        .glass-input {
+    background: rgba(31, 41, 55, 0.6);
+    backdrop-filter: blur(8px);
+    border: 1px solid rgba(55, 65, 81, 0.4);
+    border-radius: 12px;
+    color: #e5e7eb;
+    transition: all 0.3s ease;
+    font-size: 1rem;
+    padding: 1rem 0.75rem;
+    height: 60px;
+    box-sizing: border-box;
+}
+        .glass-input.resize-none {
+    min-height: 60px;
+    max-height: 60px;
+    height: 60px;
+    resize: none;
+    vertical-align: top;
+    padding: 1rem 0.75rem;
+}
+
+        .glass-input:focus {
+            background: rgba(31, 41, 55, 0.8);
+            border-color: rgba(34, 211, 238, 0.6);
+            box-shadow: 0 0 20px rgba(34, 211, 238, 0.2);
+            outline: none;
+        }
+
+        /* Blinking animation for terms */
+.blink-terms {
+    animation: blink-slow 10s infinite;
+}
+
+@keyframes blink-slow {
+    0%, 95% { opacity: 1; }
+    96%, 100% { opacity: 0.3; }
+}
+
+/* Terms glow effect */
+.terms-agreed {
+    color: #22c55e !important;
+    text-shadow: 0 0 10px rgba(34, 197, 94, 0.5);
+    animation: glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes glow {
+    from { text-shadow: 0 0 10px rgba(34, 197, 94, 0.5); }
+    to { text-shadow: 0 0 20px rgba(34, 197, 94, 0.8); }
+}
+
+/* Hero video styling */
+#hero-video {
+    height: 90vh;
+    min-height: 700px;
+    max-height: 960px;
+    width: 100%;
+    position: relative;
+    overflow: hidden;
+    border-radius: 0 0 30px 30px;
+}
+
+        #hero-video video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 100%;
+    height: 100%;
+    transform: translate(-50%, -50%);
+    min-width: 100%;
+    min-height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.5s ease-in-out;
+}
+
+/* Form grid */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    grid-template-rows: auto auto;
+    gap: 12px;
+    padding: 15px;
+    margin-bottom: 2rem;
+    align-items: start;
+}
+
+    .form-field {
+    position: relative;
+    min-height: 60px;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-start;
+}
+
+.form-field.checkbox-field {
+    grid-column: span 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: stretch;
+    min-height: 60px;
+}
+
+.form-field.checkbox-field .action-buttons {
+    margin-top: 0;
+    align-self: stretch;
+}
+
+        .form-field.p-2 {
+    padding: 0.5rem;
+}
+
+.form-field input,
+.form-field textarea,
+.form-field .dropdown-container {
+    width: 100%;
+    box-sizing: border-box;
+}
+
+        /* Dropdown styling */
+        .dropdown-container {
+            position: relative;
+        }
+
+        .dropdown-menu {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: rgba(31, 41, 55, 0.9);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(55, 65, 81, 0.8);
+            border-radius: 12px;
+            z-index: 50;
+            opacity: 0;
+            visibility: hidden;
+            transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+
+        .dropdown-menu.active {
+            opacity: 1;
+            visibility: visible;
+            transform: translateY(0);
+        }
+
+        .dropdown-item {
+            padding: 8px 12px;
+            color: #e5e7eb;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            font-size: 1rem; /* Increased from 0.875rem */
+        }
+
+        .dropdown-item:hover {
+            background: rgba(34, 211, 238, 0.2);
+        }
+
+        .dropdown-item:first-child {
+            border-radius: 12px 12px 0 0;
+        }
+
+        .dropdown-item:last-child {
+            border-radius: 0 0 12px 12px;
+        }
+
+        .submit-btn {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.3), rgba(103, 232, 249, 0.2));
+    border: 1px solid rgba(34, 211, 238, 0.5);
+    backdrop-filter: blur(8px);
+    color: #e5e7eb;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    font-weight: 500;
+}
+
+.submit-btn:hover {
+    background: linear-gradient(135deg, rgba(34, 211, 238, 0.4), rgba(103, 232, 249, 0.3));
+    transform: translateY(-2px);
+    box-shadow: 0 8px 25px rgba(34, 211, 238, 0.3);
+}
+
+/* Handle failed video iframes */
+.product-video-container:has(iframe[src*="youtube.com"]) {
+    min-height: auto;
+}
+
+.product-video-container:empty {
+    display: none;
+}
+
+/* When video container is hidden, adjust card content */
+.product-card:has(.product-video-container[style*="display: none"]) .product-card-content {
+    border-radius: 20px;
+}
+
+/* Alternative approach using JavaScript detection */
+.video-error-detected {
+    display: none !important;
+}
+
+.video-error-detected + .product-card-content {
+    border-radius: 20px;
+}
+
+.submit-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+}
+
+        /* Success overlay */
+        .success-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(17, 24, 39, 0.8);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 100;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.5s ease;
+        }
+
+        .success-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .success-message {
+            background: rgba(31, 41, 55, 0.9);
+            border: 1px solid rgba(55, 65, 81, 0.8);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: #e5e7eb;
+            font-size: 24px;
+            font-weight: 500;
+            box-shadow: 0 8px 32px rgba(34, 211, 238, 0.2);
+        }
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+    .form-grid {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(6, auto);
+        padding: 15px;
+        gap: 10px;
+        min-height: 300px;
+        overflow: visible;
+    }
+    
+    #hero-video {
+        height: 60vh;
+        min-height: 400px;
+        max-height: 500px;
+    }
+    
+    .form-field {
+        min-height: auto;
+    }
+    
+    #managementDashboard {
+        padding-bottom: 4rem;
+    }
+}
+    </style>
+</head>
+<body>
+    <div class="ambient-background">
+        <div class="blue-swirl"></div>
+        <div class="blue-swirl"></div>
+        <div class="blue-swirl"></div>
+        <div class="blue-swirl"></div>
+        <div class="blue-swirl"></div>
+    </div>
+
+    <section id="hero-video">
+    <video
+    id="background-video"
+    src="../../assets/videos/mallbuilder.mp4" 
+    autoplay loop muted playsinline
+    preload="auto"
+    oncanplay="this.style.opacity=1"
+    onerror="this.parentElement.classList.add('video-error')"
+    style="opacity:0;"
+    aria-label="Background video loop"
+></video>
+    <div id="video-overlay"></div>
+    <div id="typing-text-overlay">
+        <h1 id="typing-text"></h1>
+        <div id="typing-cursor">|</div>
+    </div>
+</section>
+
+<section id="termsSection">
+    <div class="terms-content">
+        <h1 style="font-size: 2rem; margin-bottom: 2rem; text-align: center; color: #22d3ee;">Mall Builder Terms and Conditions</h1>
+        <div id="termsContentArea">
+            <!-- Terms content will be loaded here -->
+            <p>Loading terms...</p>
+        </div>
+    </div>
+    
+</section>
+
+    <div id="submissionForm" class="form-grid">
+        <div class="form-field p-2">
+            <input 
+                type="text" 
+                id="productName" 
+                class="glass-input w-full"
+                placeholder="Product Name"
+                required
+            >
+        </div>
+
+        <div class="form-field p-2">
+            <input 
+                type="number" 
+                id="productPrice" 
+                class="glass-input w-full"
+                placeholder="Product Price (USD)"
+                min="0"
+                step="0.01"
+                required
+            >
+        </div>
+
+        <div class="form-field p-2">
+            <div class="dropdown-container">
+                <div 
+                    id="productTypeBtn" 
+                    class="glass-input w-full cursor-pointer flex justify-between items-center dropdown-btn-no-arrow"
+                    style="color: #e5e7eb;"
+                >
+                    <span id="selectedType" style="color: #9ca3af;">Product Type</span>
+                </div>
+                <div id="productTypeMenu" class="dropdown-menu">
+                    <div class="dropdown-item" data-value="food">Food</div>
+                    <div class="dropdown-item" data-value="clothing">Clothing</div>
+                    <div class="dropdown-item" data-value="technology">Technology</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="form-field p-2">
+            <textarea 
+                id="productDescription" 
+                class="glass-input w-full resize-none h-24"
+                placeholder="Product Description"
+                required
+            ></textarea>
+        </div>
+
+        <div class="form-field p-2">
+            <input 
+                type="url" 
+                id="youtubeVideo" 
+                class="glass-input w-full"
+                placeholder="YouTube Video URL"
+                pattern="https?://.*(youtube\.com|youtu\.be).*"
+                required
+            >
+        </div>
+
+      <div class="form-field checkbox-field p-2">
+    <div class="action-buttons">
+        <button id="cancelBtn" class="cancel-btn">Cancel</button>
+        <button id="clearBtn" class="clear-btn">Clear</button>
+        <button id="draftBtn" class="draft-btn">Draft</button>
+        <button id="applyBtn" class="submit-btn">Apply</button>
+    </div>
+    <div 
+    id="termsClickable" 
+    class="text-base cursor-pointer text-center mt-2"
+    style="color: #22d3ee; display: none !important;"
+>
+    Click to agree with <span id="termsText">terms</span>
+</div>
+</div>
+    </div>
+
+    <div id="managementDashboard" class="form-grid hidden">
+        <div id="productCardsContainer" class="col-span-3 grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+            </div>
+    </div>
+
+    <script>
+        // Form elements
+        const productName = document.getElementById('productName');
+        const productPrice = document.getElementById('productPrice');
+        const productTypeBtn = document.getElementById('productTypeBtn');
+        const productTypeMenu = document.getElementById('productTypeMenu');
+        const selectedType = document.getElementById('selectedType');
+        const productDescription = document.getElementById('productDescription');
+        const youtubeVideo = document.getElementById('youtubeVideo');
+        const termsClickable = document.getElementById('termsClickable');
+        const submissionForm = document.getElementById('submissionForm');
+        const managementDashboard = document.getElementById('managementDashboard');
+        const productCardsContainer = document.getElementById('productCardsContainer');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const clearBtn = document.getElementById('clearBtn');
+        const draftBtn = document.getElementById('draftBtn');
+
+        let selectedProductType = '';
+let isEditingMode = false;
+let currentEditingProductId = null;
+let termsAgreed = false;
+let checkFieldsInterval;
+let isFirstProduct = true;
+
+        // Dropdown functionality
+        productTypeBtn.addEventListener('click', () => {
+            productTypeMenu.classList.toggle('active');
+        });
+
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!productTypeBtn.contains(e.target) && !productTypeMenu.contains(e.target)) {
+                productTypeMenu.classList.remove('active');
+            }
+        });
+
+        // Handle dropdown selection
+        productTypeMenu.addEventListener('click', (e) => {
+            if (e.target.classList.contains('dropdown-item')) {
+                selectedProductType = e.target.dataset.value;
+                selectedType.textContent = e.target.textContent;
+                selectedType.style.color = '#e5e7eb'; // Change to main text color when selected
+                productTypeMenu.classList.remove('active');
+            }
+        });
+
+ ;
+
+// Terms agree button handler
+document.addEventListener('DOMContentLoaded', () => {
+    document.getElementById('termsAgreeBtn').addEventListener('click', () => {
+        termsAgreed = true;
+        
+        // Update button appearance
+        const btn = document.getElementById('termsAgreeBtn');
+        btn.classList.add('terms-agreed-btn');
+        btn.innerHTML = 'Terms Agreed ✓';
+        
+        // Update main terms text
+        termsClickable.classList.add('terms-agreed');
+        termsClickable.innerHTML = 'Terms agreed ✓';
+        
+        // Hide terms section and show hero video
+        document.getElementById('termsSection').style.display = 'none';
+        document.getElementById('hero-video').style.display = 'block';
+        
+        // Remove blinking
+        const termsTextEl = document.getElementById('termsText');
+        if (termsTextEl) {
+            termsTextEl.classList.remove('blink-terms');
+        }
+    });
+}
+
+);
+// Show terms on initial load for first time users
+document.addEventListener('DOMContentLoaded', () => {
+    const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+    isFirstProduct = submissions.length === 0;
+    
+    const termsClickable = document.getElementById('termsClickable');
+    if (isFirstProduct) {
+        termsClickable.style.display = 'block';
+    } else {
+        termsClickable.style.display = 'none';
+    }
+});
+
+// Function to load terms content
+async function loadTermsContent() {
+    try {
+        const response = await fetch('terms.html');
+        if (response.ok) {
+            const termsHtml = await response.text();
+            // Extract just the body content or specific section
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(termsHtml, 'text/html');
+            const content = doc.body.innerHTML || doc.documentElement.innerHTML;
+            document.getElementById('termsContentArea').innerHTML = content;
+        } else {
+            throw new Error('Terms file not found');
+        }
+    } catch (error) {
+        // Fallback terms content
+        document.getElementById('termsContentArea').innerHTML = `
+            <h2>Terms of Service</h2>
+            <p>By using Mall Builder, you agree to the following terms:</p>
+            <ul>
+                <li>You will provide accurate product information</li>
+                <li>You own the rights to any content you upload</li>
+                <li>You agree to comply with all applicable laws</li>
+                <li>Mall Builder reserves the right to moderate content</li>
+                <li>You understand that this is a demonstration platform</li>
+            </ul>
+            <h2>Privacy Policy</h2>
+            <p>Your privacy is important to us. We collect minimal information necessary for the service.</p>
+            <h2>Content Guidelines</h2>
+            <p>All content must be appropriate and comply with our community standards.</p>
+        `;
+    }
+}
+
+// Apply button handler
+document.getElementById('applyBtn').addEventListener('click', () => {
+    // Validate all fields are filled
+    if (!productName.value.trim() || 
+        !productPrice.value.trim() || 
+        !selectedProductType || 
+        !productDescription.value.trim() || 
+        !youtubeVideo.value.trim()) {
+        
+        // Highlight empty fields
+        [productName, productPrice, productDescription, youtubeVideo].forEach(field => {
+            if (!field.value.trim()) {
+                field.style.borderColor = '#dc2626';
+                setTimeout(() => {
+                    field.style.borderColor = '';
+                }, 2000);
+            }
+        });
+        
+        if (!selectedProductType) {
+            productTypeBtn.style.borderColor = '#dc2626';
+            setTimeout(() => {
+                productTypeBtn.style.borderColor = '';
+            }, 2000);
+        }
+        
+        alert('Please fill in all fields before submitting.');
+        return;
+    }
+
+    const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+    
+    if (isEditingMode && currentEditingProductId) {
+        // Update existing product
+        const productIndex = submissions.findIndex(p => p.id === currentEditingProductId);
+        if (productIndex !== -1) {
+            submissions[productIndex] = {
+                ...submissions[productIndex],
+                name: productName.value.trim(),
+                price: productPrice.value.trim(),
+                type: selectedProductType,
+                description: productDescription.value.trim(),
+                video: youtubeVideo.value.trim(),
+                timestamp: new Date().toISOString() // Update timestamp
+            };
+        }
+    } else {
+        // Save new product
+        const formData = {
+            id: Date.now(),
+            name: productName.value.trim(),
+            price: productPrice.value.trim(),
+            type: selectedProductType,
+            description: productDescription.value.trim(),
+            video: youtubeVideo.value.trim(),
+            timestamp: new Date().toISOString(),
+            status: 'active'
+        };
+        submissions.push(formData);
+    }
+
+    // Store updated data
+    localStorage.setItem('mallBuilderSubmissions', JSON.stringify(submissions));
+
+    // Switch to management dashboard
+    submissionForm.classList.add('hidden');
+    managementDashboard.classList.remove('hidden');
+    
+    // Hide video on dashboard and adjust layout
+    document.body.classList.add('dashboard-mode');
+    const heroVideo = document.getElementById('hero-video');
+    if (heroVideo) {
+        heroVideo.style.display = 'none';
+    }
+    
+    // Reset form and load dashboard
+    resetForm();
+    loadProductDashboard();
+});
+
+// Check fields and trigger blinking
+function checkFieldsForBlinking() {
+    const fields = [
+        productName.value.trim(),
+        productPrice.value.trim(),
+        selectedProductType,
+        productDescription.value.trim()
+        // Note: not including youtubeVideo as requested
+    ];
+    
+    const filledFields = fields.filter(field => field).length;
+    const termsTextEl = document.getElementById('termsText');
+    
+    if (filledFields >= 3 && !termsAgreed && termsTextEl) {
+        termsTextEl.classList.add('blink-terms');
+    } else if (termsTextEl) {
+        termsTextEl.classList.remove('blink-terms');
+    }
+}
+
+// Start checking fields when any input changes
+[productName, productPrice, productDescription].forEach(field => {
+    field.addEventListener('input', checkFieldsForBlinking);
+});
+
+// Check when dropdown selection changes
+document.addEventListener('click', (e) => {
+    if (e.target.classList.contains('dropdown-item')) {
+        setTimeout(checkFieldsForBlinking, 100);
+    }
+});
+
+        // Cancel button handler
+        cancelBtn.addEventListener('click', () => {
+            // Check if we have existing products
+            const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+            
+            if (submissions.length > 0 || isEditingMode) {
+                // Go back to dashboard if products exist or we're editing
+                submissionForm.classList.add('hidden');
+                managementDashboard.classList.remove('hidden');
+                
+                // Apply dashboard mode and hide video
+                document.body.classList.add('dashboard-mode');
+                const heroVideo = document.getElementById('hero-video');
+                if (heroVideo) {
+                    heroVideo.style.display = 'none';
+                }
+                
+                // Reset form and load dashboard
+                resetForm();
+                loadProductDashboard();
+            } else {
+                // If no products exist, just reset the form
+                resetForm();
+            }
+            
+            isEditingMode = false;
+        });
+
+        // Clear/Delete button handler  
+clearBtn.addEventListener('click', () => {
+    if (isEditingMode && currentEditingProductId) {
+        // Delete mode - confirm and delete product
+        if (confirm('Are you sure you want to delete this product? This action cannot be undone.')) {
+            // Remove product from localStorage
+            const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+            const updatedSubmissions = submissions.filter(product => product.id !== currentEditingProductId);
+            localStorage.setItem('mallBuilderSubmissions', JSON.stringify(updatedSubmissions));
+            
+            // Go back to dashboard
+            submissionForm.classList.add('hidden');
+            managementDashboard.classList.remove('hidden');
+            
+            // Apply dashboard mode and hide video
+            document.body.classList.add('dashboard-mode');
+            const heroVideo = document.getElementById('hero-video');
+            if (heroVideo) {
+                heroVideo.style.display = 'none';
+            }
+            
+            // Reset form and load dashboard
+            resetForm();
+            loadProductDashboard();
+            isEditingMode = false;
+            currentEditingProductId = null;
+        }
+    } else {
+        // Clear mode - just clear the form fields
+        resetForm();
+    }
+});
+
+        // Draft button handler
+        draftBtn.addEventListener('click', () => {
+            // Check if at least product name is filled
+            if (!productName.value.trim()) {
+                productName.style.borderColor = '#dc2626';
+                setTimeout(() => {
+                    productName.style.borderColor = '';
+                }, 2000);
+                alert('Please enter at least a product name to save as draft.');
+                return;
+            }
+
+            // Save as draft
+            const draftData = {
+                id: Date.now(),
+                name: productName.value.trim(),
+                price: productPrice.value.trim() || '0',
+                type: selectedProductType || 'food',
+                description: productDescription.value.trim() || 'Draft description',
+                video: youtubeVideo.value.trim() || '',
+                timestamp: new Date().toISOString(),
+                status: 'draft'
+            };
+
+            // Store in localStorage
+            const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+            submissions.push(draftData);
+            localStorage.setItem('mallBuilderSubmissions', JSON.stringify(submissions));
+
+            // Go back to dashboard
+            submissionForm.classList.add('hidden');
+            managementDashboard.classList.remove('hidden');
+            
+            // Apply dashboard mode and hide video
+            document.body.classList.add('dashboard-mode');
+            const heroVideo = document.getElementById('hero-video');
+            if (heroVideo) {
+                heroVideo.style.display = 'none';
+            }
+            
+            // Reset form and load dashboard
+            resetForm();
+            loadProductDashboard();
+            isEditingMode = false;
+        });
+
+        // Helper function to get embeddable YouTube URL
+        
+// Helper function to get embeddable YouTube URL
+function getYouTubeEmbedUrl(url) {
+    if (!url) return '';
+    let videoId;
+    try {
+        const urlObject = new URL(url);
+        if (urlObject.hostname.includes('youtube.com')) {
+            videoId = urlObject.searchParams.get('v');
+        } else if (urlObject.hostname.includes('youtu.be')) {
+            videoId = urlObject.pathname.slice(1).split('?')[0];
+        }
+    } catch (e) {
+        console.error("Invalid URL for YouTube embed:", e);
+        return '';
+    }
+
+    if (videoId) {
+        return `https://www.youtube.com/embed/${videoId}?autoplay=1&mute=1&controls=0&loop=1&playlist=${videoId}&rel=0&modestbranding=1&showinfo=0`;
+    }
+    return ''; // Return empty string if no ID found
+}
+
+        
+        // Load products into dashboard
+function loadProductDashboard() {
+    const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+    productCardsContainer.innerHTML = '';
+    
+    // Update first product status
+    isFirstProduct = submissions.length === 0;
+
+    // Ensure video is hidden when dashboard loads
+    const heroVideo = document.getElementById('hero-video');
+    if (heroVideo) {
+        heroVideo.style.display = 'none';
+    }
+    
+    // Hide terms section too
+    document.getElementById('termsSection').style.display = 'none';
+
+    // Add "New Product" card first
+    const newProductCard = document.createElement('div');
+    newProductCard.className = 'new-product-card';
+    newProductCard.innerHTML = `
+        <div class="new-product-plus">+</div>
+        <div class="new-product-text">New Product</div>
+    `;
+    newProductCard.addEventListener('click', () => {
+        // Show form
+        managementDashboard.classList.add('hidden');
+        submissionForm.classList.remove('hidden');
+        document.body.classList.remove('dashboard-mode');
+        const heroVideo = document.getElementById('hero-video');
+        if (heroVideo) {
+            heroVideo.style.display = 'block';
+        }
+        
+        // Terms are no longer required - hide the terms section
+const termsClickable = document.getElementById('termsClickable');
+if (termsClickable) {
+    termsClickable.style.display = 'none';
+}
+        
+        // Reset form
+        resetForm();
+        isEditingMode = false;
+    });
+    productCardsContainer.appendChild(newProductCard);
+
+    if (submissions.length === 0) {
+        return; // Only show new product card if no submissions
+    }
+
+    submissions.forEach(product => {
+        const card = createProductCard(product);
+        productCardsContainer.appendChild(card);
+    });
+}
+// Reset form function
+function resetForm() {
+    productName.value = '';
+    productPrice.value = '';
+    selectedType.textContent = 'Product Type';
+    selectedType.style.color = '#9ca3af';
+    selectedProductType = '';
+    productDescription.value = '';
+    youtubeVideo.value = '';
+    
+    // Reset editing state
+    isEditingMode = false;
+    currentEditingProductId = null;
+    updateButtonForEditMode();
+    
+    // Only reset terms if this is the first product
+    if (isFirstProduct) {
+        termsAgreed = false;
+        const termsClickable = document.getElementById('termsClickable');
+        if (termsClickable) {
+            termsClickable.classList.remove('terms-agreed');
+            termsClickable.innerHTML = 'Click to agree with <span id="termsText">terms</span>';
+        }
+        const termsTextEl = document.getElementById('termsText');
+        if (termsTextEl) {
+            termsTextEl.classList.remove('blink-terms');
+        }
+    }
+}
+
+        // Create product card
+        function createProductCard(product) {
+            const card = document.createElement('div');
+            card.className = `product-card ${product.status === 'draft' ? 'draft' : ''}`;
+            
+            const embedUrl = getYouTubeEmbedUrl(product.video);
+
+            card.innerHTML = `
+                <div class="product-video-container">
+                    ${embedUrl ? `<iframe src="${embedUrl}" title="${product.name.replace(/"/g, '&quot;')}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen loading="lazy" onerror="this.parentElement.style.display='none'"></iframe>` : '<div class="w-full flex items-center justify-center text-gray-500 py-4 text-sm">No video provided</div>'}
+                </div>
+                <div class="product-card-content">
+                    <div>
+                        <div class="product-card-title">${product.name}</div>
+                        <div class="product-card-meta">
+                            <div>Type: ${product.type}</div>
+                            <div>Price: ${product.price}</div>
+                            <div>Status: <span style="color: ${product.status === 'active' ? '#22c55e' : '#f59e0b'}">${product.status}</span></div>
+                        </div>
+                    </div>
+                    <div class="product-card-buttons">
+                        <button class="card-btn update-btn" onclick="updateProduct(${product.id})">Update</button>
+                        <button class="card-btn stats-btn" onclick="showStats(${product.id})">Stats</button>
+                        <button class="card-btn pause-btn ${product.status === 'paused' ? 'paused' : ''}" onclick="togglePause(${product.id})">
+                            ${product.status === 'paused' ? 'Resume' : 'Pause'}
+                        </button>
+                    </div>
+                </div>
+            `;
+            return card;
+        }
+// Function to update button for edit mode
+function updateButtonForEditMode() {
+    if (isEditingMode) {
+        clearBtn.textContent = 'Delete';
+        clearBtn.className = 'cancel-btn'; // Use delete styling (red)
+    } else {
+        clearBtn.textContent = 'Clear';
+        clearBtn.className = 'clear-btn'; // Use normal clear styling
+    }
+}
+        // Video playback management
+function setupVideoPlayback() {
+    const backgroundVideo = document.getElementById('background-video');
+    
+    if (backgroundVideo) {
+        // Ensure video starts playing if autoplay fails
+        backgroundVideo.addEventListener('canplay', () => {
+            if (backgroundVideo.paused) {
+                backgroundVideo.play().catch(e => {
+                    console.log('Autoplay prevented:', e);
+                });
+            }
+        });
+
+        // Handle video pause events (restart if it pauses unexpectedly)
+        backgroundVideo.addEventListener('pause', () => {
+            setTimeout(() => {
+                if (backgroundVideo.paused && !backgroundVideo.ended) {
+                    backgroundVideo.play().catch(e => {
+                        console.log('Video restart failed:', e);
+                    });
+                }
+            }, 100);
+        });
+
+        // Handle video end events (should loop, but as backup)
+        backgroundVideo.addEventListener('ended', () => {
+            backgroundVideo.currentTime = 0;
+            backgroundVideo.play().catch(e => {
+                console.log('Video loop restart failed:', e);
+            });
+        });
+
+        // Periodic check to ensure video is playing
+        setInterval(() => {
+            if (backgroundVideo.paused && !backgroundVideo.ended && backgroundVideo.readyState >= 2) {
+                backgroundVideo.play().catch(e => {
+                    console.log('Periodic video restart failed:', e);
+                });
+            }
+        }, 5000); // Check every 5 seconds
+    }
+}
+
+// Call the setup function
+setupVideoPlayback();
+
+        // Setup typing text animation
+
+function setupTypingAnimation() {
+    try {
+        var textElement = document.getElementById('typing-text');
+        var cursorElement = document.getElementById('typing-cursor');
+        
+        if (!textElement || !cursorElement) return;
+        
+        var fullText = "Mall Builder";
+        var currentText = "";
+        var index = 0;
+        var isTyping = true;
+        var typingSpeed = 150; // milliseconds per character
+        var pauseAfterComplete = 3000; // pause at end before restarting
+        var deleteSpeed = 80; // speed when deleting
+        
+        function typeText() {
+            if (isTyping) {
+                // Typing forward
+                if (index < fullText.length) {
+                    currentText += fullText.charAt(index);
+                    textElement.textContent = currentText;
+                    index++;
+                    setTimeout(typeText, typingSpeed + Math.random() * 50); // Add slight randomness
+                } else {
+                    // Finished typing, pause then start deleting
+                    isTyping = false;
+                    setTimeout(typeText, pauseAfterComplete);
+                }
+            } else {
+                // Deleting
+                if (currentText.length > 0) {
+                    currentText = currentText.slice(0, -1);
+                    textElement.textContent = currentText;
+                    setTimeout(typeText, deleteSpeed);
+                } else {
+                    // Finished deleting, start typing again
+                    isTyping = true;
+                    index = 0;
+                    setTimeout(typeText, 500); // Brief pause before restarting
+                }
+            }
+        }
+        
+        // Start the animation after a brief delay
+        setTimeout(typeText, 1000);
+        
+    } catch (e) {
+        console.error('Typing animation setup error:', e);
+    }
+}
+
+// Call the function when page loads
+setupTypingAnimation();
+
+        // Product management functions
+       window.updateProduct = function(productId) {
+    // Set editing mode and store product ID
+    isEditingMode = true;
+    currentEditingProductId = productId;
+    
+    // Update button text and styling
+    updateButtonForEditMode();
+    
+    // Switch back to form for editing
+    managementDashboard.classList.add('hidden');
+    submissionForm.classList.remove('hidden');
+    
+    // Stay in dashboard mode (no video)
+    document.body.classList.add('dashboard-mode');
+    
+    // Ensure video stays hidden
+    const heroVideo = document.getElementById('hero-video');
+    if (heroVideo) {
+        heroVideo.style.display = 'none';
+    }
+    
+    // Load product data for editing
+    const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+    const product = submissions.find(p => p.id === productId);
+    
+    if (product) {
+        productName.value = product.name;
+        productPrice.value = product.price;
+        selectedProductType = product.type;
+        selectedType.textContent = product.type.charAt(0).toUpperCase() + product.type.slice(1);
+        selectedType.style.color = '#e5e7eb';
+        productDescription.value = product.description;
+        youtubeVideo.value = product.video;
+    }
+};
+
+        window.showStats = function(productId) {
+            const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+            const product = submissions.find(p => p.id === productId);
+            
+            // Mock analytics data
+            const mockStats = {
+                views: Math.floor(Math.random() * 1000) + 50,
+                sales: Math.floor(Math.random() * 20) + 1,
+                revenue: (Math.random() * 500 + 50).toFixed(2),
+                demographics: {
+                    'Age 18-24': Math.floor(Math.random() * 30) + 10,
+                    'Age 25-34': Math.floor(Math.random() * 40) + 20,
+                    'Age 35-44': Math.floor(Math.random() * 30) + 15,
+                    'Age 45+': Math.floor(Math.random() * 20) + 5
+                }
+            };
+            
+            let demographicsText = Object.entries(mockStats.demographics)
+                .map(([age, percentage]) => `${age}: ${percentage}%`)
+                .join('\n');
+                
+            alert(`Stats for "${product.name}":\n\nViews: ${mockStats.views}\nSales: ${mockStats.sales}\nRevenue: ${mockStats.revenue}\n\nDemographics:\n${demographicsText}`);
+        };
+
+        window.togglePause = function(productId) {
+            const submissions = JSON.parse(localStorage.getItem('mallBuilderSubmissions') || '[]');
+            const productIndex = submissions.findIndex(p => p.id === productId);
+            
+            if (productIndex !== -1) {
+                const currentStatus = submissions[productIndex].status;
+                
+                if (currentStatus === 'draft') {
+                    submissions[productIndex].status = 'active';
+                } else if (currentStatus === 'active') {
+                    submissions[productIndex].status = 'paused';
+                } else if (currentStatus === 'paused') {
+                    submissions[productIndex].status = 'active';
+                }
+                
+                localStorage.setItem('mallBuilderSubmissions', JSON.stringify(submissions));
+                loadProductDashboard(); // Refresh the dashboard
+            }
+        };
+
+        // Video reverse playback functionality
+        const backgroundVideo = document.getElementById('background-video');
+        let isPlayingReverse = false;
+
+        if (backgroundVideo) {
+            // When video ends (playing forward), start reverse playback
+            backgroundVideo.addEventListener('ended', () => {
+                if (!isPlayingReverse) {
+                    isPlayingReverse = true;
+                    backgroundVideo.playbackRate = -1;
+                    backgroundVideo.play();
+                }
+            });
+
+            // Monitor video time to detect when reverse playback reaches the beginning
+            backgroundVideo.addEventListener('timeupdate', () => {
+                if (isPlayingReverse && backgroundVideo.currentTime <= 0.1) {
+                    // Reset to beginning and play forward
+                    isPlayingReverse = false;
+                    backgroundVideo.currentTime = 0;
+                    backgroundVideo.playbackRate = 1;
+                    backgroundVideo.play();
+                }
+            });
+
+            // Handle video load/reload
+            backgroundVideo.addEventListener('loadeddata', () => {
+                isPlayingReverse = false;
+                backgroundVideo.playbackRate = 1;
+                backgroundVideo.play();
+            });
+
+            // Ensure video starts playing if autoplay fails
+            backgroundVideo.addEventListener('canplay', () => {
+                if (backgroundVideo.paused && !isPlayingReverse) {
+                    backgroundVideo.play().catch(e => {
+                        console.log('Autoplay prevented:', e);
+                    });
+                }
+            });
+        }
+    </script>
+</body>
+</html>

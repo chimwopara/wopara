@@ -1,0 +1,1364 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nigerian Whot Game</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Tinos:wght@700&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            user-select: none; /* Prevent text highlighting globally */
+            -webkit-user-select: none;
+            -moz-user-select: none;
+            -ms-user-select: none;
+        }
+        body {
+            font-family: 'Poppins', sans-serif;
+            touch-action: manipulation;
+        }
+        .card {
+            width: 120px;
+            height: 180px;
+            border: 1px solid #888;
+            border-radius: 10px;
+            background-color: #f8f8f8;
+            position: relative;
+            cursor: pointer;
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+            color: #8C1C13; /* Maroon color for all card content */
+            font-family: 'Tinos', serif;
+            font-weight: 700;
+        }
+        .card.dragging {
+            opacity: 0.3;
+            transform: rotate(5deg) scale(0.9) !important;
+            z-index: 1000 !important;
+            pointer-events: none;
+        }
+
+        .drop-zone {
+            border: 2px dashed #4ade80 !important;
+            background-color: rgba(74, 222, 128, 0.1) !important;
+            border-radius: 8px !important;
+        }
+        .card-back {
+            background-color: #8C1C13;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 1rem;
+        }
+        .whot-text-back {
+            font-family: 'Dancing Script', cursive;
+            font-size: 34px;
+            color: white;
+            line-height: 1;
+        }
+        .card-symbol {
+            width: 70px;
+            height: 70px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .corner {
+            position: absolute;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            font-size: 24px;
+            line-height: 1;
+        }
+        .corner-shape {
+            width: 14px;
+            height: 14px;
+        }
+        .top-left { top: 10px; left: 10px; }
+        .bottom-right { bottom: 10px; right: 10px; transform: rotate(180deg); }
+        .whot-card-center {
+            text-align: center;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .whot-text {
+            font-family: 'Dancing Script', cursive;
+            font-size: 38px;
+            line-height: 1;
+        }
+        .player-hand-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 220px;
+            position: relative;
+        }
+        .player-hand-container .card, #right-hand .card {
+            position: absolute;
+            transition: transform 0.3s ease;
+        }
+        .computer-player-profile {
+            position: relative;
+            width: 140px;
+            height: 220px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 8px;
+            padding: 8px;
+            border-radius: 8px;
+            transition: background-color 0.3s, box-shadow 0.3s;
+        }
+        .computer-player-profile.active-turn {
+            background-color: #ca8a04; /* Amber 600 */
+            box-shadow: 0 0 15px #ca8a04;
+        }
+        .bot-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            border: 2px solid white;
+            object-fit: cover;
+            background-color: #4a5568;
+        }
+        .card-stack-container {
+            position: relative;
+            width: 120px;
+            height: 180px;
+        }
+        .card-stack-container .card {
+            position: absolute;
+            top: 0;
+            left: 0;
+            cursor: default;
+        }
+        .card-stack-container .card:hover {
+            transform: none;
+        }
+        #game-board {
+            perspective: 1000px;
+        }
+        #shape-modal {
+            transition: opacity 0.3s ease-in-out;
+        }
+        .shape-option {
+            transition: transform 0.2s;
+        }
+        .shape-option:hover {
+            transform: scale(1.1);
+        }
+        .toast {
+            animation: fade-in-out 3s forwards;
+        }
+        @keyframes fade-in-out {
+            0% { opacity: 0; transform: translateY(20px); }
+            15% { opacity: 1; transform: translateY(0); }
+            85% { opacity: 1; transform: translateY(0); }
+            100% { opacity: 0; transform: translateY(-20px); }
+        }
+        .drawing-card {
+            position: fixed;
+            z-index: 100;
+            transition: transform 0.4s ease-in-out, opacity 0.4s;
+        }
+        .push-button {
+            background-color: #ca8a04; /* Amber 600 */
+            color: white;
+            padding: 6px 14px;
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s;
+        }
+        .push-button:hover {
+            background-color: #a16207; /* Amber 700 */
+        }
+
+        #rotate-device-overlay {
+            display: none;
+        }
+
+        /* Mobile-friendly and landscape enforcement */
+        @media (max-width: 768px) and (orientation: portrait) {
+            #game-container, #setup-screen {
+                display: none !important;
+            }
+            #rotate-device-overlay {
+                display: flex;
+            }
+        }
+
+        @media (max-width: 1024px) {
+            .card {
+                width: 90px;
+                height: 135px;
+            }
+            .corner {
+                font-size: 18px;
+            }
+            .whot-text {
+                font-size: 28px;
+            }
+            .card-symbol {
+                width: 50px;
+                height: 50px;
+            }
+            .player-hand-container {
+                min-height: 160px;
+            }
+            .computer-player-profile {
+                width: 110px;
+                height: 180px;
+            }
+            .bot-avatar {
+                width: 40px;
+                height: 40px;
+            }
+            .card-stack-container {
+                width: 90px;
+                height: 135px;
+            }
+            #game-board {
+                gap: 1rem;
+            }
+            #discard-pile {
+                width: 220px !important;
+                height: 135px !important;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen p-4 overflow-hidden">
+
+    <div id="game-container" class="w-full max-w-screen-2xl mx-auto flex flex-col items-center justify-between flex-grow hidden">
+        <!-- Computer's Area -->
+        <div class="w-full">
+            <div id="computer-players-area" class="flex flex-wrap justify-center items-start gap-4 md:gap-12"></div>
+        </div>
+
+        <!-- Game Board -->
+        <div id="game-board" class="flex items-center justify-center gap-4 md:gap-16 my-2 w-full">
+            <div id="draw-pile" class="card-stack-container"></div>
+            <div id="game-status" class="text-center text-2xl md:text-3xl font-bold leading-tight w-28 md:w-40"></div>
+            <div id="discard-pile" class="relative w-[300px] h-[180px]"></div>
+        </div>
+        
+        <!-- Player's Area -->
+        <div class="w-full p-2 md:p-4 bg-gray-800/50 rounded-xl">
+            <div class="grid grid-cols-2 gap-2 md:gap-4">
+                <!-- Main Hand -->
+                <div class="flex flex-col items-center">
+                    <div id="left-hand" class="player-hand-container w-full"></div>
+                    <div id="left-push-buttons" class="flex gap-2 mt-2"></div>
+                </div>
+                <!-- Action Hand -->
+                <div class="flex flex-col items-center">
+                    <div id="right-hand" class="player-hand-container w-full"></div>
+                     <div id="right-push-buttons" class="flex gap-2 mt-2"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Game Setup Modal -->
+    <div id="setup-screen" class="fixed inset-0 bg-black bg-opacity-80 flex items-center justify-center z-50">
+        <div class="bg-gray-800 p-8 rounded-xl shadow-2xl text-center w-full max-w-md">
+            <h1 class="text-4xl font-bold mb-2" style="font-family: 'Dancing Script', cursive;">Nigerian Whot</h1>
+            <p class="mb-6 text-gray-400">Game Setup</p>
+            <div class="mb-6">
+                <label for="player-count" class="block mb-2 text-lg font-medium">Select Number of Opponents</label>
+                <div class="flex items-center justify-center gap-4">
+                    <button id="decrement-players" class="px-4 py-2 bg-amber-600 rounded-md text-xl font-bold">-</button>
+                    <span id="player-count-display" class="text-3xl font-bold w-16 text-center">1</span>
+                    <button id="increment-players" class="px-4 py-2 bg-amber-600 rounded-md text-xl font-bold">+</button>
+                </div>
+            </div>
+            <button id="start-game-btn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-4 rounded-lg text-xl transition-colors">
+                Start Game
+            </button>
+        </div>
+    </div>
+
+    <!-- Rotate Device Overlay -->
+    <div id="rotate-device-overlay" class="fixed inset-0 bg-gray-900 z-50 items-center justify-center text-center">
+        <div>
+            <svg class="w-24 h-24 mx-auto text-white mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 18h.01M8 21h8a2 2 0 002-2V5a2 2 0 00-2-2H8a2 2 0 00-2 2v14a2 2 0 002 2zM5 12h.01M19 12h.01M21 8v.01M21 16v.01M3 8v.01M3 16v.01"></path></svg>
+            <h2 class="text-2xl font-bold">Please Rotate Your Device</h2>
+            <p class="text-gray-400 mt-2">This game is best played in landscape mode.</p>
+        </div>
+    </div>
+
+    <!-- Shape Selection Modal -->
+    <div id="shape-modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50 opacity-0">
+        <div class="bg-gray-800 p-8 rounded-xl shadow-2xl text-center">
+            <h2 class="text-2xl font-bold mb-6">Choose a Shape</h2>
+            <div id="shape-options" class="flex gap-4">
+                <!-- Options will be injected by JS -->
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50"></div>
+
+    <script>
+        // DOM Elements
+        const gameContainer = document.getElementById('game-container');
+        const setupScreen = document.getElementById('setup-screen');
+        const playerCountDisplay = document.getElementById('player-count-display');
+        const decrementBtn = document.getElementById('decrement-players');
+        const incrementBtn = document.getElementById('increment-players');
+        const startGameBtn = document.getElementById('start-game-btn');
+
+        const leftHandDiv = document.getElementById('left-hand');
+        const rightHandDiv = document.getElementById('right-hand');
+        const computerPlayersArea = document.getElementById('computer-players-area');
+        const discardPileDiv = document.getElementById('discard-pile');
+        const drawPileDiv = document.getElementById('draw-pile');
+        const gameStatusDiv = document.getElementById('game-status');
+        const shapeModal = document.getElementById('shape-modal');
+        const shapeOptionsDiv = document.getElementById('shape-options');
+        const leftPushButtonsDiv = document.getElementById('left-push-buttons');
+        const rightPushButtonsDiv = document.getElementById('right-push-buttons');
+
+        // Game State
+        let deck = [];
+        let players = [];
+        let discardPile = [];
+        let drawPile = [];
+        let currentPlayerIndex = 0;
+        let activeStack = null; 
+        let whotRequest = null; 
+        let holdOnActive = false;
+        let turnsToSkip = 0;
+        let draggedCardData = null;
+        let isDragging = false;
+        let generalMarketState = { active: false, initiator: null, respondedMask: [], playersWhoPlayed: [] };
+
+        const ACTION_CARDS = [1, 2, 5, 8, 14, 20];
+        
+        const SHAPES_SVG = {
+            circle: `<svg viewBox="0 0 24 24" fill="currentColor"><circle cx="12" cy="12" r="11"/></svg>`,
+            triangle: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2L1 21h22L12 2z"/></svg>`,
+            square: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 3h18v18H3V3z"/></svg>`,
+            cross: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M10 3 H14 V10 H21 V14 H14 V21 H10 V14 H3 V10 H10z"/></svg>`,
+            star: `<svg viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>`
+        };
+
+        const BOT_NAMES = ["Apex", "Bolt", "Cipher", "Dynamo", "Echo", "Fusion", "Glitch", "Helix", "Ion", "Jolt", "Kortex", "Logic"];
+
+        // --- GAME INITIALIZATION ---
+
+        function generateBotName() {
+            return BOT_NAMES[Math.floor(Math.random() * BOT_NAMES.length)];
+        }
+
+        function initializeGame(numBots) {
+            players = [];
+            players.push({ id: 'human', name: 'You', isHuman: true, regularHand: [], actionHand: [] });
+            for (let i = 0; i < numBots; i++) {
+                const botName = generateBotName();
+                players.push({
+                    id: `bot${i+1}`,
+                    name: botName,
+                    isHuman: false,
+                    hand: [],
+                    avatar: `https://placehold.co/50x50/4a5568/ffffff?text=${botName.charAt(0)}`
+                });
+            }
+            setupScreen.style.display = 'none';
+            gameContainer.classList.remove('hidden');
+            gameContainer.classList.add('flex');
+            startGame();
+        }
+
+        function createDeck() {
+            const deck = [];
+            const cardDistribution = {
+                circle:   [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14],
+                triangle: [1, 2, 3, 4, 5, 7, 8, 10, 11, 12, 13, 14],
+                square:   [1, 2, 3, 5, 7, 10, 11, 13, 14],
+                cross:    [1, 2, 3, 5, 7, 10, 11, 13, 14],
+                star:     [1, 2, 3, 4, 5, 7, 8]
+            };
+            for (const shape in cardDistribution) {
+                for (const number of cardDistribution[shape]) {
+                    deck.push({ shape, number });
+                }
+            }
+            for (let i = 0; i < 5; i++) {
+                deck.push({ shape: 'whot', number: 20 });
+            }
+            return deck;
+        }
+
+        function shuffleDeck(deck) {
+            for (let i = deck.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [deck[i], deck[j]] = [deck[j], deck[i]];
+            }
+        }
+
+        async function startGame() {
+            deck = createDeck();
+            shuffleDeck(deck);
+            discardPile = [];
+            drawPile = deck;
+
+            players.forEach(p => {
+                if (p.isHuman) {
+                    p.regularHand = [];
+                    p.actionHand = [];
+                } else {
+                    p.hand = [];
+                }
+            });
+
+            const existingWinnerMessage = document.querySelector('.winner-message');
+            if (existingWinnerMessage) existingWinnerMessage.remove();
+            
+            updateStatus("Shuffling...");
+            renderGame();
+            await new Promise(r => setTimeout(r, 800));
+
+            // "Dealing cards..." text removed as requested
+            for (let i = 0; i < 6; i++) {
+                for(let j = 0; j < players.length; j++) {
+                    await dealCardToPlayer(j);
+                }
+            }
+            
+            let firstCardIndex = drawPile.findIndex(card => !ACTION_CARDS.includes(card.number));
+            if (firstCardIndex === -1) { firstCardIndex = 0; }
+            discardPile = [drawPile.splice(firstCardIndex, 1)[0]];
+            
+            activeStack = null;
+            whotRequest = null;
+            holdOnActive = false;
+            turnsToSkip = 0;
+            currentPlayerIndex = 0; // Human player starts
+            renderGame();
+            updateStatusMessage();
+        }
+
+        // --- RENDERING ---
+
+        function createCardElement(card, isFaceUp = true, cardIndex = -1, handName = '') {
+            const cardDiv = document.createElement('div');
+            if (!isFaceUp) {
+                cardDiv.className = 'card card-back';
+                cardDiv.innerHTML = `<div class="whot-text-back">Whot</div><div class="whot-text-back" style="transform: rotate(180deg);">Whot</div>`;
+                return cardDiv;
+            }
+            cardDiv.className = 'card';
+            const { shape, number } = card;
+            if (shape === 'whot') {
+                cardDiv.innerHTML = `
+                    <div class="corner top-left"><span>20</span></div>
+                    <div class="whot-card-center">
+                        <div class="whot-text">Whot</div>
+                        <div class="whot-text" style="transform: rotate(180deg);">Whot</div>
+                    </div>
+                    <div class="corner bottom-right"><span>20</span></div>
+                `;
+            } else {
+                const shapeSVG = SHAPES_SVG[shape];
+                cardDiv.innerHTML = `
+                    <div class="corner top-left">
+                        <span>${number}</span>
+                        <div class="corner-shape">${shapeSVG}</div>
+                    </div>
+                    <div class="card-symbol">${shapeSVG}</div>
+                    <div class="corner bottom-right">
+                        <span>${number}</span>
+                        <div class="corner-shape">${shapeSVG}</div>
+                    </div>
+                `;
+            }
+
+            if (handName === 'regular' || handName === 'action') {
+                cardDiv.draggable = true;
+                cardDiv.dataset.cardIndex = cardIndex;
+                cardDiv.dataset.handName = handName;
+                
+                cardDiv.addEventListener('dragstart', (e) => handleDragStart(e, card, handName, cardIndex));
+                cardDiv.addEventListener('dragend', (e) => handleDragEnd(e));
+                cardDiv.addEventListener('click', (e) => {
+                    if (!isDragging) {
+                        handleCardClick(card, handName);
+                    }
+                });
+            }
+            
+            return cardDiv;
+        }
+        
+        function renderVisualStack(container, cardCount) {
+            container.innerHTML = '';
+            const maxVisibleCards = 20; 
+            const stackSize = Math.min(cardCount, maxVisibleCards);
+            if (cardCount > 0) {
+                for (let i = 0; i < stackSize; i++) {
+                    const cardEl = createCardElement(null, false);
+                    cardEl.style.transform = `translateY(${i * 2}px)`;
+                    cardEl.style.zIndex = i;
+                    container.appendChild(cardEl);
+                }
+            }
+        }
+
+        function renderHand(handArray, containerDiv, handName) {
+            containerDiv.innerHTML = '';
+            const totalCards = handArray.length;
+            const cardWidth = window.innerWidth <= 1024 ? 90 : 120;
+            const overlap = window.innerWidth <= 1024 ? 35 : 50;
+            const totalWidth = cardWidth + (totalCards > 0 ? (totalCards - 1) * overlap : 0);
+            
+            handArray.forEach((card, i) => {
+                const cardEl = createCardElement(card, true, i, handName);
+                const xOffset = (i * overlap) - (totalWidth / 2) + (cardWidth / 2);
+                cardEl.style.transform = `translateX(${xOffset}px)`;
+                cardEl.style.zIndex = i;
+                containerDiv.appendChild(cardEl);
+            });
+        }
+
+        function renderGame() {
+            if (players.length === 0) return; // Fix for the error
+            const humanPlayer = players[0];
+            humanPlayer.regularHand.sort((a, b) => a.number - b.number);
+            humanPlayer.actionHand.sort((a, b) => a.number - b.number);
+            
+            renderHand(humanPlayer.regularHand, leftHandDiv, 'regular');
+            renderHand(humanPlayer.actionHand, rightHandDiv, 'action');
+            renderPushButtons();
+
+            computerPlayersArea.innerHTML = '';
+            players.forEach((player, index) => {
+                if (!player.isHuman) {
+                    const profileDiv = document.createElement('div');
+                    profileDiv.className = 'computer-player-profile';
+                    if (index === currentPlayerIndex && !generalMarketState.active) {
+                        profileDiv.classList.add('active-turn');
+                    }
+                    profileDiv.innerHTML = `
+                        <img src="${player.avatar}" alt="Bot Avatar" class="bot-avatar">
+                        <div class="text-base font-semibold">${player.name}</div>
+                    `;
+                    
+                    const handContainer = document.createElement('div');
+                    handContainer.className = 'card-stack-container';
+                    renderVisualStack(handContainer, player.hand.length);
+                    
+                    profileDiv.appendChild(handContainer);
+                    computerPlayersArea.appendChild(profileDiv);
+                }
+            });
+
+            discardPileDiv.innerHTML = '';
+            if (discardPile.length > 0) {
+                const cardsToShow = discardPile.slice(-5);
+                const overlap = 25;
+                const cardWidth = window.innerWidth <= 1024 ? 90 : 120;
+                const totalWidth = cardWidth + (cardsToShow.length > 1 ? (cardsToShow.length - 1) * overlap : 0);
+                
+                const containerWidth = discardPileDiv.offsetWidth;
+                const groupStartX = (containerWidth - totalWidth) / 2;
+
+                cardsToShow.forEach((card, i) => {
+                    const cardEl = createCardElement(card, true);
+                    cardEl.style.position = 'absolute';
+                    const xOffset = groupStartX + (i * overlap);
+                    const yOffset = i * 2;
+                    cardEl.style.left = `${xOffset}px`;
+                    cardEl.style.top = `${yOffset}px`;
+                    cardEl.style.zIndex = i;
+                    discardPileDiv.appendChild(cardEl);
+                });
+            }
+           
+            renderVisualStack(drawPileDiv, drawPile.length);
+            updateStatusMessage();
+        }
+
+        function renderPushButtons() {
+            leftPushButtonsDiv.innerHTML = '';
+            rightPushButtonsDiv.innerHTML = '';
+
+            if (currentPlayerIndex !== 0) return;
+
+            const humanPlayer = players[0];
+
+            const findPlayablePushableGroups = (hand) => {
+                const counts = hand.reduce((acc, card) => {
+                    acc[card.number] = (acc[card.number] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                return Object.keys(counts)
+                    .map(Number)
+                    .filter(num => {
+                        const cardsWithNum = hand.filter(c => c.number === num);
+                        return counts[num] > 1 && cardsWithNum.some(card => isCardPlayable(card));
+                    });
+            };
+
+            const regularGroups = findPlayablePushableGroups(humanPlayer.regularHand);
+            const actionGroups = findPlayablePushableGroups(humanPlayer.actionHand);
+
+            regularGroups.forEach(num => {
+                const button = document.createElement('button');
+                button.className = 'push-button';
+                button.textContent = `Push ${num}s`;
+                button.onclick = () => playPushGroup(num, 'regular');
+                leftPushButtonsDiv.appendChild(button);
+            });
+
+            actionGroups.forEach(num => {
+                const button = document.createElement('button');
+                button.className = 'push-button';
+                button.textContent = `Push ${num}s`;
+                button.onclick = () => playPushGroup(num, 'action');
+                rightPushButtonsDiv.appendChild(button);
+            });
+        }
+
+        function updateStatus(message) {
+             gameStatusDiv.innerHTML = `<div>${message}</div>`;
+             gameStatusDiv.style.visibility = 'visible';
+        }
+
+        function updateStatusMessage() {
+            if (players.length === 0) return;
+            gameStatusDiv.innerHTML = ''; // Clear previous message
+            gameStatusDiv.style.visibility = 'hidden';
+        }
+        
+        function showToast(message, type = 'info') {
+            const toastContainer = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            let bgColor = 'bg-blue-500';
+            if (type === 'error') bgColor = 'bg-red-500';
+            if (type === 'success') bgColor = 'bg-green-500';
+
+            toast.className = `toast text-white px-6 py-3 rounded-lg shadow-lg ${bgColor}`;
+            toast.textContent = message;
+            
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // --- DRAG AND DROP HANDLERS ---
+        function handleDragStart(event, card, handName, cardIndex) {
+            draggedCardData = { card, handName, cardIndex };
+            event.dataTransfer.effectAllowed = 'move';
+            event.dataTransfer.setData('text/plain', 'card'); 
+            event.target.classList.add('dragging');
+            const canvas = document.createElement('canvas');
+            canvas.width = canvas.height = 1;
+            const ctx = canvas.getContext('2d');
+            ctx.globalAlpha = 0;
+            ctx.fillRect(0, 0, 1, 1);
+            event.dataTransfer.setDragImage(canvas, 0, 0);
+            setTimeout(() => {
+                document.querySelectorAll('#left-hand, #right-hand, #discard-pile').forEach(el => {
+                    el.style.pointerEvents = 'auto';
+                });
+            }, 10);
+        }
+
+        function handleDragEnd(event) {
+            event.target.classList.remove('dragging');
+            document.querySelectorAll('.drop-zone').forEach(el => {
+                el.classList.remove('drop-zone');
+            });
+            draggedCardData = null;
+        }
+
+        function handleDragOver(event) {
+            if (draggedCardData) {
+                event.preventDefault();
+                event.dataTransfer.dropEffect = 'move';
+            }
+        }
+
+        function handleDragEnter(event) {
+            if (draggedCardData) {
+                event.preventDefault();
+                event.currentTarget.classList.add('drop-zone');
+            }
+        }
+
+        function handleDragLeave(event) {
+            const rect = event.currentTarget.getBoundingClientRect();
+            const x = event.clientX;
+            const y = event.clientY;
+            if (x <= rect.left || x >= rect.right || y <= rect.top || y >= rect.bottom) {
+                event.currentTarget.classList.remove('drop-zone');
+            }
+        }
+
+        function handleDropOnHand(event, targetHandName) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.remove('drop-zone');
+            if (!draggedCardData) return;
+
+            const { card, handName: sourceHandName } = draggedCardData;
+            const humanPlayer = players[0];
+            let sourceHand = sourceHandName === 'regular' ? humanPlayer.regularHand : humanPlayer.actionHand;
+            let targetHand = targetHandName === 'regular' ? humanPlayer.regularHand : humanPlayer.actionHand;
+            
+            const cardIndex = sourceHand.findIndex(c => c.shape === card.shape && c.number === card.number);
+            if (cardIndex !== -1) {
+                const [removedCard] = sourceHand.splice(cardIndex, 1);
+                targetHand.push(removedCard);
+                renderGame();
+            }
+        }
+
+        function handleDropOnDiscardPile(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            event.currentTarget.classList.remove('drop-zone');
+            if (!draggedCardData) return;
+
+            const { card, handName } = draggedCardData;
+            
+            if ( (generalMarketState.active && card.number !== 14) || (!generalMarketState.active && currentPlayerIndex !== 0) ) {
+                return;
+            }
+            
+            if (!isCardPlayable(card)) return;
+
+            const humanPlayer = players[0];
+            let sourceHand = handName === 'regular' ? humanPlayer.regularHand : humanPlayer.actionHand;
+            const cardIndex = sourceHand.findIndex(c => c.shape === card.shape && c.number === card.number);
+            
+            if (cardIndex !== -1) {
+                sourceHand.splice(cardIndex, 1);
+                renderGame();
+                animateCardPlayFromPosition(card, null, handName).then(() => {
+                    if (generalMarketState.active && card.number === 14) {
+                        generalMarketState.playersWhoPlayed.push(0);
+                        generalMarketState.respondedMask[0] = true;
+                        discardPile.push(card);
+                        renderGame();
+                        checkIfMarketIsOver();
+                    } else {
+                        playCard(card, 0);
+                    }
+                });
+            }
+        }
+
+        function setupDragAndDrop() {
+            leftHandDiv.addEventListener('dragover', handleDragOver);
+            leftHandDiv.addEventListener('dragenter', handleDragEnter);
+            leftHandDiv.addEventListener('dragleave', handleDragLeave);
+            leftHandDiv.addEventListener('drop', (e) => handleDropOnHand(e, 'regular'));
+
+            rightHandDiv.addEventListener('dragover', handleDragOver);
+            rightHandDiv.addEventListener('dragenter', handleDragEnter);
+            rightHandDiv.addEventListener('dragleave', handleDragLeave);
+            rightHandDiv.addEventListener('drop', (e) => handleDropOnHand(e, 'action'));
+
+            discardPileDiv.addEventListener('dragover', handleDragOver);
+            discardPileDiv.addEventListener('dragenter', (e) => {
+                if (draggedCardData && isCardPlayable(draggedCardData.card)) {
+                     if (generalMarketState.active || currentPlayerIndex === 0) {
+                        e.preventDefault();
+                        e.currentTarget.classList.add('drop-zone');
+                    }
+                }
+            });
+            discardPileDiv.addEventListener('dragleave', handleDragLeave);
+            discardPileDiv.addEventListener('drop', handleDropOnDiscardPile);
+        }
+
+        // --- GAME LOGIC & ANIMATION ---
+        
+        async function dealCardToPlayer(playerIndex) {
+            if (drawPile.length === 0) {
+                if (!reshuffleDiscardPile()) {
+                    showToast("Market is empty!", "error");
+                    return; // Can't draw
+                }
+                renderGame(); // Show the newly shuffled pile
+                await new Promise(r => setTimeout(r, 200)); // Brief pause
+            }
+            
+            const player = players[playerIndex];
+            const card = drawPile[drawPile.length - 1]; 
+            
+            if (player.isHuman) {
+                const targetDiv = ACTION_CARDS.includes(card.number) ? rightHandDiv : leftHandDiv;
+                const hand = ACTION_CARDS.includes(card.number) ? player.actionHand : player.regularHand;
+                await dealCard(hand, targetDiv);
+            } else {
+                const targetDiv = document.querySelector(`#computer-players-area .computer-player-profile:nth-child(${playerIndex}) .card-stack-container`);
+                await dealCard(player.hand, targetDiv);
+            }
+        }
+
+        async function dealCard(handArray, targetDiv) {
+            if (drawPile.length === 0) return; // Safeguard
+
+            await animateCardDraw(targetDiv);
+            handArray.push(drawPile.pop());
+
+            if (drawPile.length === 0) {
+                reshuffleDiscardPile();
+            }
+            renderGame(); 
+        }
+
+        function isCardPlayable(card) {
+            if (generalMarketState.active) {
+                return card.number === 14;
+            }
+            if (discardPile.length === 0) return false;
+            const topCard = discardPile[discardPile.length - 1];
+            if (card.number === 20) return true;
+            if (whotRequest) return card.shape === whotRequest.shape;
+            if (activeStack) return card.number === activeStack.card || card.number === 20;
+            if (holdOnActive) return card.number === 1 || card.shape === topCard.shape;
+            return card.shape === topCard.shape || card.number === topCard.number;
+        }
+        
+        function reshuffleDiscardPile() {
+            if (discardPile.length <= 1) return false;
+            const topCard = discardPile.pop();
+            drawPile = [...discardPile];
+            shuffleDeck(drawPile);
+            discardPile = [topCard];
+            return true;
+        }
+
+        async function handleCardClick(card, handName) {
+            if (isDragging) return;
+
+            if (generalMarketState.active) {
+                if (card.number === 14) {
+                    generalMarketState.playersWhoPlayed.push(0);
+                    generalMarketState.respondedMask[0] = true;
+
+                    const humanPlayer = players[0];
+                    const hand = handName === 'regular' ? humanPlayer.regularHand : humanPlayer.actionHand;
+                    const cardIndex = hand.findIndex(c => c.shape === card.shape && c.number === card.number);
+                    if (cardIndex !== -1) hand.splice(cardIndex, 1);
+                    
+                    await animateCardPlayFromPosition(card, null, handName);
+                    discardPile.push(card);
+                    renderGame();
+                    checkIfMarketIsOver();
+                }
+                return;
+            }
+            
+            if (currentPlayerIndex !== 0 || !isCardPlayable(card)) return;
+            
+            const humanPlayer = players[0];
+            let startRect = null; 
+            
+            const hand = handName === 'regular' ? humanPlayer.regularHand : humanPlayer.actionHand;
+            const cardIndex = hand.findIndex(c => c.shape === card.shape && c.number === card.number);
+            if (cardIndex !== -1) hand.splice(cardIndex, 1);
+            
+            renderGame();
+            await animateCardPlayFromPosition(card, startRect, handName);
+            await playCard(card, 0);
+        }
+
+        async function playPushGroup(number, handName) {
+            if (currentPlayerIndex !== 0) return;
+
+            const humanPlayer = players[0];
+            let sourceHand = handName === 'regular' ? humanPlayer.regularHand : humanPlayer.actionHand;
+            
+            const cardsToPlay = sourceHand.filter(c => c.number === number);
+            if (cardsToPlay.length < 2 || !cardsToPlay.some(isCardPlayable)) {
+                return;
+            }
+
+            if (handName === 'regular') {
+                humanPlayer.regularHand = sourceHand.filter(c => c.number !== number);
+            } else {
+                humanPlayer.actionHand = sourceHand.filter(c => c.number !== number);
+            }
+            renderGame();
+
+            for (const card of cardsToPlay) {
+                await animateCardPlayFromPosition(card, null, handName);
+                discardPile.push(card);
+                renderGame();
+                await new Promise(r => setTimeout(r, 100));
+            }
+
+            const lastCard = cardsToPlay[cardsToPlay.length - 1];
+            const numPlayed = cardsToPlay.length;
+
+            whotRequest = null;
+            if (lastCard.number !== 1) holdOnActive = false;
+
+            const hand = [...humanPlayer.regularHand, ...humanPlayer.actionHand];
+            if (hand.length === 0) {
+                if (ACTION_CARDS.includes(lastCard.number)) {
+                    await dealCardToPlayer(currentPlayerIndex);
+                    endTurn();
+                    return;
+                } else {
+                    endGame(players[currentPlayerIndex]);
+                    return;
+                }
+            }
+
+            switch (lastCard.number) {
+                case 1: 
+                    renderGame();
+                    break;
+                case 14:
+                    generalMarketState.active = true;
+                    generalMarketState.initiator = 0;
+                    generalMarketState.respondedMask = players.map((_, i) => i === 0);
+                    generalMarketState.playersWhoPlayed = [0];
+                    renderGame();
+                    players.forEach((p, i) => {
+                        if (!p.isHuman) respondToMarketAsBot(i);
+                    });
+                    break;
+                case 8: 
+                    turnsToSkip = numPlayed;
+                    endTurn();
+                    break;
+                case 20: 
+                    if (activeStack) { activeStack = null; }
+                    requestShapeFromPlayer();
+                    break;
+                case 2: case 5: 
+                    const penaltyCardNumber = lastCard.number;
+                    if (activeStack && activeStack.card === penaltyCardNumber) {
+                        activeStack.count += numPlayed;
+                    } else {
+                        activeStack = { card: penaltyCardNumber, count: numPlayed };
+                    }
+                    renderGame();
+                    endTurn();
+                    break;
+                default:
+                    endTurn();
+                    break;
+            }
+        }
+
+        async function playCard(card, playerIdx) {
+            discardPile.push(card);
+            whotRequest = null;
+            if (card.number !== 1) holdOnActive = false;
+
+            const player = players[playerIdx];
+            const hand = player.isHuman ? [...player.regularHand, ...player.actionHand] : player.hand;
+            
+            if (hand.length === 0) {
+                if (ACTION_CARDS.includes(card.number)) {
+                    await dealCardToPlayer(playerIdx);
+                    endTurn();
+                    return;
+                } else {
+                    endGame(player);
+                    return;
+                }
+            }
+
+            renderGame();
+            await applyCardEffect(card, playerIdx);
+        }
+
+        async function applyCardEffect(card, playerIdx) {
+            let shouldEndTurn = true;
+
+            switch (card.number) {
+                case 1:
+                    shouldEndTurn = false;
+                    if (players[playerIdx].isHuman) {
+                        renderGame();
+                    } else {
+                        setTimeout(() => botTurn(), 1000);
+                    }
+                    break;
+                case 14:
+                    shouldEndTurn = false;
+                    if (generalMarketState.active) return;
+
+                    generalMarketState.active = true;
+                    generalMarketState.initiator = playerIdx;
+                    generalMarketState.respondedMask = players.map(() => false);
+                    generalMarketState.respondedMask[playerIdx] = true;
+                    generalMarketState.playersWhoPlayed = [playerIdx];
+                    
+                    renderGame();
+                    
+                    players.forEach((p, i) => {
+                        if (i !== playerIdx) {
+                           if (p.isHuman) {
+                               // just wait for human input
+                           } else {
+                               respondToMarketAsBot(i);
+                           }
+                        }
+                    });
+                    break;
+                case 8:
+                    turnsToSkip = 1;
+                    break;
+                case 20:
+                    if (activeStack) { activeStack = null; }
+                    if (players[playerIdx].isHuman) {
+                        requestShapeFromPlayer();
+                        shouldEndTurn = false;
+                    } else {
+                        const chosenShape = chooseBestShapeForBot(players[playerIdx]);
+                        whotRequest = { shape: chosenShape };
+                        const topCard = discardPile[discardPile.length - 1];
+                        if (topCard && topCard.number === 20) {
+                            topCard.shape = chosenShape;
+                        }
+                        renderGame();
+                    }
+                    break;
+                case 2: case 5:
+                    const penalty = card.number === 2 ? 2 : 3;
+                    if (activeStack && activeStack.card === card.number) {
+                        activeStack.count++;
+                    } else {
+                        activeStack = { card: card.number, count: 1 };
+                    }
+                    renderGame();
+                    break;
+            }
+
+            if (shouldEndTurn) {
+                endTurn();
+            }
+        }
+
+        function endTurn() {
+            let nextPlayerIndex = (currentPlayerIndex + 1 + turnsToSkip) % players.length;
+            turnsToSkip = 0;
+            currentPlayerIndex = nextPlayerIndex;
+            
+            setTimeout(() => {
+                renderGame();
+                if (!players[currentPlayerIndex].isHuman) {
+                    botTurn();
+                }
+            }, 800);
+        }
+
+        async function handlePlayerDraw() {
+            if (generalMarketState.active) {
+                if (currentPlayerIndex === 0 && !generalMarketState.respondedMask[0]) {
+                    generalMarketState.respondedMask[0] = true;
+                    checkIfMarketIsOver();
+                }
+                return;
+            }
+            
+            if (currentPlayerIndex !== 0) return;
+
+            holdOnActive = false;
+
+            if (activeStack) {
+                const penalty = activeStack.card === 2 ? 2 : 3;
+                const totalCards = activeStack.count * penalty;
+                for(let i = 0; i < totalCards; i++) await dealCardToPlayer(currentPlayerIndex);
+                activeStack = null;
+            } else {
+                await dealCardToPlayer(currentPlayerIndex);
+            }
+            renderGame();
+            endTurn();
+        }
+
+        // --- COMPUTER AI ---
+
+        async function botTurn() {
+            updateStatusMessage();
+            await new Promise(r => setTimeout(r, 1200));
+            
+            const bot = players[currentPlayerIndex];
+
+            if (activeStack) {
+                const whotCard = bot.hand.find(c => c.number === 20);
+                if (whotCard) {
+                    bot.hand = bot.hand.filter(c => c !== whotCard);
+                    await animateCardPlayFromComputer(whotCard);
+                    await playCard(whotCard, currentPlayerIndex);
+                    return;
+                }
+                const counterCard = bot.hand.find(c => c.number === activeStack.card);
+                if (counterCard) {
+                    bot.hand = bot.hand.filter(c => c !== counterCard);
+                    await animateCardPlayFromComputer(counterCard);
+                    await playCard(counterCard, currentPlayerIndex);
+                    return;
+                } else {
+                    const penalty = activeStack.card === 2 ? 2 : 3;
+                    const totalCards = activeStack.count * penalty;
+                    for(let i = 0; i < totalCards; i++) await dealCardToPlayer(currentPlayerIndex);
+                    activeStack = null;
+                    endTurn();
+                    return;
+                }
+            }
+
+            const playableCards = bot.hand.filter(c => isCardPlayable(c));
+            if (playableCards.length > 0) {
+                const specialCard = playableCards.find(c => [1, 2, 5, 8, 14, 20].includes(c.number));
+                let cardToPlay = specialCard || playableCards[0];
+                
+                bot.hand = bot.hand.filter(c => c !== cardToPlay);
+                await animateCardPlayFromComputer(cardToPlay);
+                await playCard(cardToPlay, currentPlayerIndex);
+            } else {
+                holdOnActive = false;
+                await dealCardToPlayer(currentPlayerIndex);
+                endTurn();
+            }
+        }
+
+        function chooseBestShapeForBot(bot) {
+            const shapeCounts = {};
+            bot.hand.forEach(card => {
+                if (card.shape !== 'whot') shapeCounts[card.shape] = (shapeCounts[card.shape] || 0) + 1;
+            });
+            let bestShape = 'circle', maxCount = 0;
+            for (const shape in shapeCounts) {
+                if (shapeCounts[shape] > maxCount) { maxCount = shapeCounts[shape]; bestShape = shape; }
+            }
+            return bestShape;
+        }
+
+        // --- GENERAL MARKET LOGIC ---
+
+        function respondToMarketAsBot(botIndex) {
+            setTimeout(async () => {
+                const bot = players[botIndex];
+                const marketCard = bot.hand.find(c => c.number === 14);
+
+                if (marketCard) {
+                    bot.hand = bot.hand.filter(c => c !== marketCard);
+                    generalMarketState.playersWhoPlayed.push(botIndex);
+                    await animateCardPlayFromComputer(marketCard, botIndex);
+                    discardPile.push(marketCard);
+                    renderGame();
+                }
+
+                generalMarketState.respondedMask[botIndex] = true;
+                checkIfMarketIsOver();
+            }, 1000 + Math.random() * 500);
+        }
+
+        function checkIfMarketIsOver() {
+            if (!generalMarketState.active) return;
+            const allResponded = generalMarketState.respondedMask.every(r => r === true);
+            if (allResponded) {
+                resolveGeneralMarket();
+            }
+        }
+
+        async function resolveGeneralMarket() {
+            const penaltyCount = generalMarketState.playersWhoPlayed.length;
+            for (let i = 0; i < players.length; i++) {
+                if (!generalMarketState.playersWhoPlayed.includes(i)) {
+                    for (let j = 0; j < penaltyCount; j++) {
+                        await dealCardToPlayer(i);
+                    }
+                }
+            }
+            
+            currentPlayerIndex = generalMarketState.initiator;
+            generalMarketState = { active: false, initiator: null, respondedMask: [], playersWhoPlayed: [] };
+            
+            renderGame();
+            
+            if (!players[currentPlayerIndex].isHuman) {
+                setTimeout(() => botTurn(), 1000);
+            }
+        }
+
+
+        // --- WHOT CARD LOGIC ---
+
+        function requestShapeFromPlayer() {
+            shapeOptionsDiv.innerHTML = '';
+            Object.keys(SHAPES_SVG).forEach(shape => {
+                const optionDiv = document.createElement('div');
+                optionDiv.className = `shape-option w-20 h-20 flex items-center justify-center rounded-full bg-gray-700 cursor-pointer text-white`;
+                optionDiv.innerHTML = `<div class="w-12 h-12">${SHAPES_SVG[shape]}</div>`;
+                optionDiv.addEventListener('click', () => selectShape(shape));
+                shapeOptionsDiv.appendChild(optionDiv);
+            });
+            shapeModal.classList.remove('hidden');
+            setTimeout(() => shapeModal.classList.remove('opacity-0'), 10);
+        }
+
+        function selectShape(shape) {
+            whotRequest = { shape };
+            const topCard = discardPile[discardPile.length - 1];
+            if (topCard && topCard.number === 20) {
+                topCard.shape = shape;
+            }
+            shapeModal.classList.add('opacity-0');
+            setTimeout(() => shapeModal.classList.add('hidden'), 300);
+            renderGame();
+            endTurn();
+        }
+
+        // --- WIN CONDITION ---
+        
+        function endGame(winner) {
+            const winnerMessage = document.createElement('div');
+            winnerMessage.className = "winner-message absolute inset-0 bg-black/70 flex items-center justify-center text-4xl font-bold z-50";
+            winnerMessage.textContent = `${winner.name.toUpperCase()} WINS!`;
+            document.getElementById('game-container').appendChild(winnerMessage);
+
+            setTimeout(() => {
+                gameContainer.classList.add('hidden');
+                gameContainer.classList.remove('flex');
+                setupScreen.style.display = 'flex';
+            }, 4000);
+        }
+
+        // --- ANIMATIONS ---
+        function animateCardDraw(targetElement) {
+            return new Promise(resolve => {
+                const startRect = drawPileDiv.getBoundingClientRect();
+                const targetRect = targetElement.getBoundingClientRect();
+                const animCard = document.createElement('div');
+                animCard.className = 'card card-back drawing-card';
+                animCard.innerHTML = createCardElement(null, false).innerHTML;
+                document.body.appendChild(animCard);
+                animCard.style.left = `${startRect.left}px`;
+                animCard.style.top = `${startRect.top}px`;
+                requestAnimationFrame(() => {
+                    const endX = targetRect.left + (targetRect.width / 2) - (startRect.width / 2);
+                    const endY = targetRect.top;
+                    animCard.style.transform = `translate(${endX - startRect.left}px, ${endY - startRect.top}px)`;
+                });
+                setTimeout(() => {
+                    animCard.remove();
+                    resolve();
+                }, 400);
+            });
+        }
+
+        function animateCardPlayFromPosition(card, startRect, handName) {
+             return new Promise(resolve => {
+                if (!startRect) { 
+                    const handDiv = handName === 'action' ? rightHandDiv : leftHandDiv;
+                    const handRect = handDiv.getBoundingClientRect();
+                    startRect = { left: handRect.left + handRect.width / 2 - 60, top: handRect.top };
+                }
+                
+                const lastCardInPile = discardPileDiv.querySelector('.card:last-child');
+                const targetRect = lastCardInPile ? lastCardInPile.getBoundingClientRect() : discardPileDiv.getBoundingClientRect();
+
+                const animCard = document.createElement('div');
+                animCard.className = 'card drawing-card';
+                animCard.innerHTML = createCardElement(card, true).innerHTML;
+                document.body.appendChild(animCard);
+                animCard.style.left = `${startRect.left}px`;
+                animCard.style.top = `${startRect.top}px`;
+                animCard.style.width = '120px';
+                animCard.style.height = '180px';
+                
+                requestAnimationFrame(() => {
+                    const endX = targetRect.left;
+                    const endY = targetRect.top;
+                    animCard.style.transform = `translate(${endX - startRect.left}px, ${endY - startRect.top}px)`;
+                });
+                
+                setTimeout(() => {
+                    animCard.remove();
+                    resolve();
+                }, 400);
+            });
+        }
+
+        function animateCardPlayFromComputer(card, playerIndex = currentPlayerIndex) {
+            return new Promise(resolve => {
+                const botProfiles = document.querySelectorAll('.computer-player-profile');
+                const botProfile = Array.from(botProfiles).find(p => {
+                    const nameDiv = p.querySelector('.font-semibold');
+                    return nameDiv && nameDiv.textContent === players[playerIndex].name;
+                });
+
+                const startRect = botProfile.getBoundingClientRect();
+                
+                const lastCardInPile = discardPileDiv.querySelector('.card:last-child');
+                const targetRect = lastCardInPile ? lastCardInPile.getBoundingClientRect() : discardPileDiv.getBoundingClientRect();
+
+                const animCard = document.createElement('div');
+                animCard.className = 'card drawing-card';
+                animCard.innerHTML = createCardElement(card, true).innerHTML;
+                document.body.appendChild(animCard);
+                animCard.style.left = `${startRect.left + startRect.width / 2 - 60}px`;
+                animCard.style.top = `${startRect.top}px`;
+                animCard.style.width = '120px';
+                animCard.style.height = '180px';
+
+                animCard.addEventListener('transitionend', () => {
+                    animCard.remove();
+                    resolve();
+                }, { once: true });
+
+                requestAnimationFrame(() => {
+                    const endX = targetRect.left;
+                    const endY = targetRect.top;
+                    animCard.style.transform = `translate(${endX - (startRect.left + startRect.width / 2 - 60)}px, ${endY - startRect.top}px)`;
+                });
+            });
+        }
+
+        // --- EVENT LISTENERS & INITIALIZATION ---
+        
+        drawPileDiv.addEventListener('click', handlePlayerDraw);
+        
+        decrementBtn.addEventListener('click', () => {
+            let count = parseInt(playerCountDisplay.textContent);
+            if (count > 1) {
+                playerCountDisplay.textContent = count - 1;
+            }
+        });
+
+        incrementBtn.addEventListener('click', () => {
+            let count = parseInt(playerCountDisplay.textContent);
+            if (count < 5) { // Changed from 10 to 5
+                playerCountDisplay.textContent = count + 1;
+            }
+        });
+
+        startGameBtn.addEventListener('click', () => {
+            const numBots = parseInt(playerCountDisplay.textContent);
+            initializeGame(numBots);
+        });
+        
+        window.onload = () => {
+            setupDragAndDrop();
+        };
+
+        window.addEventListener('resize', renderGame);
+
+    </script>
+</body>
+</html>

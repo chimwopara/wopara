@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>Fromsupply</title>
+    <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+   <!-- Programming Languages -->
+<script src="c.js"></script>
+<script src="python.js"></script>
+<script src="java.js"></script>
+<script src="javascript.js"></script>
+<script src="csharp.js"></script>
+<script src="cpp.js"></script>
+<script src="css.js"></script>
+<script src="go.js"></script>
+<script src="html.js"></script>
+<script src="kotlin.js"></script>
+<script src="r.js"></script>
+<script src="rust.js"></script>
+<script src="swift.js"></script>
+<script src="typescript.js"></script>
+<script src="z.js"></script>
+<script src="assembly.js"></script>
+<script src="bash.js"></script>
+
+<!-- Science Subjects -->
+<script src="chemistry.js"></script>
+<script src="physics.js"></script>
+<script src="biology.js"></script>
+<script src="psychology.js"></script>
+
+<!-- Maths Subjects -->
+<script src="calculus.js"></script>
+<script src="statistics.js"></script>
+<script src="discretemaths.js"></script>
+
+<!-- Business Subjects -->
+<script src="marketing.js"></script>
+<script src="finance.js"></script>
+<script src="economics.js"></script>
+
+<!-- Cooking Subjects -->
+<script src="africanfood.js"></script>
+<script src="northamericanfood.js"></script>
+<script src="europeanfood.js"></script>
+<script src="asianfood.js"></script>
+<script src="australianfood.js"></script>
+<script src="southamericanfood.js"></script>
+
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="header">
+   <div class="logo-section" onclick="toggleLogoDropdown(event)">
+    <div class="logo"></div>
+    <div class="logo-text">Fromsupply</div>
+</div>
+
+<!-- Add this new section -->
+<div class="minimized-windows" id="minimizedWindows">
+    <!-- Minimized window indicators will appear here -->
+</div>
+
+<!-- Minimized window indicator removed -->
+
+<div id="logo-dropdown" class="logo-dropdown">
+    <div class="logo-dropdown-content">
+        <!-- Google Sign-in section -->
+        <div id="logo-google-auth-section" class="logo-dropdown-section">
+            <div id="logo-google-auth-slot"></div>
+        </div>
+        
+        <!-- User info section (hidden by default) -->
+<div id="logo-user-section" class="logo-dropdown-section" style="display: none;">
+    <div class="logo-user-expanded">
+        <!-- Account Info -->
+        <div class="logo-user-info" onclick="signOut()" style="cursor: pointer;">
+            <img id="logo-user-avatar" class="logo-user-avatar" src="https://placehold.co/32x32/4B5563/FFFFFF?text=U" alt="User">
+            <div class="logo-user-details">
+                <div id="logo-user-name" class="logo-user-name">User Name</div>
+                <div id="logo-user-email" class="logo-user-email">user@example.com</div>
+                <div class="logo-signout-text">Click to sign out</div>
+            </div>
+        </div>
+        
+        <!-- Username Field -->
+        <div class="user-field">
+            <label>Username</label>
+            <input type="text" id="username-input" placeholder="Enter username" class="user-input">
+        </div>
+        
+        <!-- Purchase Options -->
+        <div id="membership-purchase-option" class="purchase-option" onclick="purchaseMembership()">
+    <img src="clubcard.jpeg" class="purchase-icon" alt="Membership">
+    <div class="purchase-details">
+        <div class="purchase-title">Membership</div>
+        <div class="purchase-description">Unlock members only content</div>
+    </div>
+    <div class="purchase-price">$6.99</div>
+</div>
+        <!-- Cheat code Options -->
+        <div class="purchase-option" onclick="purchaseCheatCode()">
+    <img src="10kcard.jpeg" class="purchase-icon" alt="Cheat Code">
+    <div class="purchase-details">
+        <div class="purchase-title">Cheat Code</div>
+        <div class="purchase-description">Purchase 10 thousand reserves</div>
+    </div>
+    <div class="purchase-price">$9.99</div>
+</div>
+        
+        <!-- Payment Card Section -->
+        <div class="payment-section">
+    <div class="card-display" id="card-display" onclick="toggleCardEdit()">
+        <div class="card-number">•••• •••• •••• 1234</div>
+        <div class="card-edit-text">Click to edit</div>
+    </div>
+    
+    <div class="card-edit-form" id="card-edit-form" style="display: none;">
+        <div class="user-field">
+            <label>Card Number</label>
+            <input type="text" placeholder="1234 5678 9012 3456" class="user-input">
+        </div>
+        <div class="user-field-row">
+            <div class="user-field">
+                <label>Expiry</label>
+                <input type="text" placeholder="MM/YY" class="user-input">
+            </div>
+            <div class="user-field">
+                <label>CVV</label>
+                <input type="text" placeholder="123" class="user-input">
+            </div>
+        </div>
+        <div class="user-field">
+            <label>Name on Card</label>
+            <input type="text" placeholder="Full Name" class="user-input">
+        </div>
+        <div class="user-field">
+            <label>Billing Address</label>
+            <input type="text" placeholder="Street Address" class="user-input">
+            <input type="text" placeholder="City, State ZIP" class="user-input" style="margin-top: 5px;">
+        </div>
+        
+        <button id="cancel-membership-btn" class="cancel-membership" onclick="cancelMembership()" style="display: none;">Cancel Membership</button>
+    </div>
+</div>
+            </div>
+        </div>
+        
+       
+        
+       <!-- System section -->
+<div class="logo-dropdown-section">
+    <div class="logo-dropdown-item" onclick="openHiddenSystemWindow()">
+        <div class="logo-dropdown-text">System</div>
+    </div>
+</div>
+    </div>
+</div>
+        <div class="directory-nav hidden" id="directoryNav">
+        <div class="directory-path" id="directoryPath">/Fromsupply</div>
+    </div>
+
+    <!-- Search Icon Button -->
+    <div class="search-icon-button hidden" id="searchIconButton" onclick="openBlobSearch()" title="Search everywhere">
+        <svg class="search-icon" viewBox="0 0 24 24">
+            <path d="M15.5 14h-.79l-.28-.27C15.41 12.59 16 11.11 16 9.5 16 5.91 13.09 3 9.5 3S3 5.91 3 9.5 5.91 16 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/>
+        </svg>
+    </div>
+    <!-- Notes Icon Button -->
+    <div class="notes-icon-button hidden" id="notesIconButton" onclick="openNotesWindow()" title="Open Notes" style="overflow: visible !important;">
+    <img src="notesicon.png" alt="Notes" style="width: 28px !important; height: 28px !important; display: block !important; opacity: 1 !important; visibility: visible !important; position: static !important;">
+</div>
+<!-- Cart Icon Button -->
+<div class="cart-icon-button hidden" id="cartIconButton" onclick="openCartWindow()" title="Open Cart" style="overflow: visible !important;">
+    <img src="fsBank.png" alt="Cart" style="width: 28px !important; height: 28px !important; display: block !important; opacity: 1 !important; visibility: visible !important; position: static !important;">
+</div>
+
+<!-- Pals Icon Button -->
+<div class="pals-icon-button hidden" id="palsIconButton" onclick="openPalsWindow()" title="Open Pals" style="overflow: visible !important;">
+    <img src="fsPals.png" alt="Pals" style="width: 28px !important; height: 28px !important; display: block !important; opacity: 1 !important; visibility: visible !important; position: static !important;">
+</div>
+
+     <!-- star Icon Button -->
+        <div class="star-button" onclick="handleStarClick()" onmousedown="startStarLongPress()" onmouseup="endStarLongPress()" onmouseleave="endStarLongPress()">
+        <svg class="star-icon" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+        </svg>
+        <span class="star-count" id="starCount">0</span>
+    </div>
+</div>
+
+   <!-- Fixed desktop section with Arcade folder properly placed -->
+<div class="desktop" id="desktop">
+    <div class="folder" data-folder="Logic" style="left: 40px; top: 100px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Logic</div>
+    </div>
+    
+    <div class="folder" data-folder="Mall" style="left: 300px; top: 100px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Mall</div>
+    </div>
+    
+    <div class="folder" data-folder="Farm" style="left: 560px; top: 100px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Farm</div>
+    </div>
+    
+    <div class="folder" data-folder="Prompts" style="left: 40px; top: 400px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Prompts</div>
+    </div>
+    
+    <div class="folder" data-folder="Media" style="left: 300px; top: 400px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Media</div>
+    </div>
+    
+    <div class="folder" data-folder="Browser" style="left: 560px; top: 400px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Browser</div>
+    </div>
+    
+   <!-- Store folder (renamed from Arcade) -->
+    <div class="folder" data-folder="Store" style="left: 820px; top: 100px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Store</div>
+    </div>
+    <div class="folder" data-folder="Builder" style="left: 820px; top: 400px;">
+        <div class="folder-icon"></div>
+        <div class="folder-name">Builder</div>
+    </div>
+</div>
+
+    <div id="phoneOverlay" class="phone-overlay-wrapper" style="display: none;" onclick="hidePhoneOverlay()">
+    <iframe src="ActionsBlob.html" class="phone-iframe" onclick="event.stopPropagation()"></iframe>
+</div>
+
+<div id="savedOverlay" class="saved-overlay-wrapper" style="display: none;" onclick="hideSavedOverlay()">
+   <div class="saved-grid" onclick="event.stopPropagation()">
+    <div class="saved-content" id="savedContent">
+        <!-- Content will be populated here -->
+    </div>
+</div>
+</div>
+
+    <div id="notesIcon" class="notes-icon" onclick="toggleNotesInterface()">
+</div>
+
+    <div id="fsConsole" class="fs-console">
+        <div class="fs-console-header" onmousedown="DragManager.start('console', document.getElementById('fsConsole'), event)">
+            <div class="fs-console-title">
+                <span>⚡</span>
+                <span>Fromsupply Console</span>
+                <span id="fsConsoleContext" class="fs-console-path"></span>
+            </div>
+        </div>
+        <input type="text" class="fs-console-input" id="fsConsoleInput" placeholder="Type command or 'help' for assistance..." />
+        <div class="fs-console-output" id="fsConsoleOutput">
+            <div class="fs-console-line">
+                <span class="fs-console-success">Fromsupply Console v2.0 - Ready</span>
+            </div>
+            <div class="fs-console-line">
+                <span class="fs-console-output-text">Type 'help' for commands or 'h' for shortcuts</span>
+            </div>
+        </div>
+    </div>
+    <!-- Mobile drag icons (only show on mobile during drag) -->
+<div id="mobile-drag-icons">
+    <div class="mobile-trash-icon">🕳️</div>
+    <div class="mobile-favorites-icon">⭐</div>
+</div>
+
+<script src="main.js"></script>
+
+</body>
+</html>

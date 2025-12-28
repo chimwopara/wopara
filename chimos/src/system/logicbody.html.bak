@@ -1,0 +1,1649 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chim Code - C Sequence Challenge</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@400;500;700&family=Courier+Prime:wght@400;700&family=Source+Code+Pro:wght@400;500;700&family=VT323&display=swap" rel="stylesheet">
+    <style>
+        /* --- THEME VARIABLES --- */
+        :root {
+            --bg-color: rgba(17, 24, 39, 0.8); /* semi-transparent gray-900 */
+            --panel-bg-color: rgba(31, 41, 55, 0.9); /* semi-transparent gray-800 */
+            --border-color: rgba(55, 65, 81, 0.8); /* semi-transparent gray-700 */
+            --text-color: #e5e7eb; /* gray-200 */
+            --text-muted-color: #9ca3af; /* gray-400 */
+            --accent-color: #22d3ee; /* cyan-400 */
+            --accent-hover-color: #67e8f9; /* cyan-300 */
+            --hint-color: #6ee7b7; /* emerald-300 */
+            --star-color: #facc15; /* yellow-400 */
+            --success-color: #059669; /* Emerald-600 */
+            --error-color: #dc2626; /* Red-600 */
+            --info-btn-bg: #4f46e5; /* indigo-600 */
+            --info-btn-hover-bg: #6366f1; /* indigo-500 */
+            --library-btn-bg: #6d28d9; /* violet-700 */
+            --library-btn-hover-bg: #7c3aed; /* violet-600 */
+            --price-color: #f59e0b; /* amber-500 */
+            --money-price-color: #a3e635; /* lime-400 */
+            --blur-amount: 3px;
+            --appstore-blue: #007aff; /* iOS Blue */
+            --appstore-blue-hover: #005ecb;
+            /* Glassy Button Styles */
+            --glass-bg-color: rgba(31, 41, 55, 0.6); /* More transparent for window compatibility */
+            --glass-border-color: rgba(55, 65, 81, 0.4);
+            --glass-hover-bg: rgba(156, 163, 175, 0.3);
+            --glass-blur-amount: 8px; /* Blur intensity */
+            /* Custom Theme Additions */
+            --header-btn-text-color: white; /* Default for star/library buttons */
+            /* Font Variable */
+            --main-font-family: 'Roboto Mono', monospace; /* Default Font */
+        }
+        
+        /* Example Theme 1: Matrix */
+        .theme-matrix {
+            --bg-color: rgba(0, 0, 0, 0.8); --panel-bg-color: rgba(13, 2, 8, 0.9); --border-color: rgba(0, 59, 0, 0.8);
+            --text-color: #00FF00; --text-muted-color: #008F11; --accent-color: #00FF00;
+            --accent-hover-color: #80FF80; --hint-color: #00FF00; --star-color: #39FF14;
+            --success-color: #008F11; --error-color: #7F0000; --info-btn-bg: #008F11;
+            --info-btn-hover-bg: #00FF00; --library-btn-bg: #006400; --library-btn-hover-bg: #008000;
+            --price-color: #39FF14; --money-price-color: #80FF80;
+            --appstore-blue: #00A800; --appstore-blue-hover: #007500;
+            --glass-bg-color: rgba(13, 2, 8, 0.6); --glass-border-color: rgba(0, 59, 0, 0.4);
+            --glass-hover-bg: rgba(0, 143, 17, 0.3); --header-btn-text-color: #00FF00;
+        }
+        /* Example Theme 2: Solarized Light */
+        .theme-solarized {
+            --bg-color: rgba(253, 246, 227, 0.8); --panel-bg-color: rgba(238, 232, 213, 0.9); --border-color: rgba(147, 161, 161, 0.8);
+            --text-color: #586e75; --text-muted-color: #839496; --accent-color: #268bd2;
+            --accent-hover-color: #2aa198; --hint-color: #859900; --star-color: #b58900;
+            --success-color: #859900; --error-color: #dc322f; --info-btn-bg: #6c71c4;
+            --info-btn-hover-bg: #d33682; --library-btn-bg: #cb4b16; --library-btn-hover-bg: #dc322f;
+            --price-color: #b58900; --money-price-color: #859900;
+            --appstore-blue: #268bd2; --appstore-blue-hover: #1a5f90;
+            --glass-bg-color: rgba(238, 232, 213, 0.5); --glass-border-color: rgba(147, 161, 161, 0.4);
+            --glass-hover-bg: rgba(131, 148, 150, 0.3); --header-btn-text-color: #586e75;
+        }
+
+        /* Global Styles - Optimized for window content */
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+    font-family: var(--main-font-family);
+    background: transparent; /* Transparent background for window compatibility */
+    color: var(--text-color); 
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Let the window handle scrolling */
+    transition: color 0.3s ease, font-family 0.3s ease;
+    cursor: default;
+}
+/* Glass Button Style matching index.html */
+.glass-btn {
+    background-color: rgba(31, 41, 55, 0.6);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border: 1px solid rgba(55, 65, 81, 0.4);
+    border-radius: 20px;
+    padding: 8px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: white;
+    font-weight: 500;
+    font-size: 0.9em;
+    transition: all 0.2s ease;
+    cursor: pointer;
+    text-shadow: none;
+    box-shadow: none;
+    min-width: 120px;
+}
+
+.glass-btn:hover {
+    background-color: rgba(156, 163, 175, 0.3);
+    border-color: rgba(156, 163, 175, 0.5);
+    transform: translateY(-1px);
+}
+
+.glass-btn:active {
+    transform: scale(0.98);
+}
+/* Prevent text selection globally */
+body {
+    user-select: none;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+}
+
+/* Allow text selection only in specific input elements */
+input, textarea {
+    user-select: text;
+    -webkit-user-select: text;
+    -moz-user-select: text;
+    -ms-user-select: text;
+}
+
+        /* Main Game Container - Replaces app-container for window compatibility */
+        .game-container {
+    width: 100%;
+    height: 100vh; /* Use full window height */
+    background: transparent; /* Transparent to work with window blur */
+    display: flex;
+    flex-direction: column;
+    padding: 12px 16px 16px 16px; /* Reduced top padding since no header */
+    gap: 12px;
+    overflow: hidden;
+    transition: background-color 0.3s ease;
+    min-height: 600px; /* Minimum usable height */
+}
+
+        /* Responsive adjustments for window content */
+        @media (max-height: 700px) {
+            .game-container {
+                padding: 12px;
+                gap: 8px;
+            }
+        }
+
+        @media (max-height: 500px) {
+            .game-container {
+                padding: 8px;
+                gap: 6px;
+                min-height: 400px;
+            }
+        }
+
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: var(--panel-bg-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: var(--text-muted-color); }
+
+        /* Code Area & Attempts Counter */
+        #code-display-container {
+            position: relative;
+            flex-grow: 1;
+            width: 100%;
+            min-height: 0;
+            background-color: var(--panel-bg-color);
+            border: 1px solid var(--border-color);
+            border-radius: 16px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.4);
+            display: flex;
+            transition: background-color 0.3s ease, border-color 0.3s ease;
+        }
+        #code-display-area {
+    font-family: var(--main-font-family);
+    font-size: 0.9rem; line-height: 1.6; color: var(--text-color);
+    white-space: pre-wrap; overflow-y: auto; overflow-x: hidden;
+    width: 100%;
+    height: 100%;
+    padding: 12px;
+    box-sizing: border-box;
+    background-color: transparent;
+    border: none;
+    box-shadow: none;
+    border-radius: 0;
+    transition: color 0.3s ease, font-family 0.3s ease;
+    word-wrap: break-word;
+}
+        .explanation-comment { color: var(--hint-color); font-style: italic; }
+        #attempts-counter {
+            position: absolute;
+            bottom: 8px;
+            right: 12px;
+            font-size: 0.75rem;
+            color: var(--text-muted-color);
+            pointer-events: none;
+            z-index: 10;
+            transition: color 0.3s ease;
+        }
+        .wrong-comment { 
+    color: var(--error-color); 
+    font-style: italic; 
+    opacity: 0.8;
+    font-size: 0.9rem;
+    font-weight: 500;
+    line-height: 1.6;
+}
+
+        /* Hint Area */
+        #hint-container {
+    display: flex; align-items: center; gap: 10px;
+    background-color: var(--panel-bg-color);
+    border-radius: 16px; padding: 8px 12px;
+    min-height: 3em;
+    transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+     cursor: pointer;
+}
+        #hint-container:hover {
+    background-color: color-mix(in srgb, var(--panel-bg-color), var(--border-color) 20%);
+}
+        #hint-text {
+            flex-grow: 1; color: var(--hint-color); font-style: italic; font-size: 0.85rem;
+            line-height: 1.5; white-space: pre-wrap; transition: filter 0.3s ease, color 0.3s ease;
+        }
+        #hint-text.blurred { filter: blur(var(--blur-amount)); user-select: none; cursor: default; }
+
+        /* Hint Button Style */
+        #reveal-hint-btn {
+    background: none;
+    color: white;
+    border: none;
+    padding: 0;
+    font-size: 0.85rem;
+    font-weight: normal;
+    cursor: default;
+    pointer-events: none;
+}
+        #reveal-hint-btn:hover:not(:disabled) { background-color: var(--appstore-blue-hover); }
+        #reveal-hint-btn:active:not(:disabled) { transform: scale(0.96); }
+        #reveal-hint-btn:disabled {
+            background-color: color-mix(in srgb, var(--appstore-blue), var(--panel-bg-color) 60%);
+            color: color-mix(in srgb, white, var(--panel-bg-color) 40%);
+            cursor: not-allowed; opacity: 0.7;
+        }
+        
+        #reveal-hint-btn .star-icon {
+            color: var(--star-color); font-size: 1.2em; margin-right: 3px; line-height: 1; transition: color 0.3s ease;
+        }
+        #reveal-hint-btn.hidden { display: none; }
+
+        /* Option Buttons */
+        .option-btn-wrapper { position: relative; }
+        .option-btn {
+            font-family: var(--main-font-family);
+            background-color: var(--panel-bg-color); border: 1px solid var(--text-muted-color);
+            color: var(--text-color); padding: 12px 10px; padding-right: 30px; border-radius: 16px;
+            font-weight: 500; transition: all 0.2s ease; text-align: left; font-size: 0.85rem;
+            line-height: 1.4; width: 100%; white-space: pre;
+            cursor: pointer; overflow: hidden; text-overflow: ellipsis;
+        }
+        .option-btn:hover:not(:disabled) { 
+    background-color: var(--text-muted-color); 
+    border-color: black; 
+    color: black;
+    transform: translateY(-1px); 
+}
+        .option-btn:active:not(:disabled) { transform: translateY(0px); }
+        .option-btn:disabled { opacity: 0.6; cursor: not-allowed; }
+
+        /* Info Button (on incorrect options) */
+        .info-btn {
+            position: absolute; right: 5px; top: 50%; transform: translateY(-50%);
+            background-color: var(--info-btn-bg); color: white; border: none; border-radius: 50%;
+            width: 22px; height: 22px; font-size: 14px; font-weight: bold; line-height: 22px;
+            text-align: center; cursor: pointer; transition: background-color 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+        }
+        .info-btn:hover { background-color: var(--info-btn-hover-bg); }
+
+        /* Header */
+        #main-header {
+            display: flex; justify-content: space-between; align-items: center;
+            border-bottom: 1px solid var(--border-color); padding-bottom: 0.75rem;
+            flex-shrink: 0; /* Prevent header from shrinking */
+        }
+        .header-left { display: flex; align-items: baseline; gap: 0.5rem; }
+        .header-right { display: flex; align-items: center; gap: 0.75rem; }
+
+        #main-title { font-size: 1.25rem; font-weight: bold; color: var(--accent-color); transition: color 0.3s ease; }
+        .language-indicator {
+            font-size: 1.4em; font-weight: bold; color: var(--accent-color);
+            opacity: 0.3; line-height: 1; transition: color 0.3s ease;
+        }
+
+        /* Glassy Header Buttons */
+        .glassy-header-btn {
+            background-color: var(--glass-bg-color);
+            backdrop-filter: blur(var(--glass-blur-amount));
+            -webkit-backdrop-filter: blur(var(--glass-blur-amount));
+            border: 1px solid var(--glass-border-color);
+            border-radius: 20px; padding: 6px 15px;
+            display: inline-flex; align-items: center; justify-content: center;
+            color: var(--header-btn-text-color);
+            font-weight: 500;
+            transition: background-color 0.2s ease, border-color 0.2s ease, color 0.3s ease, transform 0.1s ease;
+            cursor: pointer; text-shadow: none; box-shadow: none;
+        }
+        .glassy-header-btn:hover {
+            background-color: var(--glass-hover-bg); border-color: var(--text-muted-color);
+            color: var(--header-btn-text-color);
+        }
+        .glassy-header-btn:active { transform: scale(0.98); }
+        #level-display-btn { padding: 5px 10px; color: var(--accent-hover-color); font-size: 1rem; transition: color 0.3s ease; }
+        #level-display-btn:hover { color: var(--accent-color); }
+        #library-btn { font-size: 0.9rem; padding: 6px 12px; }
+        #star-display-wrapper { min-width: 70px; }
+        #star-count { margin: 0; display: flex; align-items: baseline; gap: 5px; }
+        #star-count .star-icon { color: var(--star-color); font-size: 1.3em; line-height: 1; display: inline-block; vertical-align: middle; transition: color 0.3s ease;}
+        #star-count .star-number { vertical-align: middle; }
+
+        /* Star Animations */
+        @keyframes star-jump {
+            0%, 100% { transform: translateY(0) scale(1); }
+            50% { transform: translateY(-8px) scale(1.1); }
+        }
+        .star-jump-animation { animation: star-jump 0.35s ease-in-out; }
+        @keyframes star-flash-red-bg {
+            0%, 100% {
+                background-color: var(--glass-bg-color); border-color: var(--glass-border-color);
+            }
+            50% {
+                background-color: color-mix(in srgb, var(--error-color), transparent 70%);
+                border-color: var(--error-color);
+            }
+        }
+        .star-flash-red-animation { animation: star-flash-red-bg 0.4s ease-in-out; }
+
+        /* Generic Buttons (Endgame, Level Select) */
+        .endgame-btn, .level-select-btn {
+            background-color: var(--info-btn-bg); border: 1px solid var(--info-btn-hover-bg); color: white;
+            padding: 8px 16px; border-radius: 6px; font-weight: 500;
+            transition: background-color 0.2s ease; margin: 5px;
+            cursor: pointer; text-align: center;
+        }
+        .endgame-btn:hover, .level-select-btn:hover { background-color: var(--info-btn-hover-bg); }
+        .level-select-btn:disabled {
+            background-color: var(--border-color); border-color: var(--text-muted-color);
+            color: var(--text-muted-color); cursor: not-allowed; opacity: 0.7;
+        }
+        .level-select-btn { width: 100%; margin: 5px 0; }
+        .level-select-btn span { display: block; font-size: 0.8em; color: var(--text-muted-color); }
+
+        /* App Store Purchase Buttons */
+        .purchase-buttons-container {
+            display: flex; flex-direction: row; gap: 10px;
+            justify-content: center; align-items: center; min-width: 180px;
+        }
+        #theme-store-modal .theme-item:not(.single-button-item):not(.buy-stars-item) .purchase-buttons-container {
+            justify-content: flex-end;
+        }
+        .buy-stars-item .purchase-buttons-container,
+        .single-button-item .purchase-buttons-container {
+            justify-content: flex-end;
+        }
+
+        .appstore-purchase-btn {
+            background-color: var(--appstore-blue); color: white; border: none;
+            border-radius: 999px; padding: 5px 15px; font-size: 0.9em; font-weight: 600;
+            cursor: pointer; transition: background-color 0.2s ease, transform 0.1s ease, color 0.3s ease;
+            min-width: 90px; text-align: center; line-height: 1.4;
+            display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0;
+        }
+        .appstore-purchase-btn:hover:not(:disabled) { background-color: var(--appstore-blue-hover); }
+        .appstore-purchase-btn:active:not(:disabled) { transform: scale(0.96); }
+        .appstore-purchase-btn:disabled {
+            background-color: color-mix(in srgb, var(--appstore-blue), var(--panel-bg-color) 60%);
+            color: color-mix(in srgb, white, var(--panel-bg-color) 40%);
+            cursor: not-allowed; opacity: 0.7;
+        }
+        .appstore-purchase-btn .star-icon {
+            color: var(--star-color); font-size: 1.2em; margin-right: 3px; line-height: 1; transition: color 0.3s ease;
+        }
+
+        .status-text-container {
+            display: flex; align-items: center; justify-content: center; min-width: 180px;
+        }
+        #theme-store-modal .theme-item .status-text-container {
+            justify-content: flex-end;
+        }
+
+        .status-text {
+            background-color: var(--success-color); color: white;
+            border-radius: 999px; padding: 5px 15px; font-size: 0.9em; font-weight: 600;
+            min-width: 90px; text-align: center; line-height: 1.4;
+            display: inline-block; transition: background-color 0.3s ease;
+        }
+
+        /* Modal styles - Fixed positioning for window compatibility */
+        .modal-overlay {
+            position: fixed; inset: 0; background-color: rgba(0, 0, 0, 0.7);
+            display: flex; align-items: center; justify-content: center;
+            z-index: 3000; opacity: 0; visibility: hidden;
+            transition: opacity 0.3s ease, visibility 0.3s ease; backdrop-filter: blur(2px);
+        }
+        .modal-overlay.visible { opacity: 1; visibility: visible; }
+        .modal-content {
+            background-color: var(--panel-bg-color); color: var(--text-color);
+            padding: 25px; border-radius: 8px; border: 1px solid var(--border-color);
+            max-width: 600px; width: 90%; position: relative;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4); transform: scale(0.95);
+            transition: transform 0.3s ease, background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .modal-overlay.visible .modal-content { transform: scale(1); }
+        .modal-close-btn {
+            position: absolute; top: 10px; right: 10px; background: transparent; border: none;
+            color: var(--text-muted-color); font-size: 24px; line-height: 1; cursor: pointer;
+        }
+        .modal-close-btn:hover { color: var(--text-color); }
+
+        /* Feedback Overlay Styles */
+        .feedback-overlay {
+            position: fixed; inset: 0; z-index: 2000; opacity: 0; visibility: hidden;
+            transition: opacity 0.2s ease-in-out, visibility 0.2s ease-in-out;
+            pointer-events: none;
+        }
+        .feedback-overlay.visible { opacity: 1; visibility: visible; }
+        .feedback-overlay.overlay-green { background-color: color-mix(in srgb, var(--success-color), transparent 80%); }
+        .feedback-overlay.overlay-red { background-color: color-mix(in srgb, var(--error-color), transparent 80%); }
+
+        /* Info Modal Feedback Area */
+        #feedback-area { display: none; margin-top: 15px; }
+        #feedback-text {
+            width: 100%; background-color: var(--bg-color); color: var(--text-color);
+            border: 1px solid var(--border-color); border-radius: 4px; padding: 8px;
+            min-height: 60px; font-size: 0.9em; margin-bottom: 10px;
+        }
+        #feedback-submit-btn {
+            background-color: var(--info-btn-bg); border: 1px solid var(--info-btn-hover-bg); color: white;
+            padding: 8px 16px; border-radius: 6px; font-weight: 500;
+            transition: background-color 0.2s ease; margin: 5px;
+            cursor: pointer; text-align: center;
+        }
+        #feedback-submit-btn:hover { background-color: var(--info-btn-hover-bg); }
+        #feedback-confirmation { color: var(--hint-color); font-style: italic; font-size: 0.9em; }
+
+        /* Theme Store Specific Styles */
+        .theme-item {
+            border: 1px solid var(--border-color); padding: 10px 15px;
+            margin-bottom: 10px; border-radius: 8px; display: flex;
+            justify-content: space-between; align-items: center;
+            background-color: color-mix(in srgb, var(--panel-bg-color), transparent 30%);
+            min-height: 55px;
+        }
+        .theme-info { flex-grow: 1; margin-right: 15px; }
+        .theme-name { font-weight: bold; font-size: 1.0em; color: var(--text-color); }
+
+        /* Library Modal Specific Styles */
+        #library-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+            gap: 15px;
+        }
+        .language-card {
+            background-color: var(--bg-color); border: 1px solid var(--border-color);
+            border-radius: 8px; padding: 15px; text-align: center;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            display: flex; flex-direction: column; justify-content: space-between;
+            min-height: 100px;
+        }
+        .language-card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.2); }
+        .language-name { font-weight: bold; font-size: 1.1em; margin-bottom: 10px; color: var(--accent-color); }
+        .language-card.current-language { border-color: var(--accent-color); box-shadow: 0 0 10px color-mix(in srgb, var(--accent-color), transparent 70%); }
+        .language-card.current-language .language-name { color: var(--accent-hover-color); }
+        .language-card .purchase-buttons-container {
+            margin-top: auto; justify-content: center;
+        }
+        .language-card .status-text-container { justify-content: center; }
+
+        /* Level Select Modal Styles */
+        #level-list { margin-top: 15px; max-height: 50vh; overflow-y: auto; padding-right: 10px; }
+        .level-select-item { border-bottom: 1px solid var(--border-color); padding-bottom: 10px; margin-bottom: 10px; }
+        .level-select-item:last-child { border-bottom: none; margin-bottom: 0; }
+
+        /* Custom Theme Modal Styles */
+        #custom-theme-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px; margin-bottom: 20px;
+        }
+        .color-picker-item {
+            display: flex; align-items: center; gap: 10px;
+            background-color: var(--bg-color); padding: 8px; border-radius: 6px;
+            border: 1px solid var(--border-color);
+        }
+        .color-picker-item label {
+            font-size: 0.85em; color: var(--text-muted-color);
+            flex-shrink: 0; width: 100px;
+        }
+        .color-picker-item input[type="color"] {
+            width: 40px; height: 30px; border: 1px solid var(--border-color);
+            border-radius: 4px; cursor: pointer; padding: 0;
+            background-color: transparent;
+        }
+        .color-picker-item input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker-item input[type="color"]::-webkit-color-swatch { border: none; border-radius: 3px; }
+        .color-picker-item input[type="color"]::-moz-color-swatch { border: none; border-radius: 3px; }
+
+        /* Font Selection in Custom Modal */
+        #font-selection-area {
+            margin-top: 20px; padding-top: 15px; border-top: 1px solid var(--border-color);
+        }
+        #font-selection-area label {
+            display: block; margin-bottom: 8px; color: var(--text-muted-color);
+            font-size: 0.9em; font-weight: 500;
+        }
+        #font-select-dropdown {
+            width: 100%; padding: 8px 12px; border-radius: 6px;
+            border: 1px solid var(--border-color); background-color: var(--bg-color);
+            color: var(--text-color); font-family: var(--main-font-family);
+            font-size: 0.9em; cursor: pointer;
+            transition: border-color 0.2s ease, background-color 0.2s ease;
+        }
+        #font-select-dropdown:focus {
+            outline: none; border-color: var(--accent-color);
+        }
+        #font-select-dropdown:disabled {
+            opacity: 0.6; cursor: not-allowed; background-color: var(--panel-bg-color);
+        }
+        #font-unlock-message {
+            font-size: 0.85em; color: var(--error-color);
+            margin-top: 5px; text-align: center;
+        }
+
+        #interaction-area {
+    display: flex;
+    gap: 12px;
+    
+    
+    flex-shrink: 0;
+}
+
+#interaction-area .option-btn-wrapper {
+    flex: 1;
+}
+
+        /* Make main content areas draggable */
+.game-container,
+#code-display-container,
+#code-display-area {
+    cursor: grab;
+}
+
+.game-container:active,
+#code-display-container:active,
+#code-display-area:active {
+    cursor: grabbing;
+}
+
+/* Keep buttons and interactive elements with pointer cursor */
+button, input, select, textarea,
+.option-btn, .glass-btn, .appstore-purchase-btn {
+    cursor: pointer !important;
+}
+
+        /* Responsive grid for larger windows */
+        @media (min-width: 600px) {
+            #interaction-area {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+
+        /* Adjust for smaller window heights */
+        @media (max-height: 600px) {
+            #interaction-area {
+                gap: 8px;
+                padding-top: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Main Game Container - Compatible with fsLogic windows -->
+    <div class="game-container">
+        <!-- Header removed - managed by fsLogic window -->
+
+        <!-- Code Display Area -->
+        <div id="code-display-container">
+            <div id="code-display-area"></div>
+            <div id="attempts-counter">Attempts: 1</div>
+        </div>
+
+        <!-- Hint Container -->
+        <div id="hint-container">
+            <span id="hint-text" class="blurred"></span>
+            <button id="reveal-hint-btn">hint</button>
+        </div>
+
+        
+
+        <!-- Interaction Area -->
+        <div id="interaction-area">
+        </div>
+    </div>
+
+    <!-- Modals (keep all the existing modals with fixed positioning) -->
+    <div id="info-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="modal-close" class="modal-close-btn">&times;</button>
+            <h3 class="text-lg font-semibold mb-3" style="color: var(--accent-color);">Why is this incorrect?</h3>
+            <p id="modal-reason" class="mb-4"></p>
+            <button id="flag-feedback-btn" class="endgame-btn text-sm py-1 px-3">Disagree? Flag for Review</button>
+            <div id="feedback-area">
+                <textarea id="feedback-text" placeholder="Explain why you think this option might be correct (optional)..."></textarea>
+                <button id="feedback-submit-btn" class="endgame-btn">Submit Feedback</button>
+                <p id="feedback-confirmation" class="mt-2"></p>
+            </div>
+        </div>
+    </div>
+
+    <div id="theme-store-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="theme-modal-close" class="modal-close-btn">&times;</button>
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--accent-color);">Theme Store</h3>
+            <p class="mb-4 text-sm" style="color: var(--text-muted-color);">Use stars (★) or purchase themes to customize your experience!</p>
+
+            <div class="theme-item" data-item-identifier="default">
+                <div class="theme-info"> <div class="theme-name">Default Theme</div> </div>
+                <div class="purchase-buttons-container">
+                    <div class="status-text-container"> <span class="status-text">Applied</span> </div>
+                </div>
+            </div>
+            <div class="theme-item" data-item-identifier="theme-matrix" data-star-price="200" data-money-price="2.99">
+                <div class="theme-info"> <div class="theme-name">Matrix Theme</div> </div>
+                <div class="purchase-buttons-container">
+                    </div>
+                <div class="status-text-container" style="display: none;"></div>
+            </div>
+            <div class="theme-item" data-item-identifier="theme-solarized" data-star-price="200" data-money-price="2.99">
+                <div class="theme-info"> <div class="theme-name">Solarized Light Theme</div> </div>
+                <div class="purchase-buttons-container">
+                    </div>
+                <div class="status-text-container" style="display: none;"></div>
+            </div>
+            <div class="theme-item" data-item-identifier="color-orange" data-star-price="200" data-money-price="2.99">
+                <div class="theme-info"> <div class="theme-name">Accent Color: Orange</div> </div>
+                <div class="purchase-buttons-container">
+                    </div>
+                <div class="status-text-container" style="display: none;"></div>
+            </div>
+            <div class="theme-item" data-item-identifier="custom-theme" data-star-price="1000" data-money-price="4.99">
+                <div class="theme-info"> <div class="theme-name">Custom Theme</div> </div>
+                <div class="purchase-buttons-container">
+                    </div>
+                <div class="status-text-container" style="display: none;"></div>
+            </div>
+            <div class="theme-item single-button-item" data-item-identifier="change-font" data-star-price="20">
+                <div class="theme-info"> <div class="theme-name">Change Font</div> </div>
+                <div class="purchase-buttons-container">
+                    </div>
+                <div class="status-text-container" style="display: none;"></div>
+            </div>
+            <div class="theme-item buy-stars-item" data-item-identifier="buy-stars">
+                <div class="theme-info"> <div class="theme-name">Get 1000 Stars</div> </div>
+                <div class="purchase-buttons-container">
+                    <button data-action="buy-stars" data-amount="1000" data-money-price="4.99" class="appstore-purchase-btn">$4.99</button>
+                </div>
+                <div class="status-text-container" style="display: none;"></div> </div>
+            <p id="store-message" class="text-center mt-4 text-sm" style="color: var(--error-color);"></p>
+        </div>
+    </div>
+
+    <div id="library-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="library-modal-close" class="modal-close-btn">&times;</button>
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--accent-color);">Language Library</h3>
+            <p class="mb-4 text-sm" style="color: var(--text-muted-color);">Select a language to start learning. Currently only 'C' is available.</p>
+            <div id="library-grid">
+                </div>
+            <p id="library-message" class="text-center mt-4 text-sm" style="color: var(--error-color);"></p>
+        </div>
+    </div>
+
+    <div id="level-select-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="level-select-modal-close" class="modal-close-btn">&times;</button>
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--accent-color);">Select Level</h3>
+            <div id="level-list">
+                </div>
+        </div>
+    </div>
+
+    <div id="custom-theme-modal" class="modal-overlay">
+        <div class="modal-content">
+            <button id="custom-theme-modal-close" class="modal-close-btn">&times;</button>
+            <h3 class="text-lg font-semibold mb-4" style="color: var(--accent-color);">Customize Theme</h3>
+            <p class="mb-4 text-sm" style="color: var(--text-muted-color);">Select colors and font for different UI elements. Changes apply immediately.</p>
+
+            <div id="custom-theme-grid">
+                </div>
+
+            <div id="font-selection-area">
+                <label for="font-select-dropdown">Select Font:</label>
+                <select id="font-select-dropdown" disabled>
+                    </select>
+                <p id="font-unlock-message" style="display: none;">Unlock "Change Font" in the Theme Store (★ 20) to enable selection.</p>
+            </div>
+
+            <div class="text-center mt-4">
+                <button id="apply-custom-theme-btn" class="endgame-btn">Apply & Close</button>
+                <button id="reset-custom-theme-btn" class="endgame-btn" style="background-color: var(--error-color); border-color: color-mix(in srgb, var(--error-color), black 20%);">Reset to Defaults</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="feedback-overlay" class="feedback-overlay"></div>
+
+    <script src="../data/c/c.js"></script>
+
+    <script>
+        // Note: You'll need to include the c.js file or define challengesData here
+        // For demo purposes, creating a simple challenges array
+        if (typeof challengesData === 'undefined') {
+            const challengesData = [
+                {
+                    goal: "Create a simple Hello World program in C.",
+                    concepts: "Basic program structure, printf function",
+                    sequence: [
+                        {
+                            correct: "#include <stdio.h>",
+                            indent: 0,
+                            explanation: "Include the standard input/output library",
+                            distractors: [
+                                { text: "#include <stdlib.h>", reason: "This is for general utilities, not I/O functions" },
+                                { text: "#include <string.h>", reason: "This is for string manipulation functions" }
+                            ]
+                        },
+                        {
+                            correct: "int main() {",
+                            indent: 0,
+                            explanation: "Define the main function that returns an integer",
+                            distractors: [
+                                { text: "void main() {", reason: "Main should return int, not void" },
+                                { text: "int start() {", reason: "The entry point function must be named 'main'" }
+                            ]
+                        },
+                        {
+                            correct: 'printf("Hello, World!\\n");',
+                            indent: 1,
+                            explanation: "Print the message with a newline character",
+                            distractors: [
+                                { text: 'print("Hello, World!");', reason: "C uses printf, not print" },
+                                { text: 'cout << "Hello, World!";', reason: "This is C++ syntax, not C" }
+                            ]
+                        },
+                        {
+                            correct: "return 0;",
+                            indent: 1,
+                            explanation: "Return 0 to indicate successful program execution",
+                            distractors: [
+                                { text: "return 1;", reason: "Non-zero return values indicate errors" },
+                                { text: "exit(0);", reason: "While this works, return 0 is the conventional way" }
+                            ]
+                        },
+                        {
+                            correct: "}",
+                            indent: 0,
+                            explanation: "Close the main function",
+                            distractors: [
+                                { text: "};", reason: "Functions end with }, not };" },
+                                { text: "end", reason: "C uses braces, not keywords to end blocks" }
+                            ]
+                        }
+                    ]
+                }
+            ];
+        }
+
+        const availableLanguages = [
+            { id: 'c', name: 'C', priceStars: 0, priceMoney: null, available: true },
+            { id: 'cpp', name: 'C++', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'csharp', name: 'C#', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'python', name: 'Python', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'java', name: 'Java', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'javascript', name: 'JavaScript', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'html', name: 'HTML', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'css', name: 'CSS', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'php', name: 'PHP', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'swift', name: 'Swift', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'kotlin', name: 'Kotlin', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'rust', name: 'Rust', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'r', name: 'R', priceStars: 1000, priceMoney: '4.99', available: false },
+            { id: 'ruby', name: 'Ruby', priceStars: 1000, priceMoney: '4.99', available: false },
+        ];
+
+        const availableFonts = {
+            'Roboto Mono': "'Roboto Mono', monospace",
+            'Source Code Pro': "'Source Code Pro', monospace",
+            'Courier Prime': "'Courier Prime', monospace",
+            'VT323': "'VT323', monospace"
+        };
+        const defaultFontFamily = availableFonts['Roboto Mono'];
+
+        const customThemeProperties = {
+            '--bg-color': 'Background',
+            '--panel-bg-color': 'Panel Background',
+            '--border-color': 'Borders',
+            '--text-color': 'Primary Text',
+            '--text-muted-color': 'Muted Text',
+            '--accent-color': 'Accent / Logo',
+            '--accent-hover-color': 'Accent Hover',
+            '--hint-color': 'Hint Text',
+            '--star-color': 'Star Icon',
+            '--header-btn-text-color': 'Header Button Text',
+            '--success-color': 'Success Messages',
+            '--error-color': 'Error Messages',
+            '--appstore-blue': 'Purchase Buttons'
+        };
+        let defaultThemeValues = {};
+
+        // Game State
+        let currentLevelIndex = 0;
+        let currentStep = 0;
+        let starCount = 0;
+        let constructedCode = '';
+        let optionsLocked = false;
+        let feedbackTimeout = null;
+        let incorrectChoiceData = null;
+        let previousStarCountForAnimation = 0;
+        let hintRevealed = false;
+        let unlockedThemes = {};
+        let unlockedLanguages = {};
+        let unlockedFeatures = {};
+        let currentCustomColors = {};
+        let currentFontFamily = defaultFontFamily;
+        let initialStarsForLevelAttempt = 0;
+        let levelAttempts = {};
+        let levelInProgress = false;
+        let levelCompletedThisSession = {};
+        let starsGainedThisLevel = 0;
+        let starsLostThisLevel = 0;
+        let wrongAnswersCount = 0;
+        let hintsUsedCount = 0;
+
+        // DOM Elements
+        // Header elements removed - managed by fsLogic
+        const levelDisplayBtn = null;
+        const levelTextSpan = null;
+        const starDisplay = null;
+        const starNumberSpan = null;
+        const starDisplayWrapper = null;
+        const libraryBtn = null;
+        const codeDisplayArea = document.getElementById('code-display-area');
+        const interactionArea = document.getElementById('interaction-area');
+        const hintContainer = document.getElementById('hint-container');
+        const hintText = document.getElementById('hint-text');
+        const revealHintBtn = document.getElementById('reveal-hint-btn');
+        const infoModal = document.getElementById('info-modal');
+        const modalReason = document.getElementById('modal-reason');
+        const modalCloseBtn = document.getElementById('modal-close');
+        const themeStoreModal = document.getElementById('theme-store-modal');
+        const themeStoreContent = themeStoreModal.querySelector('.modal-content');
+        const themeModalCloseBtn = document.getElementById('theme-modal-close');
+        const libraryModal = document.getElementById('library-modal');
+        const libraryModalContent = libraryModal.querySelector('.modal-content');
+        const libraryModalCloseBtn = document.getElementById('library-modal-close');
+        const libraryGrid = document.getElementById('library-grid');
+        const libraryMessage = document.getElementById('library-message');
+        const levelSelectModal = document.getElementById('level-select-modal');
+        const levelSelectModalCloseBtn = document.getElementById('level-select-modal-close');
+        const levelListContainer = document.getElementById('level-list');
+        const customThemeModal = document.getElementById('custom-theme-modal');
+        const customThemeModalCloseBtn = document.getElementById('custom-theme-modal-close');
+        const customThemeGrid = document.getElementById('custom-theme-grid');
+        const applyCustomThemeBtn = document.getElementById('apply-custom-theme-btn');
+        const resetCustomThemeBtn = document.getElementById('reset-custom-theme-btn');
+        const feedbackOverlay = document.getElementById('feedback-overlay');
+        const flagFeedbackBtn = document.getElementById('flag-feedback-btn');
+        const feedbackArea = document.getElementById('feedback-area');
+        const feedbackTextEl = document.getElementById('feedback-text');
+        const feedbackSubmitBtn = document.getElementById('feedback-submit-btn');
+        const feedbackConfirmation = document.getElementById('feedback-confirmation');
+        const fontSelectionArea = document.getElementById('font-selection-area');
+        const fontSelectDropdown = document.getElementById('font-select-dropdown');
+        const fontUnlockMessage = document.getElementById('font-unlock-message');
+        const attemptsCounter = document.getElementById('attempts-counter');
+
+        // Include all the game logic functions here...
+        // (All the functions from the original game remain the same)
+
+        // Helper Functions
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+            return array;
+        }
+        function getIndent(level) { return '    '.repeat(level); }
+        function getCssVariableValue(varName) {
+            const cssVarName = varName.startsWith('--') ? varName : `--${varName}`;
+            const value = getComputedStyle(document.documentElement).getPropertyValue(cssVarName).trim();
+            return value;
+        }
+    function updateStarDisplay(animate = false, animationType = 'none') {
+    // Send score update to fsLogic instead of local display
+    if (typeof parent !== 'undefined' && parent !== window) {
+        parent.postMessage({
+            action: 'updateScore',
+            newScore: starCount
+        }, '*');
+    }
+    updateStoreButtons();
+    updateLibraryButtons();
+    updateHintButtonState();
+}
+
+    function saveStarCount() {
+    // fsLogic handles score persistence
+    if (typeof parent !== 'undefined' && parent !== window) {
+        parent.postMessage({
+            action: 'updateScore',
+            newScore: starCount
+        }, '*');
+    }
+    console.log(`Updated fsLogic score: ${starCount}`);
+}
+
+        function scrollCodeDisplay() { codeDisplayArea.scrollTop = codeDisplayArea.scrollHeight; }
+        function escapeHtml(unsafe) {
+            if (typeof unsafe !== 'string') { return unsafe; }
+            return unsafe.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#039;");
+        }
+
+        // Modal Functions
+        function showModal(modalElement) { modalElement.classList.add('visible'); }
+        function hideModal(modalElement) { modalElement.classList.remove('visible'); }
+
+        function initializeGame(levelIndex = 0) {
+    // Check if level was selected from index.html
+    const selectedLevel = localStorage.getItem('selectedLevel');
+    if (selectedLevel) {
+        currentLevelIndex = parseInt(selectedLevel) - 1;
+        console.log('Starting selected level:', selectedLevel, 'Array index:', currentLevelIndex);
+    } else {
+        currentLevelIndex = levelIndex;
+        console.log('Starting default level:', currentLevelIndex);
+    }
+
+    if (typeof challengesData === 'undefined' || !challengesData || !challengesData[currentLevelIndex]) {
+        console.error("Invalid level index or challengesData not loaded:", currentLevelIndex);
+        interactionArea.innerHTML = `<p style="text-align: center; color: var(--error-color);">Error: Level data not found.</p>`;
+        hintText.textContent = '';
+        revealHintBtn.classList.add('hidden');
+        return;
+    }
+
+    const currentChallenge = challengesData[currentLevelIndex];
+currentStep = 0;
+
+// Set current level info for notes system
+if (typeof parent !== 'undefined' && parent !== window) {
+    parent.postMessage({
+        action: 'setCurrentLevelInfo',
+        subject: 'C',
+        level: currentLevelIndex + 1,
+        path: `C/Level ${currentLevelIndex + 1}`
+    }, '*');
+}
+
+    initialStarsForLevelAttempt = starCount;
+    
+    // ONLY set attempts to 1 if this level has never been attempted before
+    if (!levelAttempts[currentLevelIndex]) {
+        levelAttempts[currentLevelIndex] = 1; // First time ever playing this level
+    }
+    // Do NOT increment attempts here - only on explicit re-attempt button click
+    
+    levelInProgress = true;
+
+    // Reset level tracking
+    starsGainedThisLevel = 0;
+    starsLostThisLevel = 0;
+    wrongAnswersCount = 0;  // ADD THIS
+    hintsUsedCount = 0;     // ADD THIS
+
+    // Mark level as started for index.html progress tracking
+    const levelNumber = currentLevelIndex + 1;
+    if (!localStorage.getItem(`level_${levelNumber}_completed`)) {
+        localStorage.setItem(`level_${levelNumber}_progress`, 'true');
+    }
+
+    sessionStorage.setItem('chimCodeLevelInProgress', 'true');
+    sessionStorage.setItem('chimCodeInitialStars', initialStarsForLevelAttempt.toString());
+    sessionStorage.setItem('chimCodeSavedLevelIndex', currentLevelIndex.toString());
+    sessionStorage.setItem('chimCodeLevelAttempts', JSON.stringify(levelAttempts));
+
+    constructedCode = `// Goal: ${escapeHtml(currentChallenge.goal)}\n\n`;
+    codeDisplayArea.innerHTML = constructedCode;
+    attemptsCounter.textContent = `Attempts: ${levelAttempts[currentLevelIndex]}`;
+    updateStarDisplay();
+    hintContainer.style.display = 'flex';
+    displayStep();
+}
+
+        // Display current step
+        function displayStep() {
+            if (typeof challengesData === 'undefined' || !challengesData[currentLevelIndex]) {
+                console.error("Invalid level index or challengesData not loaded:", currentLevelIndex);
+                interactionArea.innerHTML = `<p style="text-align: center; color: var(--error-color);">Error: Level data not found.</p>`;
+                hintText.textContent = '';
+                revealHintBtn.classList.add('hidden');
+                return;
+            }
+            const currentChallenge = challengesData[currentLevelIndex];
+            if (currentStep >= currentChallenge.sequence.length) {
+                endGame();
+                return;
+            }
+            optionsLocked = false;
+            hintRevealed = false;
+            const stepData = currentChallenge.sequence[currentStep];
+            const hintContent = stepData.explanation ? `Hint: ${stepData.explanation}` : '';
+            hintText.textContent = hintContent;
+            if (hintContent) {
+                hintText.classList.add('blurred');
+                revealHintBtn.classList.remove('hidden');
+                updateHintButtonState();
+            } else {
+                hintText.classList.remove('blurred');
+                revealHintBtn.classList.add('hidden');
+            }
+            const correctOption = { text: stepData.correct, isCorrect: true };
+            const distractors = stepData.distractors || [];
+            const distractorOptions = distractors.map(d => ({ ...d, isCorrect: false }));
+            let allOptions = [correctOption, ...distractorOptions];
+            while (allOptions.length < 3 && allOptions.length > 0) {
+                if (distractorOptions.length > 0) {
+                    allOptions.push({...distractorOptions[0], isCorrect: false});
+                } else {
+                    allOptions.push({text: "/* Placeholder 1 */", isCorrect: false, reason: "This is a placeholder."});
+                    if (allOptions.length < 3) {
+                        allOptions.push({text: "/* Placeholder 2 */", isCorrect: false, reason: "This is another placeholder."});
+                    }
+                }
+            }
+            allOptions = shuffleArray(allOptions);
+            interactionArea.innerHTML = '';
+            allOptions.forEach((optionData) => {
+                const wrapper = document.createElement('div');
+                wrapper.classList.add('option-btn-wrapper');
+                const button = document.createElement('button');
+                button.classList.add('option-btn');
+                button.textContent = getIndent(stepData.indent) + optionData.text;
+                button.dataset.correct = optionData.isCorrect;
+                if (!optionData.isCorrect && optionData.reason) {
+                    button.dataset.reason = optionData.reason;
+                    button.dataset.incorrectText = optionData.text;
+                }
+                button.addEventListener('click', handleOptionClick);
+                wrapper.appendChild(button);
+                interactionArea.appendChild(wrapper);
+            });
+        }
+function incrementAttempts() {
+    levelAttempts[currentLevelIndex] = (levelAttempts[currentLevelIndex] || 0) + 1;
+    attemptsCounter.textContent = `Attempts: ${levelAttempts[currentLevelIndex]}`;
+    sessionStorage.setItem('chimCodeLevelAttempts', JSON.stringify(levelAttempts));
+}
+        // Handle option click
+        function handleOptionClick(event) {
+            if (optionsLocked) return;
+            optionsLocked = true;
+
+            const button = event.target.closest('.option-btn');
+            if (!button) return;
+
+            const wrapper = button.parentElement;
+            const isCorrect = button.dataset.correct === 'true';
+            const reason = button.dataset.reason;
+            const incorrectText = button.dataset.incorrectText;
+            const currentChallenge = challengesData[currentLevelIndex];
+            const stepData = currentChallenge.sequence[currentStep];
+
+            interactionArea.querySelectorAll('.info-btn').forEach(btn => btn.remove());
+            interactionArea.querySelectorAll('.option-btn').forEach(btn => btn.disabled = true);
+
+            previousStarCountForAnimation = starCount;
+
+            if (isCorrect) {
+    // Don't add stars immediately - calculate at end of level
+    console.log("Correct answer - will calculate stars at level end");
+    showFeedbackOverlay('correct');
+    updateStarDisplay(starCount > previousStarCountForAnimation, 'gain');
+    saveStarCount();
+
+    // Check if this was a correction of a previous wrong answer
+    checkForCorrection(stepData.correct);
+
+    let codeToAdd = '';
+    if (stepData.explanation) {
+        codeToAdd += getIndent(stepData.indent) + `<span class="explanation-comment">${escapeHtml("// " + stepData.explanation)}</span>\n`;
+    }
+    const escapedCorrectCode = escapeHtml(stepData.correct);
+    codeToAdd += getIndent(stepData.indent) + escapedCorrectCode + '\n';
+    constructedCode += codeToAdd;
+
+    codeDisplayArea.innerHTML = constructedCode;
+    scrollCodeDisplay();
+
+    setTimeout(() => {
+        currentStep++;
+        displayStep();
+    }, 300);
+
+    } else {
+    // Track wrong answers for end-of-level calculation
+    starsLostThisLevel += 2;
+    wrongAnswersCount++; // Track for corrections
+    console.log("Wrong answer - will calculate stars at level end");
+
+    showFeedbackOverlay('incorrect');
+    const didLoseStar = starCount < previousStarCountForAnimation;
+    updateStarDisplay(didLoseStar, 'loss');
+    saveStarCount();
+
+    // DEBUG: Log everything before sending
+    console.log('=== WRONG ANSWER DEBUG ===');
+    console.log('incorrectText:', incorrectText);
+    console.log('reason:', reason);
+    console.log('stepData.correct:', stepData.correct);
+    console.log('currentLevelIndex:', currentLevelIndex);
+    console.log('currentStep:', currentStep);
+    console.log('parent window exists:', typeof parent !== 'undefined' && parent !== window);
+
+    // Send correction data to parent window for notes app
+    if (typeof parent !== 'undefined' && parent !== window) {
+        const messageData = {
+            action: 'updateLevelCorrections',
+            language: 'C',
+            levelNumber: currentLevelIndex + 1,
+            step: currentStep + 1,
+            incorrectAnswer: incorrectText,
+            reason: reason,
+            correctAnswer: stepData.correct,
+            isCorrection: false
+        };
+        
+        console.log('Sending message to parent:', messageData);
+        parent.postMessage(messageData, '*');
+        console.log('Message sent successfully');
+    } else {
+        console.error('PARENT WINDOW NOT FOUND - Messages cannot be sent');
+    }
+
+    // Add wrong answer comment to code
+    if (reason && incorrectText) {
+        let wrongCodeComment = '';
+        wrongCodeComment += getIndent(stepData.indent) + `<span class="wrong-comment">\n/* Wrong: ${escapeHtml(incorrectText)}</span>\n`;
+        wrongCodeComment += getIndent(stepData.indent) + `<span class="wrong-comment">   ${escapeHtml(reason)} */</span>\n\n`;
+        constructedCode += wrongCodeComment;
+        codeDisplayArea.innerHTML = constructedCode;
+        scrollCodeDisplay();
+    }
+
+    // Remove the incorrect option
+    wrapper.remove();
+
+    setTimeout(() => {
+        interactionArea.querySelectorAll('.option-btn').forEach(btn => {
+            btn.disabled = false;
+        });
+        optionsLocked = false;
+    }, 500);
+}
+        }
+
+        function checkForCorrection(correctAnswer) {
+    // Check if this correct answer was previously answered incorrectly
+    const correctionKey = `corrections_C_level_${currentLevelIndex + 1}`;
+    
+    try {
+        let corrections = JSON.parse(localStorage.getItem(correctionKey) || '[]');
+        
+        // Find any incorrect answers for this step that match this correct answer
+        const stepCorrections = corrections.filter(c => 
+            c.step === (currentStep + 1) && 
+            c.correctAnswer === correctAnswer &&
+            c.status === 'incorrect'
+        );
+        
+        if (stepCorrections.length > 0) {
+            // Mark all matching corrections as corrected
+            stepCorrections.forEach(correction => {
+                // Send correction update to parent
+                if (typeof parent !== 'undefined' && parent !== window) {
+                    parent.postMessage({
+                        action: 'updateLevelCorrections',
+                        language: 'C',
+                        levelNumber: currentLevelIndex + 1,
+                        step: currentStep + 1,
+                        incorrectAnswer: correction.incorrectAnswer,
+                        reason: correction.reason,
+                        correctAnswer: correctAnswer,
+                        isCorrection: true
+                    }, '*');
+                }
+            });
+        }
+    } catch (error) {
+        console.warn('Error checking for corrections:', error);
+    }
+}
+
+
+        // End game
+        function endGame() {
+            const isLastLevel = currentLevelIndex >= challengesData.length - 1;
+            hintText.textContent = '';
+            revealHintBtn.classList.add('hidden');
+            hintContainer.style.display = 'none';
+
+            levelCompletedThisSession[currentLevelIndex] = true;
+            sessionStorage.setItem('chimCodeLevelCompleted', JSON.stringify(levelCompletedThisSession));
+            // Save individual level completion and star data for index.html
+            // Save individual level completion and star data for index.html
+            const levelNumber = currentLevelIndex + 1;
+            const wasAlreadyCompleted = localStorage.getItem(`level_${levelNumber}_completed`) === 'true';
+
+            localStorage.setItem(`level_${levelNumber}_completed`, 'true');
+
+            
+
+// Simple calculation: (steps × 3) - (wrong answers × 2) - (hints × 1)
+const totalStepsCompleted = challengesData[currentLevelIndex].sequence.length;
+const totalPossibleStars = totalStepsCompleted * 3;
+const finalStarsEarned = Math.max(0, totalPossibleStars - (wrongAnswersCount * 2) - (hintsUsedCount * 1));
+
+// Only update star count and save data on FIRST completion
+if (!wasAlreadyCompleted) {
+    const netStarGain = finalStarsEarned;
+    starCount = initialStarsForLevelAttempt + netStarGain;
+    
+    localStorage.setItem(`level_${levelNumber}_stars_earned`, finalStarsEarned.toString());
+    localStorage.setItem(`level_${levelNumber}_total_available`, totalPossibleStars.toString());
+    
+    const currentAttempt = levelAttempts[currentLevelIndex] || 1;
+    localStorage.setItem(`level_${levelNumber}_completion_attempt`, currentAttempt.toString());
+    
+    console.log(`Level ${levelNumber} completed: ${finalStarsEarned}/${totalPossibleStars} stars (${wrongAnswersCount} wrong, ${hintsUsedCount} hints)`);
+} else {
+    console.log(`Re-attempt of Level ${levelNumber}: grade remains from first attempt`);
+}
+
+            // Remove progress flag since level is now completed
+            localStorage.removeItem(`level_${levelNumber}_progress`);
+
+            levelInProgress = false;
+            sessionStorage.setItem('chimCodeLevelInProgress', 'false');
+            sessionStorage.removeItem('chimCodeInitialStars');
+            sessionStorage.removeItem('chimCodeSavedLevelIndex');
+
+            saveStarCount();
+
+// Calculate net stars gained this level (simple difference)
+const netStarsGained = starCount - initialStarsForLevelAttempt;
+    const isReattempt = wasAlreadyCompleted;
+
+    interactionArea.innerHTML = `
+        <div style="width: 100%; text-align: center; padding: 20px;">
+            <p style="font-weight: bold; font-size: 1.2em; margin-bottom: 10px; color: var(--success-color);">
+                Level ${currentLevelIndex + 1} Complete! ${isReattempt ? '(Re-attempt)' : ''}
+            </p>
+            <p style="font-size: 1em; margin-bottom: 20px; color: var(--text-color);">
+                ${isReattempt ? 
+                    'Stars Gained: +0' : 
+                    `Stars Gained: <span style="color: var(--success-color);">+${Math.max(0, starsGainedThisLevel)}</span>`
+                }
+            </p>
+        <div style="display: flex; gap: 12px; justify-content: center; align-items: center; flex-wrap: wrap; width: 100%;">
+            ${currentLevelIndex > 0 ? `
+                <button id="previous-btn" class="glass-btn">
+                    <span style="margin-right: 6px;">←</span> Previous Level
+                </button>
+            ` : ''}
+            <button id="reattempt-btn" class="glass-btn">
+                <span style="margin-right: 6px;">↻</span> Re-attempt
+            </button>
+            ${!isLastLevel ? `
+                <button id="next-btn" class="glass-btn">
+                    <span style="margin-right: 6px;">→</span> Next Level
+                </button>
+            ` : '<p style="margin-top: 10px; color: var(--star-color);">All levels complete!</p>'}
+        </div>
+    </div>
+`;
+
+// Add event handlers for the new buttons
+            document.getElementById('reattempt-btn')?.addEventListener('click', () => {
+                showReattemptMessage();
+            });
+
+            if (!isLastLevel) {
+                document.getElementById('next-btn')?.addEventListener('click', () => {
+                    goToLevelBegin(currentLevelIndex + 2); // +2 because next level (1-based)
+                });
+            }
+
+            if (currentLevelIndex > 0) {
+                document.getElementById('previous-btn')?.addEventListener('click', () => {
+                    goToLevelBegin(currentLevelIndex); // current index is 0-based, so this gives previous level in 1-based
+                });
+            }
+
+            document.getElementById('restart-btn')?.addEventListener('click', () => {
+                starCount = initialStarsForLevelAttempt;
+                updateStarDisplay();
+                saveStarCount();
+                initializeGame(currentLevelIndex);
+            });
+
+            if (!isLastLevel) {
+                document.getElementById('next-btn')?.addEventListener('click', () => {
+                    initializeGame(currentLevelIndex + 1);
+                });
+            }
+        }
+
+        function updateHintButtonState() {
+    if (hintRevealed) {
+        revealHintBtn.style.display = 'none';
+    } else {
+        revealHintBtn.style.display = 'block';
+        revealHintBtn.textContent = 'hint';
+    }
+}
+
+        function showFeedbackOverlay(type) {
+            if (feedbackTimeout) { clearTimeout(feedbackTimeout); }
+            feedbackOverlay.classList.remove('overlay-green', 'overlay-red', 'visible');
+            void feedbackOverlay.offsetWidth;
+            feedbackOverlay.classList.add(type === 'correct' ? 'overlay-green' : 'overlay-red');
+            feedbackOverlay.classList.add('visible');
+            feedbackTimeout = setTimeout(() => {
+                feedbackOverlay.classList.remove('visible');
+                setTimeout(() => {
+                    feedbackOverlay.classList.remove('overlay-green', 'overlay-red');
+                }, 200);
+            }, 400);
+        }
+
+        function showInfoModal(reason, incorrectData) {
+            modalReason.textContent = reason || "No specific reason provided.";
+            incorrectChoiceData = incorrectData;
+            feedbackArea.style.display = 'none';
+            flagFeedbackBtn.textContent = 'Disagree? Flag for Review';
+            flagFeedbackBtn.disabled = false;
+            feedbackTextEl.value = '';
+            feedbackConfirmation.textContent = '';
+            showModal(infoModal);
+        }
+
+        // Simplified store/library functions for demo
+        function updateStoreButtons() {
+            // Simplified for demo
+        }
+
+        function updateLibraryButtons() {
+            // Simplified for demo
+        }
+        function showReattemptMessage() {
+    interactionArea.innerHTML = `
+        <div style="width: 100%; text-align: center; padding: 40px;">
+            <h2 style="color: var(--accent-color); margin-bottom: 20px; font-size: 1.4em;">Re-attempt Level ${currentLevelIndex + 1}</h2>
+            <p style="color: var(--hint-color); font-style: italic; margin-bottom: 30px; font-size: 1.1em;">
+                No stars will be lost or gained during re-attempts
+            </p>
+            <button onclick="startReattempt()" class="glass-btn" style="font-size: 1.1em; padding: 12px 24px;">
+                <span style="margin-right: 8px;">▶</span> Begin Re-attempt
+            </button>
+        </div>
+    `;
+}
+
+function startReattempt() {
+    // Increment attempts counter only on re-attempts
+    incrementAttempts();
+    // Don't reset star count for re-attempts
+    initializeGame(currentLevelIndex);
+}
+
+function goToLevelBegin(levelNumber) {
+    // Store the target level for index.html to pick up
+    localStorage.setItem('selectedLevel', levelNumber.toString());
+    localStorage.setItem('selectedSubject', 'C');
+    
+    // Send message to parent to navigate back to level selection view
+    if (typeof parent !== 'undefined' && parent !== window) {
+        parent.postMessage({
+            action: 'navigateToLevel',
+            level: levelNumber
+        }, '*');
+    }
+}
+
+        // Event listeners
+        modalCloseBtn.addEventListener('click', () => hideModal(infoModal));
+        infoModal.addEventListener('click', (event) => { if (event.target === infoModal) hideModal(infoModal); });
+
+    hintContainer.addEventListener('click', () => {
+    const hintCost = 1;
+    if (starCount >= hintCost && !hintRevealed) {
+        let didLoseStar = false;
+        if (!levelCompletedThisSession[currentLevelIndex]) {
+            previousStarCountForAnimation = starCount;
+            starCount -= hintCost;
+            hintsUsedCount++;  // REPLACE starsLostThisLevel += hintCost with this
+            didLoseStar = true;
+        }
+        updateStarDisplay(didLoseStar, 'loss');
+        hintText.classList.remove('blurred');
+        hintRevealed = true;
+        updateHintButtonState();
+    }
+});
+
+        // Load session data
+        function loadSessionData() {
+            defaultThemeValues = {};
+            for (const cssVar in customThemeProperties) {
+                defaultThemeValues[cssVar] = getCssVariableValue(cssVar);
+            }
+
+            try {
+                unlockedThemes = JSON.parse(sessionStorage.getItem('chimCodeUnlockedThemes') || '{}');
+                unlockedLanguages = JSON.parse(sessionStorage.getItem('chimCodeUnlockedLanguages') || '{}');
+                unlockedFeatures = JSON.parse(sessionStorage.getItem('chimCodeUnlockedFeatures') || '{}');
+                currentCustomColors = JSON.parse(sessionStorage.getItem('chimCodeCustomColors') || '{}');
+                levelAttempts = JSON.parse(sessionStorage.getItem('chimCodeLevelAttempts') || '{}');
+                levelCompletedThisSession = JSON.parse(sessionStorage.getItem('chimCodeLevelCompleted') || '{}');
+                levelInProgress = JSON.parse(sessionStorage.getItem('chimCodeLevelInProgress') || 'false');
+                let savedInitialStars = parseInt(sessionStorage.getItem('chimCodeInitialStars') || '0', 10);
+                let savedLevelIndex = parseInt(sessionStorage.getItem('chimCodeSavedLevelIndex') || '0', 10);
+                // Get initial score from fsLogic
+                starCount = 0; // Will be updated by fsLogic response
+                if (typeof parent !== 'undefined' && parent !== window) {
+                    parent.postMessage({
+                        action: 'getScore'
+                    }, '*');
+                }
+
+                if (levelInProgress) {
+    console.warn("Level was in progress on refresh. Reverting star count.");
+    starCount = savedInitialStars;
+    levelInProgress = false;
+    sessionStorage.setItem('chimCodeLevelInProgress', 'false');
+    // Don't override level selection - let initializeGame handle it
+}
+            } catch (e) {
+                console.error("Error parsing saved state:", e);
+                starCount = 0;
+                currentLevelIndex = 0;
+                 levelAttempts = {}; // Reset attempts on error
+            }
+
+            return 0;
+        }
+
+window.addEventListener('message', function(event) {
+    console.log('=== PARENT RECEIVED MESSAGE ===');
+    console.log('Event origin:', event.origin);
+    console.log('Event data:', event.data);
+    
+    try {
+        if (event.data && event.data.action) {
+            console.log('Processing action:', event.data.action);
+            
+            switch(event.data.action) {
+                case 'dismissOverlay':
+                    navigationAttempted = false;
+                    hidePhoneOverlay();
+                    break;
+                    
+                case 'updateScore':
+                    if (typeof event.data.points === 'number') {
+                        addToScore(event.data.points);
+                    } else if (typeof event.data.newScore === 'number') {
+                        setScore(event.data.newScore);
+                    }
+                    break;
+                    
+                case 'getScore':
+                    if (event.source) {
+                        event.source.postMessage({
+                            action: 'scoreResponse',
+                            score: currentScore
+                        }, '*');
+                    }
+                    break;
+                    
+                case 'openApp':
+                    if (event.data.appName && event.data.fileName) {
+                        openApp(event.data.appName, event.data.fileName);
+                    }
+                    break;
+                    
+                case 'openCodeApp':
+                    console.log('Opening code app from message');
+                    openApp('C Coding Challenge', 'logicbody.html');
+                    break;
+                
+                case 'updateDirectoryForArcadeApp':
+                    if (event.data.appName) {
+                        updateDirectoryForArcadeApp(event.data.appName, event.data.appPath);
+                    }
+                    break;
+                    
+                case 'searchResponse':
+                    if (event.data.matches) {
+                        searchMatches = event.data.matches.map((match, index) => ({
+                            element: null,
+                            iframe: true,
+                            index: index
+                        }));
+                        currentMatchIndex = event.data.currentIndex || 0;
+                        updateSearchResultsCount();
+                    }
+                    break;
+                        
+                case 'navigateToLevel':
+                    const targetLevel = event.data.level;
+                    if (targetLevel) {
+                        const focusedWindow = openWindows.find(w => {
+                            const element = document.getElementById(w.id);
+                            return element && parseInt(element.style.zIndex) === windowZIndex;
+                        });
+                        
+                        if (focusedWindow) {
+                            const newPath = ['Fromsupply', 'Desktop', 'Logic', 'Code', 'C'];
+                            PathManager.updatePath(focusedWindow.id, newPath);
+                            
+                            const content = generateLanguageLevels('C', 100, 'C.png', focusedWindow.id);
+                            const contentElement = document.getElementById(focusedWindow.id + '-content');
+                            if (contentElement) {
+                                contentElement.style.padding = '16px';
+                                contentElement.innerHTML = content;
+                            }
+                        }
+                    }
+                    break;
+
+                case 'updateLevelCorrections':
+                    console.log('*** RECEIVED LEVEL CORRECTIONS MESSAGE ***');
+                    console.log('Data:', event.data);
+                    updateLevelCorrections(event.data);
+                    break;
+
+                case 'setCurrentLevelInfo':
+                    console.log('*** SETTING CURRENT LEVEL INFO ***');
+                    console.log('Data:', event.data);
+                    window.currentLevelInfo = {
+                        subject: event.data.subject,
+                        level: event.data.level,
+                        path: event.data.path
+                    };
+                    console.log('Set currentLevelInfo to:', window.currentLevelInfo);
+                    break;
+
+                // ... rest of cases
+            }
+        } else {
+            console.log('Message received but no action property');
+        }
+    } catch (error) {
+        console.error('Error handling message:', error);
+    }
+});
+
+
+loadSessionData();
+initializeGame(0); // Always pass 0, let initializeGame check localStorage
+
+// Simple event forwarding to parent for dragging
+let mouseDownOnNonInteractive = false;
+
+document.addEventListener('mousedown', function(e) {
+    // Only prevent dragging on actual clickable elements
+    const preventDragElements = ['BUTTON', 'INPUT', 'SELECT', 'TEXTAREA', 'A'];
+    const isClickableElement = preventDragElements.includes(e.target.tagName) || 
+                              e.target.closest('button, input, select, textarea, a, .modal-overlay');
+    
+    if (!isClickableElement) {
+        mouseDownOnNonInteractive = true;
+        
+        if (parent !== window) {
+            parent.postMessage({
+                action: 'startDragFromIframe',
+                mouseX: e.clientX,
+                mouseY: e.clientY
+            }, '*');
+        }
+    }
+}, true);
+
+// Forward keyboard events to parent for shortcuts
+document.addEventListener('keydown', function(e) {
+    // Don't forward if user is typing in input elements
+    if (e.target.matches('input, textarea, [contenteditable]')) return;
+    
+    // Forward the keyboard event to parent
+    if (parent !== window) {
+        parent.postMessage({
+            action: 'keyboardEvent',
+            key: e.key,
+            metaKey: e.metaKey,
+            ctrlKey: e.ctrlKey,
+            shiftKey: e.shiftKey,
+            altKey: e.altKey
+        }, '*');
+    }
+}, true);
+
+document.addEventListener('mousemove', function(e) {
+    if (mouseDownOnNonInteractive && parent !== window) {
+        parent.postMessage({
+            action: 'updateDragFromIframe',
+            mouseX: e.clientX,
+            mouseY: e.clientY
+        }, '*');
+    }
+}, true);
+
+document.addEventListener('mouseup', function(e) {
+    if (mouseDownOnNonInteractive && parent !== window) {
+        parent.postMessage({
+            action: 'endDragFromIframe',
+            mouseX: e.clientX,
+            mouseY: e.clientY
+        }, '*');
+    }
+    mouseDownOnNonInteractive = false;
+}, true);
+
+    </script>
+
+</body>
+</html>

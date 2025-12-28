@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notes - Fromsupply</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: #000;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+        #notesContainer {
+            width: 100vw;
+            height: 100vh;
+            background: transparent;
+        }
+    </style>
+</head>
+<body>
+    <div id="notesContainer">
+        <div id="notesContent" style="width: 100%; height: 100%;"></div>
+    </div>
+
+    <script>
+        // Global variables - make sure these are declared first
+        let notesCurrentTool = 'pen';
+        let notesCurrentColor = '#000000';
+        let notesCurrentTab = 'drawn';
+        let notesEraserMode = 'brush';
+        let notesIsDrawing = false;
+        let notesCanvas, notesCtx;
+        let notesPenStroke = 2;
+        let notesHighlighterStroke = 8;
+        let notesLinesMode = 'none';
+        let notesSelectedStrokes = [];
+        let notesLassoPath = [];
+        let notesIsDragging = false;
+        let notesStrokes = [];
+        let notesCurrentStroke = null;
+        let notesDragOffset = { x: 0, y: 0 };
+        
+        let notesSettings = {
+            penStroke: 2,
+            highlighterStroke: 8,
+            currentColor: '#000000',
+            currentTool: 'pen',
+            eraserMode: 'brush',
+            lastTab: 'drawn',
+            linesMode: 'none'
+        };
+
+        // INSERT ALL YOUR NOTES FUNCTIONS HERE
+        // (Copy all the functions from loadNotesContent, initializeNotesApp, etc.)
+        
+        function loadNotesContent() {
+            const notesContent = document.getElementById('notesContent');
+            
+            // Create the complete notes interface
+            notesContent.innerHTML = `
+                <div style="display: flex; flex-direction: column; height: 100%; background: transparent; border-radius: 20px; overflow: hidden;">
+                    <!-- Dynamic Toolbar -->
+                    <div id="notesToolbar" style="display: flex; gap: 12px; padding: 20px 24px 16px 24px; background: transparent; border-bottom: 1px solid rgba(255, 255, 255, 0.15); flex-wrap: wrap; justify-content: center;">
+                        <!-- Drawing Tools -->
+                        <button id="penBtn" style="background: rgba(59, 130, 246, 0.4); border: 1px solid rgba(59, 130, 246, 0.6); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">✏️ Pen ▼</button>
+                        <button id="highlighterBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">🖍️ Highlighter ▼</button>
+                        <button id="eraserBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">🧹 Eraser ▼</button>
+                        <button id="lassoBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">🪃 Lasso</button>
+                        <button id="linesBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">📏 Lines</button>
+                        
+                        <!-- Formatting Tools -->
+                        <button id="fontBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; display: none;"><span id="currentFont">Arial</span> ▼</button>
+                        <button id="sizeBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; display: none;"><span id="currentSize">14px</span> ▼</button>
+                        <button id="boldBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; display: none; min-width: 40px;"><strong>B</strong></button>
+                        <button id="italicBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; display: none; min-width: 40px;"><em>I</em></button>
+                        <button id="underlineBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500; display: none; min-width: 40px;"><u>U</u></button>
+                        
+                        <!-- Universal Tools -->
+                        <button id="colorsBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">🎨 Colors ▼</button>
+                        <button id="exportBtn" style="background: rgba(255, 255, 255, 0.15); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; color: white; padding: 12px 16px; cursor: pointer; font-size: 13px; font-weight: 500;">📄 Export</button>
+                    </div>
+                    
+                    <!-- Content Area -->
+                    <div id="contentArea" style="flex: 1; position: relative; background: transparent;">
+                        <canvas id="notesCanvas" style="width: 100%; height: 100%; display: block; touch-action: none; background: transparent;"></canvas>
+                    </div>
+                    
+                    <!-- Tabs -->
+                    <div style="display: flex; justify-content: center; gap: 12px; padding: 16px 20px; background: transparent; border-top: 1px solid rgba(255, 255, 255, 0.15);">
+                        <button id="logicTab" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 10px 20px; color: rgba(255, 255, 255, 0.7); cursor: pointer; font-size: 13px; font-weight: 500;">⚡ Logic</button>
+                        <button id="typedTab" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 10px 20px; color: rgba(255, 255, 255, 0.7); cursor: pointer; font-size: 13px; font-weight: 500;">📝 Typed</button>
+                        <button id="drawnTab" style="background: rgba(59, 130, 246, 0.4); border: 1px solid rgba(59, 130, 246, 0.6); border-radius: 20px; padding: 10px 20px; color: white; cursor: pointer; font-size: 13px; font-weight: 500;">🎨 Drawn</button>
+                        <button id="coplayTab" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 10px 20px; color: rgba(255, 255, 255, 0.7); cursor: pointer; font-size: 13px; font-weight: 500;">🤝 Coplay</button>
+                        <button id="machineTab" style="background: rgba(255, 255, 255, 0.1); border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 20px; padding: 10px 20px; color: rgba(255, 255, 255, 0.7); cursor: pointer; font-size: 13px; font-weight: 500;">🤖 Machine</button>
+                    </div>
+                </div>
+            `;
+            
+            // Add dropdowns to document body
+            const dropdownsHTML = `/* YOUR DROPDOWNS HTML HERE */`;
+            document.body.insertAdjacentHTML('beforeend', dropdownsHTML);
+            
+            setTimeout(() => {
+                initializeNotesApp();
+            }, 50);
+        }
+
+        // ALL YOUR OTHER FUNCTIONS GO HERE...
+        // (Copy all functions from previous responses)
+
+        // Initialize when DOM is ready
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Notes.html DOM loaded, initializing...');
+            loadNotesContent();
+        });
+
+        // Also try immediate initialization in case DOMContentLoaded already fired
+        if (document.readyState === 'loading') {
+            document.addEventListener('DOMContentLoaded', loadNotesContent);
+        } else {
+            loadNotesContent();
+        }
+    </script>
+</body>
+</html>

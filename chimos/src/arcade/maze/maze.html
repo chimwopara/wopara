@@ -1,0 +1,2187 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Chim Maze</title>
+    <style>
+        /* Basic reset and fullscreen setup */
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html, body {
+            width: 100%; height: 100%; overflow: hidden;
+            background-color: #000000; /* Default to black */
+            cursor: default;
+            transition: background-color 0.5s ease;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #FFFFFF;
+        }
+        #gameContainer { /* Added container for blur effect */
+            width: 100%; height: 100%;
+            position: relative;
+            transition: filter 0.3s ease-in-out; /* Transition for blur */
+        }
+        #gameContainer.blurred {
+            filter: blur(5px);
+            /* Removed pointer-events: none; to allow modal interaction */
+        }
+        canvas { display: block; width: 100%; height: 100%; }
+
+        /* --- Top Bar --- */
+        #topBar {
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+            padding: 10px 20px;
+            display: flex; justify-content: space-between; align-items: center;
+            background-color: rgba(10, 20, 30, 0.6);
+            backdrop-filter: blur(5px);
+            z-index: 10;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        #topLeft { display: flex; align-items: baseline; }
+        #gameTitle { font-size: 1.6em; font-weight: bold; color: #FFFFFF; margin-right: 15px; text-shadow: 1px 1px 3px rgba(0,0,0,0.5); }
+        #subjectName { font-size: 1.3em; font-weight: normal; color: #FFFFFF; opacity: 0.6; transition: opacity 0.3s ease; }
+        #subjectName.hidden { opacity: 0; }
+        #topRight { display: flex; align-items: center; gap: 15px; }
+        .top-button { background-color: rgba(40, 50, 60, 0.8); color: #E0E0E0; border: 1px solid rgba(255, 255, 255, 0.2); padding: 8px 15px; border-radius: 6px; cursor: pointer; font-size: 0.95em; transition: background-color 0.2s ease, border-color 0.2s ease; display: flex; align-items: center; gap: 5px; }
+        .top-button:hover { background-color: rgba(50, 60, 70, 0.9); border-color: rgba(255, 255, 255, 0.4); }
+        .top-button:active { transform: scale(0.97); }
+        #starsDisplay { font-size: 1.1em; color: #FFD700; font-weight: bold; text-shadow: 1px 1px 2px rgba(0,0,0,0.5); cursor: pointer; padding: 5px 8px; border-radius: 4px; transition: background-color 0.2s ease; user-select: none; }
+        #starsDisplay:hover { background-color: rgba(255, 255, 255, 0.1); }
+        #starsDisplay span { display: inline-block; margin-left: 3px; font-size: 1.1em; }
+
+        /* Modals */
+        .modal {
+            position: fixed; /* Use fixed positioning */
+            top: 50%; left: 50%; transform: translate(-50%, -50%);
+            background-color: rgba(20, 30, 40, 0.97);
+            color: white; padding: 25px 30px; /* Adjusted padding */
+            border-radius: 15px; text-align: center;
+            display: none; z-index: 20; /* Ensure modals are above blurred container */
+            box-shadow: 0 8px 25px rgba(0,0,0,0.5);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            min-width: 320px; max-width: 600px; /* Wider for levels */ width: 90%;
+            max-height: 85vh; overflow-y: auto;
+            pointer-events: auto; /* Ensure modals are interactive */
+        }
+        .modal h2 { margin-bottom: 20px; font-size: 1.6em; color: #a0c0ff; text-align: left; }
+        .modal .modal-close-button { position: absolute; top: 15px; right: 20px; background: none; border: none; font-size: 1.8em; color: #aaa; cursor: pointer; padding: 0; line-height: 1; transition: color 0.2s ease; }
+        .modal .modal-close-button:hover { color: #fff; }
+        .modal button { /* General button style if needed */
+             margin: 8px 5px; padding: 10px 20px; font-size: 0.95em; cursor: pointer;
+             border: none; border-radius: 8px; background-color: #4a90e2; color: white;
+             transition: background-color 0.3s ease, transform 0.1s ease; min-width: 100px;
+        }
+        .modal button:hover:not(:disabled) { background-color: #3a80d2; }
+        .modal button:active:not(:disabled) { transform: scale(0.95); }
+        .modal button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.6; }
+
+
+        /* Library/Theme Store Button Styles (within modal) */
+        #libraryContent button, #themeStoreContent .theme-item button {
+            margin: 8px 5px; padding: 10px 20px; font-size: 0.95em; cursor: pointer;
+            border: none; border-radius: 8px; background-color: #4a90e2; color: white;
+            transition: background-color 0.3s ease, transform 0.1s ease; min-width: 100px;
+        }
+         #libraryContent button:hover, #themeStoreContent .theme-item button:hover:not(:disabled) { background-color: #3a80d2; }
+         #libraryContent button:active, #themeStoreContent .theme-item button:active:not(:disabled) { transform: scale(0.95); }
+
+
+        /* --- Topic/Level Modal Specific Styles --- */
+        #topicModal h2 { margin-bottom: 15px; } /* Less space below title */
+        #topicContent {
+            display: flex;
+            flex-direction: column; /* Stack items vertically */
+            gap: 10px; /* Space between level items */
+        }
+        .topic-item-container {
+            background-color: rgba(74, 144, 226, 0.2); /* Light blue translucent */
+            border: 1px solid rgba(74, 144, 226, 0.5); /* Blue border */
+            border-radius: 8px;
+            padding: 15px 20px;
+            text-align: left;
+            cursor: pointer;
+            transition: background-color 0.2s ease, border-color 0.2s ease;
+        }
+        .topic-item-container:hover {
+            background-color: rgba(74, 144, 226, 0.35);
+             border-color: rgba(74, 144, 226, 0.8);
+        }
+        .topic-item-container.all-topics { /* Special style for 'All Topics' */
+             background-color: rgba(100, 120, 140, 0.2);
+             border: 1px solid rgba(100, 120, 140, 0.5);
+        }
+        .topic-item-container.all-topics:hover {
+             background-color: rgba(100, 120, 140, 0.35);
+             border-color: rgba(100, 120, 140, 0.8);
+        }
+        .topic-title {
+            font-size: 1.15em;
+            font-weight: bold;
+            color: #FFFFFF; /* White title */
+            margin-bottom: 5px;
+            display: block; /* Ensure it takes full width */
+        }
+        .topic-description {
+            font-size: 0.9em;
+            color: #cccccc; /* Lighter grey for description */
+            line-height: 1.4;
+        }
+
+
+        /* Theme Store Specific Styles */
+        #themeStoreModal h2 { margin-bottom: 10px; }
+        #themeStoreModal p.store-description { text-align: left; margin-bottom: 25px; color: #ccc; font-size: 0.95em; }
+        .theme-item { display: flex; justify-content: space-between; align-items: center; background-color: rgba(10, 20, 30, 0.7); padding: 12px 20px; border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255, 255, 255, 0.08); }
+        .theme-item span { font-size: 1.05em; color: #eee; }
+        .theme-item .buttons { display: flex; gap: 10px; }
+        .theme-item button { padding: 6px 14px; font-size: 0.9em; min-width: 80px; margin: 0; } /* Overrides general modal button styles */
+        .theme-item button.star-button { background-color: #3a80d2; color: #FFD700; }
+        .theme-item button.star-button:hover:not(:disabled) { background-color: #4a90e2; }
+        .theme-item button.money-button { background-color: #50a060; }
+        .theme-item button.money-button:hover:not(:disabled) { background-color: #60b070; }
+        .theme-item button:disabled { background-color: #555; cursor: not-allowed; opacity: 0.6; }
+        .theme-item button.active-theme { background-color: #666; color: #fff; cursor: default; }
+        .theme-item button.active-theme:hover { background-color: #666; }
+
+        /* Custom Theme Editor Modal Styles */
+        #customThemeModal .theme-editor-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        #customThemeModal .theme-editor-item {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        #customThemeModal label {
+            font-size: 0.9em;
+            color: #ccc;
+        }
+        #customThemeModal input[type="color"] {
+            width: 100%;
+            height: 40px;
+            border: 1px solid #555;
+            border-radius: 5px;
+            cursor: pointer;
+            padding: 0 2px; /* Minimal padding */
+             background-color: #333; /* Background for the input itself */
+        }
+        #customThemeModal .modal-actions {
+            display: flex;
+            justify-content: flex-end; /* Align buttons to the right */
+            gap: 10px;
+            margin-top: 20px;
+        }
+         #customThemeModal .modal-actions button {
+             min-width: 120px; /* Slightly wider buttons */
+         }
+         #customThemeModal .modal-actions button.reset-button {
+              background-color: #c06060; /* Reddish color for reset */
+         }
+         #customThemeModal .modal-actions button.reset-button:hover {
+              background-color: #d07070;
+         }
+
+        /* Typing Input Overlay Styles */
+        #typingOverlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); /* Slightly darker */
+            display: none; /* Hidden by default */
+            justify-content: center;
+            align-items: center;
+            z-index: 25; /* Above game, below modals */
+            flex-direction: column;
+            padding: 20px;
+            color: white;
+            text-align: center;
+            cursor: pointer; /* Make overlay clickable to skip reveal */
+            pointer-events: auto; /* Allow clicks on overlay */
+        }
+        #typingOverlay.visible { display: flex; }
+        #typingContent {
+            background-color: rgba(30, 40, 50, 0.9);
+            padding: 30px 40px;
+            border-radius: 15px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4);
+            max-width: 90%;
+            width: 500px; /* Max width for content */
+            cursor: default; /* Prevent click-skip inside content box */
+            pointer-events: auto; /* Ensure content box is interactive */
+        }
+        #typingTimerDisplay { font-size: 1.5em; margin-bottom: 15px; color: #ffcc00; font-weight: bold; }
+        #typingQuestionText { font-size: 1.8em; margin-bottom: 15px; text-shadow: 1px 1px 2px black; }
+        #typingInput {
+            padding: 10px 15px; font-size: 1.2em;
+            border-radius: 6px; border: 1px solid #888;
+            background-color: #eee; color: #333;
+            width: 100%; /* Full width within content box */
+            margin-bottom: 15px; text-align: center;
+        }
+        #typingInput:disabled { background-color: #ccc; cursor: not-allowed; }
+        /* Removed Submit Button */
+        /* #typingSubmitButton { ... } */
+
+        /* --- UPDATED Hint Button Styles --- */
+         #typingHint {
+            margin-top: 10px;
+            padding: 8px 12px;
+            font-size: 0.95em;
+            background-color: rgba(255, 255, 255, 0.1); /* Button background */
+            border: 1px dashed rgba(255, 255, 255, 0.3);
+            border-radius: 6px;
+            cursor: pointer;
+            /* Added border-color and background-color to transition */
+            transition: background-color 0.3s ease, border-color 0.3s ease, border-style 0.3s ease;
+            color: #ddd;
+            display: inline-block; /* Fit content */
+            text-align: center; /* Center elements inside */
+            line-height: 1; /* Ensure spans align nicely */
+        }
+        #typingHint span { /* Basic styling for spans inside the hint button */
+             display: inline-block; /* Keep them inline */
+             vertical-align: middle; /* Align vertically */
+             margin: 0 2px; /* Add some horizontal spacing */
+        }
+
+        #hintContent {
+            /* Styles specific to the hint content span */
+            transition: filter 0.3s ease; /* Transition for blur removal */
+        }
+
+        /* Style for when the hint is revealed */
+        #typingHint.revealed {
+            background-color: rgba(255, 255, 255, 0.2);
+            border-style: solid; /* Change from dashed to solid */
+            cursor: default;
+            border-color: rgba(255, 255, 255, 0.5); /* Make border more prominent */
+        }
+
+        /* Ensure hint content isn't blurred when revealed */
+        #typingHint.revealed #hintContent {
+             filter: none !important; /* Ensure blur is removed */
+        }
+        /* --- END UPDATED Hint Button Styles --- */
+
+
+        #typingAnswerReveal {
+            margin-top: 20px;
+            font-size: 1.2em;
+            color: #90ee90; /* Light green for correct answer */
+            display: none; /* Hidden initially */
+        }
+        #typingAnswerReveal span { font-weight: bold; }
+        #typingSkipMessage {
+            margin-top: 10px;
+            font-size: 0.9em;
+            color: #aaa;
+            display: none; /* Hidden initially */
+        }
+
+        /* Message Flash Styling */
+        #messageFlash { position: fixed; /* Fixed position */ bottom: 30px; left: 50%; transform: translateX(-50%); background-color: rgba(0, 0, 0, 0.8); color: white; padding: 10px 20px; border-radius: 8px; z-index: 30; /* Above modals */ opacity: 0; transition: opacity 0.5s ease-in-out; pointer-events: none; font-size: 1em; }
+        #messageFlash.visible { opacity: 1; }
+
+        /* Pause Overlay - Invisible click catcher */
+        #pauseOverlay {
+            position: fixed; /* Cover viewport */
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); /* Semi-transparent black when paused */
+            z-index: 15; /* Below modals, above game container */
+            display: none; /* Hidden by default */
+            cursor: pointer; /* Indicate clickable */
+            justify-content: center;
+            align-items: center;
+            font-size: 5em;
+            color: rgba(255, 255, 255, 0.7);
+            text-shadow: 2px 2px 5px rgba(0,0,0,0.5);
+            pointer-events: auto; /* Allow clicks */
+        }
+         #pauseOverlay.visible { display: flex; }
+         #pauseOverlay::after {
+             content: "❚❚"; /* Pause symbol */
+         }
+
+         /* Glow effect for correct answer */
+         .correct-answer-glow {
+             animation: glow 1s ease-in-out;
+         }
+         @keyframes glow {
+             0%, 100% { text-shadow: 0 0 5px #0f0, 0 0 10px #0f0, 0 0 15px #0f0; }
+             50% { text-shadow: 0 0 10px #0f0, 0 0 20px #0f0, 0 0 30px #0f0; }
+         }
+
+         /* Game Over Buttons */
+         #gameOverButtons {
+              margin-top: 20px;
+              display: flex;
+              justify-content: center;
+              gap: 15px;
+         }
+         #buyStarsButton {
+              background-color: #50a060; /* Green */
+         }
+         #buyStarsButton:hover {
+              background-color: #60b070;
+         }
+
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <div id="topBar">
+            <div id="topLeft">
+                <span id="gameTitle">Chim Maze</span>
+                <span id="subjectName" class="hidden">None</span>
+            </div>
+            <div id="topRight">
+                <button id="levelButton" class="top-button">Level: ♾️</button>
+                <button id="libraryButton" class="top-button">Library</button>
+                <span id="starsDisplay" title="Open Theme Store">0 <span>⭐</span></span>
+            </div>
+        </div>
+        <canvas id="gameCanvas"></canvas>
+    </div>
+
+    <div id="pauseOverlay"></div>
+
+    <div id="libraryModal" class="modal">
+        <button class="modal-close-button" onclick="closeModal()">&times;</button>
+        <h2>Choose a Subject</h2>
+        <div id="libraryContent"></div>
+    </div>
+    <div id="topicModal" class="modal">
+        <button class="modal-close-button" onclick="closeModal()">&times;</button>
+        <h2>Select Level</h2>
+        <div id="topicContent"></div>
+    </div>
+    <div id="gameOverBox" class="modal">
+        <h2>Game Over!</h2>
+        <p id="gameOverText" style="margin-bottom: 20px; font-size: 1.1em; line-height: 1.5;"></p>
+        <div id="gameOverButtons">
+             <button id="buyStarsButton">Get 1000 ⭐ ($0.99)</button>
+             <button id="restartButton">Restart</button>
+        </div>
+    </div>
+    <div id="themeStoreModal" class="modal">
+        <button class="modal-close-button" onclick="closeModal()">&times;</button>
+        <h2>Theme Store</h2>
+        <p class="store-description">Use stars (⭐) or purchase themes to customize your experience!</p>
+        <div id="themeStoreContent"></div>
+    </div>
+     <div id="customThemeModal" class="modal">
+        <button class="modal-close-button" onclick="closeModal()">&times;</button>
+        <h2>Customize Theme</h2>
+        <div class="theme-editor-grid">
+            <div class="theme-editor-item">
+                <label for="customBg1">Background 1 / Solid BG</label>
+                <input type="color" id="customBg1" name="customBg1">
+            </div>
+            <div class="theme-editor-item">
+                <label for="customBg2">Background 2 (Gradient)</label>
+                <input type="color" id="customBg2" name="customBg2">
+            </div>
+             <div class="theme-editor-item">
+                <label for="customBall">Ball Color</label>
+                <input type="color" id="customBall" name="customBall">
+            </div>
+            <div class="theme-editor-item">
+                <label for="customTube1">Tube Color 1</label>
+                <input type="color" id="customTube1" name="customTube1">
+            </div>
+             <div class="theme-editor-item">
+                <label for="customTube2">Tube Color 2</label>
+                <input type="color" id="customTube2" name="customTube2">
+            </div>
+             <div class="theme-editor-item">
+                <label for="customTubeBorder">Tube Border</label>
+                <input type="color" id="customTubeBorder" name="customTubeBorder">
+            </div>
+             <div class="theme-editor-item">
+                <label for="customText">Primary Text</label>
+                <input type="color" id="customText" name="customText">
+            </div>
+            </div>
+         <div class="modal-actions">
+              <button class="reset-button" onclick="resetCustomThemeToDefault()">Reset to Defaults</button>
+              <button onclick="applyCustomTheme()">Apply & Close</button>
+         </div>
+    </div>
+
+    <div id="typingOverlay" onclick="skipTypingRevealWait()">
+        <div id="typingContent" onclick="event.stopPropagation()">
+            <div id="typingTimerDisplay">Time: 6s</div>
+            <p id="typingQuestionText"></p>
+            <input type="text" id="typingInput" placeholder="Type your answer...">
+            <div id="typingHint" onclick="revealTypingHint(event)">
+                <span id="hintLabel">Hint</span>
+                <span id="hintCostDisplay">(Cost: 1 ⭐)</span>
+                <span id="hintContent" style="filter: blur(4px); display: none;"></span>
+            </div>
+            <div id="typingAnswerReveal">Correct Answer: <span></span></div>
+            <div id="typingSkipMessage">Tap background or wait to continue...</div>
+        </div>
+    </div>
+
+
+    <div id="messageFlash"></div>
+
+    <script>
+        const gameContainer = document.getElementById('gameContainer');
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const pauseOverlay = document.getElementById('pauseOverlay');
+
+        // --- UI Element References ---
+        const gameOverBox = document.getElementById('gameOverBox');
+        const gameOverText = document.getElementById('gameOverText');
+        const restartButton = document.getElementById('restartButton');
+        const buyStarsButton = document.getElementById('buyStarsButton'); // New Game Over button
+        const libraryModal = document.getElementById('libraryModal');
+        const libraryContent = document.getElementById('libraryContent');
+        const topicModal = document.getElementById('topicModal');
+        const topicContent = document.getElementById('topicContent');
+        const themeStoreModal = document.getElementById('themeStoreModal');
+        const themeStoreContent = document.getElementById('themeStoreContent');
+        const customThemeModal = document.getElementById('customThemeModal');
+        const libraryButton = document.getElementById('libraryButton');
+        const levelButton = document.getElementById('levelButton');
+        const gameTitle = document.getElementById('gameTitle');
+        const subjectNameDisplay = document.getElementById('subjectName');
+        const starsDisplay = document.getElementById('starsDisplay');
+        const messageFlash = document.getElementById('messageFlash');
+        const typingOverlay = document.getElementById('typingOverlay');
+        const typingContent = document.getElementById('typingContent'); // Added reference
+        const typingTimerDisplay = document.getElementById('typingTimerDisplay'); // New
+        const typingQuestionText = document.getElementById('typingQuestionText');
+        const typingInput = document.getElementById('typingInput');
+        const typingAnswerReveal = document.getElementById('typingAnswerReveal'); // New
+        const typingAnswerRevealText = typingAnswerReveal.querySelector('span'); // New
+        const typingSkipMessage = document.getElementById('typingSkipMessage'); // New
+        // UPDATED Hint Element References
+        const typingHint = document.getElementById('typingHint'); // The main hint div/button
+        const hintLabelSpan = document.getElementById('hintLabel');    // The "Hint" text span
+        const hintCostDisplaySpan = document.getElementById('hintCostDisplay'); // The "(Cost: 1 ⭐)" span
+        const hintContentSpan = document.getElementById('hintContent'); // The span for the actual hint content
+
+
+        // Game Content: Questions (Added typing questions)
+        const questions = {
+            'Chemistry': {
+                'Basics': {
+                    description: "Fundamental symbols, terms, and measurements.",
+                    list: [
+                        { q: 'Symbol for Water?', a: ['H2O', 'CO2', 'O2', 'NaCl'], correct: 0 },
+                        { q: 'What is table salt?', a: ['KCl', 'NaCl', 'CaCl2', 'MgO'], correct: 1 },
+                        { q: 'pH of a neutral solution?', a: ['0', '14', '7', '1'], correct: 2 },
+                        { q: 'Element with symbol Au?', type: 'typing', a: 'Gold' }, // Typing question
+                        { q: 'Most abundant gas in air?', a: ['Oxygen', 'CO2', 'Nitrogen', 'Argon'], correct: 2 },
+                        { q: 'Type the symbol for Oxygen', type: 'typing', a: 'O' } // Typing question
+                    ]
+                },
+                'Atoms & Molecules': {
+                    description: "Structure of atoms, bonding, and Avogadro's number.",
+                    list: [ { q: 'What particle orbits the nucleus?', a: ['Proton', 'Neutron', 'Electron', 'Photon'], correct: 2 }, { q: 'Smallest unit of an element?', a: ['Molecule', 'Compound', 'Atom', 'Ion'], correct: 2 }, { q: 'Charge of a proton?', a: ['Positive', 'Negative', 'Neutral', 'Variable'], correct: 0 }, { q: 'Bond type in NaCl?', a: ['Covalent', 'Metallic', 'Ionic', 'Hydrogen'], correct: 2 }, { q: 'What is Avogadro\'s number (approx)?', a: ['6.02x10^23', '3.00x10^8', '9.81', '1.60x10^-19'], correct: 0 } ]
+                },
+                'Acids & States': {
+                    description: "Properties of acids, bases, and states of matter.",
+                    list: [ { q: 'What is H2SO4?', a: ['Hydrochloric Acid', 'Sulfuric Acid', 'Nitric Acid', 'Acetic Acid'], correct: 1 }, { q: 'Process of liquid to gas?', a: ['Condensation', 'Freezing', 'Evaporation', 'Sublimation'], correct: 2 }, { q: 'Symbol for Potassium?', type: 'typing', a: 'K' }, { q: 'pH < 7 indicates?', a: ['Acid', 'Base', 'Neutral', 'Salt'], correct: 0 }, { q: 'Gas to liquid is called?', a: ['Evaporation', 'Sublimation', 'Melting', 'Condensation'], correct: 3 } ]
+                }
+            },
+            'Physics': {
+                'Mechanics': {
+                    description: "Forces, motion, energy, and Newton's Laws.",
+                    list: [ { q: 'Unit of Force?', type: 'typing', a: 'Newton' }, { q: "Newton's First Law is about?", a: ['Action-Reaction', 'Inertia', 'F=ma', 'Gravity'], correct: 1 }, { q: 'Force opposing motion?', a: ['Gravity', 'Inertia', 'Friction', 'Momentum'], correct: 2 }, { q: 'Unit of Energy?', a: ['Newton', 'Watt', 'Pascal', 'Joule'], correct: 3 }, { q: 'Tendency to resist change in motion?', a: ['Velocity', 'Acceleration', 'Inertia', 'Force'], correct: 2 }, { q: 'Rate of change of velocity?', a: ['Speed', 'Acceleration', 'Displacement', 'Momentum'], correct: 1 } ]
+                },
+                'Waves & Light': {
+                    description: "Properties of waves, light speed, lenses, and frequency.",
+                    list: [ { q: 'Speed of light in vacuum (approx)?', a: ['3x10^8 m/s', '3x10^6 m/s', '343 m/s', '1000 m/s'], correct: 0 }, { q: 'What type of lens converges light?', a: ['Concave', 'Diverging', 'Convex', 'Flat'], correct: 2 }, { q: 'Highest point of a wave?', a: ['Trough', 'Amplitude', 'Wavelength', 'Crest'], correct: 3 }, { q: 'Unit of frequency?', type: 'typing', a: 'Hertz' }, { q: 'Light behaves as particle & ___?', a: ['Gas', 'Liquid', 'Wave', 'Solid'], correct: 2 } ]
+                },
+                'Electricity & Modern': {
+                    description: "E=mc², circuits, charge, potential, and resistance.",
+                    list: [ { q: 'What does E=mc^2 represent?', a: ['Kinetic Energy', 'Potential Energy', 'Mass-Energy Equiv.', 'Power'], correct: 2 }, { q: 'Unit of Electrical Resistance?', type: 'typing', a: 'Ohm' }, { q: 'Flow of electric charge?', a: ['Voltage', 'Resistance', 'Current', 'Power'], correct: 2 }, { q: 'Unit of electric potential?', a: ['Ampere', 'Ohm', 'Watt', 'Volt'], correct: 3 }, { q: 'What particle carries negative charge?', a: ['Proton', 'Neutron', 'Electron', 'Positron'], correct: 2 } ]
+                }
+            },
+            'Biology': {
+                 'Cells': {
+                     description: "Cellular structures like mitochondria, nucleus, and ribosomes.",
+                     list: [ { q: 'Powerhouse of the cell?', a: ['Nucleus', 'Ribosome', 'Mitochondria', 'Chloroplast'], correct: 2 }, { q: 'Control center of the cell?', type: 'typing', a: 'Nucleus' }, { q: 'Basic unit of life?', a: ['Atom', 'Molecule', 'Organ', 'Cell'], correct: 3 }, { q: 'Where does protein synthesis occur?', a: ['Nucleus', 'Mitochondria', 'Ribosomes', 'Golgi Apparatus'], correct: 2 }, { q: 'Outer layer of animal cell?', a: ['Cell Wall', 'Membrane', 'Nucleolus', 'Cytoplasm'], correct: 1 } ]
+                 },
+                 'Genetics & Processes': {
+                     description: "Photosynthesis, DNA structure, heredity, and pigments.",
+                     list: [ { q: 'Process plants use for food?', type: 'typing', a: 'Photosynthesis' }, { q: 'DNA stands for?', a: ['Deoxyribonucleic Acid', 'Di-Nucleic Acid', 'Ribonucleic Acid', 'Data Nucleic Acid'], correct: 0 }, { q: 'Green pigment in plants?', a: ['Carotene', 'Xanthophyll', 'Chlorophyll', 'Anthocyanin'], correct: 2 }, { q: 'Shape of DNA molecule?', a: ['Single Helix', 'Circle', 'Double Helix', 'Ladder'], correct: 2 }, { q: 'Passing traits to offspring?', a: ['Metabolism', 'Heredity', 'Evolution', 'Adaptation'], correct: 1 } ]
+                 },
+                 'Human Body & Classification': {
+                     description: "Oxygen transport, organs, entomology, respiration, and skeleton.",
+                     list: [ { q: 'What carries oxygen in blood?', type: 'typing', a: 'Hemoglobin' }, { q: 'Largest organ in human body?', a: ['Liver', 'Brain', 'Skin', 'Lungs'], correct: 2 }, { q: 'Study of insects?', a: ['Botany', 'Zoology', 'Entomology', 'Ornithology'], correct: 2 }, { q: 'System responsible for breathing?', a: ['Circulatory', 'Nervous', 'Digestive', 'Respiratory'], correct: 3 }, { q: 'Bones in adult human body?', a: ['Approx 150', 'Approx 206', 'Approx 300', 'Approx 50'], correct: 1 } ]
+                 }
+            }
+        };
+        const subjectKeys = Object.keys(questions);
+
+        // --- Helper Functions for Question Data ---
+        function getQuestionList(subject, topic) {
+             if (questions[subject] && questions[subject][topic]) {
+                 // Ensure 'list' exists and is an array
+                 return Array.isArray(questions[subject][topic].list) ? questions[subject][topic].list : [];
+             }
+             return [];
+        }
+        function getTopicsForSubject(subject) {
+             if (questions[subject]) {
+                 return Object.keys(questions[subject]);
+             }
+             return [];
+        }
+        function getTopicDescription(subject, topic) {
+             if (questions[subject] && questions[subject][topic]) {
+                 return questions[subject][topic].description || "";
+             }
+             return "";
+         }
+         // Helper to get the numerical index of a topic within a subject
+         function getTopicIndex(subject, topicKey) {
+           if (!subject || !topicKey || topicKey === 'All') return null;
+           const topics = getTopicsForSubject(subject);
+           const index = topics.indexOf(topicKey);
+           return index !== -1 ? index + 1 : null; // Return 1-based index
+         }
+
+
+        // Game State Variables
+        let ball, obstacles, powerUps, score, stars, baseGameSpeed, currentGameSpeed, highScore;
+        let gameStarted = false; // Will be set true in initGame if subject is selected
+        let gameOver = false, subjectSelected = false, isPaused = false;
+        let pausedByTyping = false; // Flag to track if pause was initiated by typing overlay
+        let currentSubject = null;
+        let currentTopic = 'All'; // Stores the key ('Basics', 'All', etc.)
+        let currentLevelIndex = null; // Stores the numerical index (1, 2, etc.) or null for 'All'
+        let currentQuestionIndices = {};
+        let isInvincible = false;
+        let invincibilityTimer = 0;
+        const postHitInvincibilityDuration = 1.5;
+        const baseBallRadius = 12;
+        let currentBallRadius = baseBallRadius;
+        const scrollSensitivity = 1.5;
+        const obstacleWidth = 60;
+        const obstacleFrequency = 250; // How often obstacles *can* spawn (distance)
+        let frameCount = 0;
+        const numAnswerGaps = 4;
+        const answerGapHeight = baseBallRadius * 9.0; // Increased gap height
+        const minPillarHeight = baseBallRadius * 1.5;
+        const obstaclePaddingY = 30;
+        const questionObstacleGap = 150; // Distance between question text and obstacle
+        const powerUpRadius = 10;
+        const POWERUP_TYPES = {
+            SHIELD: 'shield',
+            SLOW_MO: 'slow_mo',
+            SHRINK: 'shrink',
+            SCORE_MULTIPLIER: 'score_multiplier',
+            GREY_OUT: 'grey_out', // New
+            FREE_SKIP: 'free_skip'  // New
+        };
+        const POWERUP_COLORS = {
+            [POWERUP_TYPES.SHIELD]: 'lightblue',
+            [POWERUP_TYPES.SLOW_MO]: 'lightgreen',
+            [POWERUP_TYPES.SHRINK]: 'purple',
+            [POWERUP_TYPES.SCORE_MULTIPLIER]: 'orange',
+            [POWERUP_TYPES.GREY_OUT]: '#aaaaaa', // Grey
+            [POWERUP_TYPES.FREE_SKIP]: '#ffeb3b' // Yellow
+        };
+        const POWERUP_SYMBOLS = {
+            [POWERUP_TYPES.SHIELD]: '🛡️',
+            [POWERUP_TYPES.SLOW_MO]: '⏳',
+            [POWERUP_TYPES.SHRINK]: '🤏',
+            [POWERUP_TYPES.SCORE_MULTIPLIER]: 'x2',
+            [POWERUP_TYPES.GREY_OUT]: '❓', // Question mark
+            [POWERUP_TYPES.FREE_SKIP]: '➡️' // Right arrow
+        };
+        let activePowerUps = {};
+        const powerUpBaseDuration = 7;
+        let slowMoFactor = 1.0;
+        let scoreMultiplier = 1;
+        let lastTime = 0; let deltaTime = 0;
+        let animationFrameId = null;
+        let starsBackground = [];
+        const numBgStars = 50;
+        let activeModalId = null;
+        let correctAnswersCount = 0; // Counter for power-up spawning
+        let greyOutActive = false; // Flag for grey-out power-up effect
+        let freeSkipActive = false; // Flag for free-skip power-up effect
+        let firstPauseUsed = false; // Track first spacebar pause
+        let currentTypingObstacle = null; // Store the obstacle requiring typing input
+        let typingTimerId = null; // For setInterval of typing timer
+        let typingTimeLeft = 0; // Seconds left for typing
+        const TYPING_TIME_LIMIT = 6; // Seconds for typing question
+        const TYPING_HINT_TIME_BONUS = 6; // Seconds added for hint
+        let typingTimeoutId = null; // For setTimeout after reveal
+        const TYPING_REVEAL_WAIT = 3; // Seconds to wait after reveal
+        let hintRevealed = false; // New: Track if hint was revealed for current question
+
+        // --- Theme Variables ---
+        let currentTheme = 'default';
+        let purchasedThemes = {};
+        let customThemeSettings = {}; // Store custom theme colors
+        const defaultCustomTheme = { // Default colors for the custom editor
+            bg1: '#1a1a1a', bg2: '#333333', ball: '#FFA500', tube1: '#444444',
+            tube2: '#555555', border: '#FFA500', text: '#FFFFFF'
+        };
+        const THEME_COSTS = { // Costs in stars
+            'matrix': 200,
+            'solarized': 200,
+            'orangeAccent': 200,
+            'custom': 1000,
+            'font': 20,
+            'get1000': 0 // Star cost for getting stars doesn't make sense here
+        };
+        const THEMES = { // Theme definitions
+            'default': { bg1: '#000000', bg2: '#000000', ball: '#FFFFFF', tube1: '#222222', tube2: '#333333', border: '#555555', text: '#FFFFFF', isGradient: false, hasStarryBg: true },
+            'matrix': { bg1: '#051005', bg2: '#051005', ball: '#00FF00', tube1: '#003000', tube2: '#004000', border: '#008000', text: '#00FF00', isGradient: false, hasStarryBg: false },
+            'solarized': { bg1: '#fdf6e3', bg2: '#fdf6e3', ball: '#657b83', tube1: '#eee8d5', tube2: '#eee8d5', border: '#93a1a1', text: '#586e75', isGradient: false, hasStarryBg: false },
+            'orangeAccent': { bg1: '#1a1a1a', bg2: '#1a1a1a', ball: '#FFA500', tube1: '#333333', tube2: '#444444', border: '#FFA500', text: '#FFFFFF', isGradient: false, hasStarryBg: false },
+            // Custom is handled separately using customThemeSettings
+        };
+        let currentBgColor1, currentBgColor2, currentBallColor, currentTubeColor1, currentTubeColor2, currentTubeBorder, currentTextColor, isGradientBackground, hasStarryBackground;
+
+        // --- Utility Functions ---
+        function getRandomHexColor() { return '#' + Math.floor(Math.random()*16777215).toString(16).padStart(6, '0'); }
+        function getLuminance(hexColor) { const hex = String(hexColor).replace('#', ''); if (hex.length !== 6) return 0.5; const rgb = parseInt(hex, 16); if (isNaN(rgb)) return 0.5; const r = (rgb >> 16) & 0xff; const g = (rgb >> 8) & 0xff; const b = (rgb >> 0) & 0xff; const RsRGB = r / 255; const GsRGB = g / 255; const BsRGB = b / 255; const R = (RsRGB <= 0.03928) ? RsRGB / 12.92 : Math.pow(((RsRGB + 0.055) / 1.055), 2.4); const G = (GsRGB <= 0.03928) ? GsRGB / 12.92 : Math.pow(((GsRGB + 0.055) / 1.055), 2.4); const B = (BsRGB <= 0.03928) ? BsRGB / 12.92 : Math.pow(((BsRGB + 0.055) / 1.055), 2.4); return 0.2126 * R + 0.7152 * G + 0.0722 * B; }
+        function shuffleArray(array) { for (let i = array.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [array[i], array[j]] = [array[j], array[i]]; } }
+
+        // --- Theme Functions ---
+        function loadCustomThemeSettings() {
+            const savedSettings = localStorage.getItem('chimMazeCustomTheme');
+            if (savedSettings) {
+                customThemeSettings = JSON.parse(savedSettings);
+            } else {
+                customThemeSettings = { ...defaultCustomTheme }; // Use defaults if nothing saved
+            }
+        }
+        function saveCustomThemeSettings() {
+            localStorage.setItem('chimMazeCustomTheme', JSON.stringify(customThemeSettings));
+        }
+        function applyTheme(themeName) {
+            console.log("Applying theme:", themeName);
+            let themeData;
+
+            if (themeName === 'custom') {
+                loadCustomThemeSettings(); // Make sure latest custom settings are loaded
+                themeData = customThemeSettings;
+                // Determine if gradient should be used based on custom colors
+                isGradientBackground = themeData.bg1 !== themeData.bg2;
+                hasStarryBackground = false; // Custom themes don't have starry bg by default
+            } else {
+                 // Ensure THEMES constant is available
+                 if (typeof THEMES === 'undefined' || !THEMES) {
+                      console.error("THEMES constant is not defined!");
+                      themeName = 'default'; // Fallback hard
+                      themeData = { bg1: '#000000', bg2: '#000000', ball: '#FFFFFF', tube1: '#222222', tube2: '#333333', border: '#555555', text: '#FFFFFF', isGradient: false, hasStarryBg: true }; // Hardcoded default
+                 } else {
+                     themeData = THEMES[themeName];
+                     if (!themeData) {
+                         console.error("Theme not found:", themeName);
+                         themeName = 'default'; // Fallback to default
+                         themeData = THEMES.default;
+                     }
+                 }
+                 isGradientBackground = themeData.isGradient;
+                 hasStarryBackground = themeData.hasStarryBg;
+            }
+
+            currentTheme = themeName;
+            localStorage.setItem('chimMazeCurrentTheme', themeName); // Save current theme choice
+
+            // Apply colors from themeData
+            currentBgColor1 = themeData.bg1;
+            currentBgColor2 = themeData.bg2 || themeData.bg1; // Fallback bg2 to bg1 if not defined
+            currentBallColor = themeData.ball;
+            currentTubeColor1 = themeData.tube1;
+            currentTubeColor2 = themeData.tube2;
+            currentTubeBorder = themeData.border;
+            currentTextColor = themeData.text;
+
+            applyThemeColorsToUI();
+            if (hasStarryBackground) { generateBackgroundStars(); } else { starsBackground = []; } // Clear stars if not starry
+            redrawStaticElements(); // Redraw canvas with new theme
+            populateThemeStore(); // Update store button states
+        }
+        function setDefaultTheme() { applyTheme('default'); }
+        function applyThemeColorsToUI() { if (isGradientBackground) { document.body.style.background = `linear-gradient(to bottom, ${currentBgColor1}, ${currentBgColor2})`; } else { document.body.style.background = ''; document.body.style.backgroundColor = currentBgColor1; } document.body.style.color = currentTextColor; }
+        function generateBackgroundStars() { starsBackground = []; for (let i = 0; i < numBgStars; i++) { starsBackground.push({ x: Math.random(), y: Math.random(), radius: Math.random() * 1.5 + 0.5 }); } }
+        function drawBackground(logicalWidth, logicalHeight) { if (hasStarryBackground) { if (currentTheme === 'default') { ctx.fillStyle = '#f0f0e0'; ctx.beginPath(); ctx.arc(logicalWidth * 0.85, logicalHeight * 0.15, 30, 0, Math.PI * 2); ctx.fill(); ctx.fillStyle = currentBgColor1; ctx.beginPath(); ctx.arc(logicalWidth * 0.83, logicalHeight * 0.14, 28, 0, Math.PI * 2); ctx.fill(); } ctx.fillStyle = '#FFFFFF'; starsBackground.forEach(star => { ctx.beginPath(); ctx.arc(star.x * logicalWidth, star.y * logicalHeight, star.radius, 0, Math.PI * 2); ctx.fill(); }); } }
+        function redrawStaticElements() { ctx.save(); ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.fillStyle = currentBgColor1; ctx.fillRect(0, 0, canvas.width, canvas.height); ctx.restore(); const logicalWidth = canvas.clientWidth; const logicalHeight = canvas.clientHeight; drawBackground(logicalWidth, logicalHeight); if (ball) ball.draw(); }
+
+        // --- Custom Theme Editor Functions ---
+        function openCustomThemeEditor() {
+            if (!purchasedThemes['custom']) {
+                 showMessage("Purchase the Custom Theme first!");
+                 return;
+            }
+            loadCustomThemeSettings(); // Load current settings
+            // Populate color pickers
+            document.getElementById('customBg1').value = customThemeSettings.bg1 || defaultCustomTheme.bg1;
+            document.getElementById('customBg2').value = customThemeSettings.bg2 || defaultCustomTheme.bg2;
+            document.getElementById('customBall').value = customThemeSettings.ball || defaultCustomTheme.ball;
+            document.getElementById('customTube1').value = customThemeSettings.tube1 || defaultCustomTheme.tube1;
+            document.getElementById('customTube2').value = customThemeSettings.tube2 || defaultCustomTheme.tube2;
+            document.getElementById('customTubeBorder').value = customThemeSettings.border || defaultCustomTheme.border;
+            document.getElementById('customText').value = customThemeSettings.text || defaultCustomTheme.text;
+
+            openModal('customThemeModal');
+        }
+        function applyCustomTheme() {
+             // Read values from pickers
+             customThemeSettings.bg1 = document.getElementById('customBg1').value;
+             customThemeSettings.bg2 = document.getElementById('customBg2').value;
+             customThemeSettings.ball = document.getElementById('customBall').value;
+             customThemeSettings.tube1 = document.getElementById('customTube1').value;
+             customThemeSettings.tube2 = document.getElementById('customTube2').value;
+             customThemeSettings.border = document.getElementById('customTubeBorder').value;
+             customThemeSettings.text = document.getElementById('customText').value;
+
+             saveCustomThemeSettings(); // Save the new settings
+             applyTheme('custom'); // Apply the new custom theme
+             closeModal(); // Close the editor
+        }
+        function resetCustomThemeToDefault() {
+            customThemeSettings = { ...defaultCustomTheme }; // Reset to defaults
+            // Update pickers to show defaults
+             document.getElementById('customBg1').value = customThemeSettings.bg1;
+             document.getElementById('customBg2').value = customThemeSettings.bg2;
+             document.getElementById('customBall').value = customThemeSettings.ball;
+             document.getElementById('customTube1').value = customThemeSettings.tube1;
+             document.getElementById('customTube2').value = customThemeSettings.tube2;
+             document.getElementById('customTubeBorder').value = customThemeSettings.border;
+             document.getElementById('customText').value = customThemeSettings.text;
+        }
+
+
+        // --- Game Objects ---
+        class Ball {
+             constructor(x, y, radius) { this.x = x; this.y = y; this.baseRadius = radius; this.radius = radius; }
+             draw() {
+                 this.radius = currentBallRadius;
+                 const ballColor = currentBallColor;
+                 ctx.beginPath();
+                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                 if (isInvincible || freeSkipActive) { // Show shield effect also for free skip
+                     const shieldPulse = Math.abs(Math.sin(Date.now() / 200)) * 4;
+                     ctx.fillStyle = ballColor; ctx.fill();
+                     // Use shield color for shield/invincibility, free skip color for free skip
+                     const borderColor = freeSkipActive ? POWERUP_COLORS[POWERUP_TYPES.FREE_SKIP] : POWERUP_COLORS[POWERUP_TYPES.SHIELD];
+                     ctx.strokeStyle = borderColor;
+                     ctx.lineWidth = 2 + shieldPulse / 2; ctx.stroke();
+                     // Draw timer arc only for shield power-up, not temp invincibility or free skip
+                     if (activePowerUps[POWERUP_TYPES.SHIELD] > 0) {
+                         const shieldTimeLeft = activePowerUps[POWERUP_TYPES.SHIELD] || 0; const angle = (shieldTimeLeft / powerUpBaseDuration) * Math.PI * 2;
+                         ctx.beginPath(); ctx.lineWidth = 2; ctx.strokeStyle = 'rgba(0, 150, 255, 0.7)'; ctx.arc(this.x, this.y, this.radius + 4 + shieldPulse, -Math.PI / 2, -Math.PI / 2 + angle); ctx.stroke();
+                     }
+                 } else {
+                     const gradient = ctx.createRadialGradient(this.x - this.radius * 0.3, this.y - this.radius * 0.3, this.radius * 0.1, this.x, this.y, this.radius);
+                     // Ensure ballColor is a valid hex string before parsing
+                     const safeBallColor = typeof ballColor === 'string' && ballColor.startsWith('#') ? ballColor : '#FFFFFF'; // Default to white if invalid
+                     const r = parseInt(safeBallColor.slice(1, 3), 16) || 255;
+                     const g = parseInt(safeBallColor.slice(3, 5), 16) || 255;
+                     const b = parseInt(safeBallColor.slice(5, 7), 16) || 255;
+                     const highlight = `rgba(${Math.min(255, r + 50)}, ${Math.min(255, g + 50)}, ${Math.min(255, b + 50)}, 1)`;
+                     const shadow = `rgb(${Math.max(0, r - 50)}, ${Math.max(0, g - 50)}, ${Math.max(0, b - 50)})`;
+                     gradient.addColorStop(0, highlight); gradient.addColorStop(1, safeBallColor); ctx.fillStyle = gradient; ctx.fill();
+                     ctx.strokeStyle = shadow; ctx.lineWidth = 1; ctx.stroke();
+                 }
+                 ctx.closePath(); ctx.lineWidth = 1;
+             }
+             update(dt) { const logicalHeight = canvas.clientHeight; if (this.y - this.radius < 0) { this.y = this.radius; } if (this.y + this.radius > logicalHeight) { this.y = logicalHeight - this.radius; } }
+             move(deltaY) {
+                 if (gameStarted && !gameOver && !isPaused) {
+                     this.y += deltaY * scrollSensitivity;
+                     const logicalHeight = canvas.clientHeight;
+                     if (this.y - this.radius < 0) { this.y = this.radius; }
+                     if (this.y + this.radius > logicalHeight) { this.y = logicalHeight - this.radius; }
+                 }
+             }
+        }
+        class Obstacle {
+            constructor(x, width, canvasHeight, questionData) {
+                this.x = x; this.width = width; this.canvasHeight = canvasHeight;
+                this.questionData = questionData; // Store the whole data object
+                this.question = questionData.q;
+                this.isTypingQuestion = questionData.type === 'typing'; // Check type
+                this.answers = this.isTypingQuestion ? [questionData.a] : questionData.a; // Typing has single answer string
+                this.correctAnswerIndex = this.isTypingQuestion ? 0 : questionData.correct; // Typing correct is always index 0
+                this.passed = false; this.scored = false; this.gapHeight = answerGapHeight;
+                this.hitY = null; this.hitTime = 0; this.greyedOutAnswerIndex = null;
+                this.correctAnswerFlashTime = 0; // Timestamp for glowing effect start
+                this.flashDuration = 1000; // How long the glow lasts in ms
+
+                // --- Gap Calculation (only for non-typing questions) ---
+                if (!this.isTypingQuestion) {
+                    const availableHeight = this.canvasHeight - 2 * obstaclePaddingY;
+                    const requiredTotalGapHeight = numAnswerGaps * this.gapHeight;
+                    const requiredTotalPillarHeight = (numAnswerGaps - 1) * minPillarHeight;
+
+                    if (requiredTotalGapHeight + requiredTotalPillarHeight > availableHeight) {
+                        console.warn("Not enough space for gaps and pillars, reducing gap height.");
+                        this.gapHeight = (availableHeight - requiredTotalPillarHeight) / numAnswerGaps;
+                        if (this.gapHeight < baseBallRadius * 2.5) {
+                            this.gapHeight = baseBallRadius * 2.5;
+                            console.warn("Gap height clamped to minimum.");
+                        }
+                    }
+
+                    const maxAttempts = 50; let attempts = 0; let validPlacement = false;
+                    this.gapBounds = [];
+
+                    while (!validPlacement && attempts < maxAttempts) {
+                        attempts++; this.gapBounds = []; let potentialTops = [];
+                        const placeableRange = availableHeight - this.gapHeight;
+                        for (let i = 0; i < numAnswerGaps; i++) { potentialTops.push(obstaclePaddingY + Math.random() * placeableRange); }
+                        potentialTops.sort((a, b) => a - b);
+                        validPlacement = true;
+                        for (let i = 0; i < numAnswerGaps; i++) {
+                            const top = potentialTops[i]; const bottom = top + this.gapHeight;
+                            if (i < numAnswerGaps - 1) { if (bottom + minPillarHeight > potentialTops[i + 1]) { validPlacement = false; break; } }
+                            this.gapBounds.push({ top: top, bottom: bottom, answerIndex: i });
+                        }
+                    }
+                     if (!validPlacement) {
+                         console.error("Failed to place gaps without overlap. Using stacked fallback.");
+                         this.gapBounds = []; const totalStructureHeight = (numAnswerGaps * this.gapHeight) + ((numAnswerGaps - 1) * minPillarHeight);
+                         const startYFallback = obstaclePaddingY + (availableHeight - totalStructureHeight) / 2;
+                         for (let i = 0; i < numAnswerGaps; i++) {
+                              const gapTop = startYFallback + i * (this.gapHeight + minPillarHeight);
+                              this.gapBounds.push({ top: gapTop, bottom: gapTop + this.gapHeight, answerIndex: i });
+                         }
+                     }
+
+
+                    let answerIndices = Array.from(Array(numAnswerGaps).keys()); shuffleArray(answerIndices);
+                    this.gapBounds.forEach((gap, i) => { gap.answerIndex = answerIndices[i]; });
+                    this.gapBounds.sort((a, b) => a.top - b.top);
+
+                    // Apply grey-out effect if active
+                    if (greyOutActive) {
+                        let incorrectIndices = [];
+                        for (let i = 0; i < this.answers.length; i++) {
+                            if (i !== this.correctAnswerIndex) { incorrectIndices.push(i); }
+                        }
+                        if (incorrectIndices.length > 0) {
+                            this.greyedOutAnswerIndex = incorrectIndices[Math.floor(Math.random() * incorrectIndices.length)];
+                        }
+                        greyOutActive = false; // Consume the effect
+                    }
+                } else {
+                    // For typing questions, no gaps needed
+                    this.gapBounds = [];
+                }
+            }
+
+            draw() {
+                const logicalWidth = canvas.clientWidth;
+
+                // --- Draw Question ---
+                ctx.save();
+                ctx.fillStyle = currentTextColor;
+                ctx.font = 'bold 32px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.7)'; ctx.shadowBlur = 5; ctx.shadowOffsetX = 2; ctx.shadowOffsetY = 2;
+                const questionText = this.question;
+                const questionX = this.x - questionObstacleGap - 150;
+                const questionY = this.canvasHeight / 2;
+                ctx.fillText(questionText, questionX, questionY);
+                ctx.restore();
+
+                // --- Draw Pillars and Gaps (or typing indicator) ---
+                if (!this.isTypingQuestion) {
+                    // --- Draw Pillars and Gaps (Multiple Choice) ---
+                    const gradient = ctx.createLinearGradient(this.x, 0, this.x + this.width, 0);
+                    gradient.addColorStop(0, currentTubeColor1); gradient.addColorStop(0.5, currentTubeColor2); gradient.addColorStop(1, currentTubeColor1);
+                    ctx.fillStyle = gradient; ctx.strokeStyle = currentTubeBorder; ctx.lineWidth = 2;
+
+                    let lastBottom = 0;
+                    this.gapBounds.forEach(gap => {
+                        this.drawPillarSegment(this.x, lastBottom, this.width, gap.top - lastBottom);
+                        lastBottom = gap.bottom;
+                    });
+                    this.drawPillarSegment(this.x, lastBottom, this.width, this.canvasHeight - lastBottom);
+
+                    // --- Draw Answers in Gaps ---
+                    ctx.font = 'bold 16px Arial'; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    const now = Date.now();
+                    const isFlashingCorrect = this.correctAnswerFlashTime > 0 && (now - this.correctAnswerFlashTime < this.flashDuration);
+
+                    this.gapBounds.forEach(gap => {
+                        const answerIndex = gap.answerIndex;
+                        const answerText = this.answers[answerIndex];
+                        const textX = this.x + this.width / 2;
+                        const textY = gap.top + this.gapHeight / 2;
+
+                        ctx.save(); // Save context state before drawing text
+
+                        if (isFlashingCorrect && answerIndex === this.correctAnswerIndex) {
+                            // Apply glow effect for the correct answer during flash
+                            const flashProgress = (now - this.correctAnswerFlashTime) / this.flashDuration;
+                            const glowIntensity = Math.sin(flashProgress * Math.PI) * 15; // Pulsating glow
+                            ctx.fillStyle = '#00FF00'; // Bright green
+                            ctx.shadowColor = '#00FF00';
+                            ctx.shadowBlur = glowIntensity;
+                            ctx.fillText(answerText, textX, textY);
+                        } else {
+                            // Default text color or greyed out
+                            ctx.fillStyle = (this.greyedOutAnswerIndex === answerIndex) ? 'rgba(150, 150, 150, 0.7)' : currentTextColor;
+                             ctx.shadowColor = 'transparent'; // No shadow otherwise
+                             ctx.shadowBlur = 0;
+                            ctx.fillText(answerText, textX, textY);
+                        }
+
+                        ctx.restore(); // Restore context state
+                    });
+
+                     // Reset flash time after duration
+                     if (isFlashingCorrect && (now - this.correctAnswerFlashTime >= this.flashDuration)) {
+                         this.correctAnswerFlashTime = 0;
+                    }
+
+                } else {
+                    // --- Draw Typing Obstacle Indicator ---
+                    // Draw solid pillars with a visual cue for typing
+                    const gradient = ctx.createLinearGradient(this.x, 0, this.x + this.width, 0);
+                    gradient.addColorStop(0, currentTubeColor1); gradient.addColorStop(0.5, currentTubeColor2); gradient.addColorStop(1, currentTubeColor1);
+                    ctx.fillStyle = gradient; ctx.strokeStyle = currentTubeBorder; ctx.lineWidth = 2;
+
+                    // Draw a single solid pillar section
+                    this.drawPillarSegment(this.x, 0, this.width, this.canvasHeight);
+
+                    // Add a visual indicator (e.g., keyboard icon)
+                    ctx.font = 'bold 40px Arial'; ctx.fillStyle = currentTextColor; ctx.textAlign = 'center'; ctx.textBaseline = 'middle';
+                    ctx.fillText('⌨️', this.x + this.width / 2, this.canvasHeight / 2);
+                }
+            }
+
+            // Helper to draw pillar segments (allows applying crumble effect)
+            drawPillarSegment(x, y, w, h) {
+                if (h <= 0) return; // Don't draw zero-height pillars
+
+                ctx.save();
+                const gradient = ctx.createLinearGradient(x, y, x + w, y);
+                gradient.addColorStop(0, currentTubeColor1);
+                gradient.addColorStop(0.5, currentTubeColor2);
+                gradient.addColorStop(1, currentTubeColor1);
+                ctx.fillStyle = gradient;
+                ctx.strokeStyle = currentTubeBorder;
+                ctx.lineWidth = 2;
+
+                // Check if this segment was hit
+                if (this.hitY !== null && this.hitY >= y && this.hitY <= y + h) {
+                    const timeSinceHit = (Date.now() - this.hitTime) / 1000;
+                    const crumbleDuration = 0.5; // How long the effect lasts
+                    if (timeSinceHit < crumbleDuration) {
+                        const effectProgress = timeSinceHit / crumbleDuration;
+                        // Simple crumble effect: darken and add cracks
+                        ctx.fillStyle = 'rgba(50, 50, 50, 0.8)'; // Darker color
+                        ctx.fillRect(x, y, w, h);
+                        ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)'; // Red cracks
+                        ctx.lineWidth = 1 + (1 - effectProgress) * 2; // Thicker lines initially
+                        // Draw some random crack lines
+                        for (let i = 0; i < 5; i++) {
+                            ctx.beginPath();
+                            ctx.moveTo(x + Math.random() * w, y + Math.random() * h);
+                            ctx.lineTo(x + Math.random() * w, y + Math.random() * h);
+                            ctx.stroke();
+                        }
+                    } else {
+                        // Draw normally after effect duration
+                        ctx.fillRect(x, y, w, h);
+                        ctx.strokeRect(x, y, w, h);
+                    }
+                } else {
+                    // Draw normally if not hit
+                    ctx.fillRect(x, y, w, h);
+                    ctx.strokeRect(x, y, w, h);
+                }
+                ctx.restore();
+            }
+
+            update(dt) { this.x -= currentGameSpeed * slowMoFactor * dt * 60; }
+            isOffscreen() { return this.x + this.width < -questionObstacleGap - 250; } // Increased offscreen buffer
+            markHit(y) {
+                if (this.hitY === null) { // Only mark hit once
+                    this.hitY = y;
+                    this.hitTime = Date.now();
+                }
+            }
+            // New method to trigger the correct answer flash
+            startCorrectAnswerFlash() {
+                 if (!this.isTypingQuestion) {
+                     this.correctAnswerFlashTime = Date.now();
+                 }
+            }
+        }
+        class PowerUp {
+             constructor(x, y, radius, type) { this.x = x; this.y = y; this.radius = radius; this.type = type; this.color = POWERUP_COLORS[type] || 'gray'; this.symbol = POWERUP_SYMBOLS[type] || '?'; }
+             draw() {
+                 ctx.save();
+                 ctx.beginPath();
+                 ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                 // Add a subtle pulse effect
+                 const pulse = Math.abs(Math.sin(Date.now() / 300)) * 3;
+                 const gradient = ctx.createRadialGradient(this.x, this.y, this.radius * 0.1, this.x, this.y, this.radius + pulse);
+                 gradient.addColorStop(0, 'rgba(255, 255, 255, 0.8)');
+                 gradient.addColorStop(0.7, this.color);
+                 gradient.addColorStop(1, 'rgba(0, 0, 0, 0)'); // Fade out at edges
+                 ctx.fillStyle = gradient;
+                 ctx.fill();
+                 ctx.closePath();
+
+                 // Draw symbol
+                 ctx.fillStyle = 'black'; // Contrast against light colors
+                 const fontSize = this.symbol.length > 1 ? this.radius * 0.9 : this.radius * 1.1;
+                 ctx.font = `bold ${fontSize}px Arial`;
+                 ctx.textAlign = 'center';
+                 ctx.textBaseline = 'middle';
+                 ctx.fillText(this.symbol, this.x, this.y + 1);
+                 ctx.restore();
+             }
+             update(dt) { this.x -= currentGameSpeed * slowMoFactor * dt * 60; }
+             isOffscreen() { return this.x + this.radius < 0; }
+        }
+
+        // --- Game Functions ---
+        function resizeCanvas() {
+             const dpr = window.devicePixelRatio || 1;
+             const displayWidth = Math.floor(canvas.clientWidth * dpr);
+             const displayHeight = Math.floor(canvas.clientHeight * dpr);
+             if (canvas.width !== displayWidth || canvas.height !== displayHeight) {
+                 canvas.width = displayWidth; canvas.height = displayHeight;
+                 ctx.setTransform(1, 0, 0, 1, 0, 0); ctx.scale(dpr, dpr);
+             }
+             baseGameSpeed = canvas.clientWidth * 0.003;
+             redrawStaticElements(); // Redraw background/static elements on resize
+         }
+        function initGame(resetHighScore = true) {
+            console.log("Initializing game...");
+            gameOver = false; isPaused = false; pausedByTyping = false; // Reset pause flags
+            activeModalId = null; subjectSelected = false; gameStarted = false;
+            invincibilityTimer = 0; score = 0; frameCount = 0; lastTime = 0; correctAnswersCount = 0;
+            obstacles = []; powerUps = []; activePowerUps = {}; slowMoFactor = 1.0; scoreMultiplier = 1;
+            currentBallRadius = baseBallRadius; greyOutActive = false; freeSkipActive = false; firstPauseUsed = false; // Reset pause flag
+            clearTypingState(); // Clear any leftover typing stuff
+
+            currentQuestionIndices = {};
+            subjectKeys.forEach(subj => { currentQuestionIndices[subj] = {}; getTopicsForSubject(subj).forEach(topic => { currentQuestionIndices[subj][topic] = 0; }); });
+
+            loadStars(); loadPurchasedThemes(); loadCustomThemeSettings(); // Load custom theme
+            currentSubject = localStorage.getItem('chimMazeLastSubject') || 'Chemistry';
+            subjectSelected = true;
+            // Set initial topic and level index
+            currentTopic = localStorage.getItem('chimMazeLastTopic') || 'All';
+            currentLevelIndex = getTopicIndex(currentSubject, currentTopic);
+
+
+            if (resetHighScore) { highScore = localStorage.getItem('chimMazeHighScore') || 0; }
+
+            updateSubjectDisplay(); updateLevelButtonText(); updateStarsDisplay(); populateThemeStore();
+
+            resizeCanvas();
+            ball = new Ball(canvas.clientWidth / 4, canvas.clientHeight / 2, baseBallRadius);
+
+            closeModal(); // Ensure all modals closed
+            hideTypingOverlay(); // Ensure typing overlay hidden
+            gameContainer.classList.remove('blurred');
+            pauseOverlay.classList.remove('visible'); // Ensure pause overlay hidden
+            libraryButton.style.display = 'inline-flex'; levelButton.style.display = 'inline-flex';
+            canvas.style.cursor = 'default';
+
+            const savedTheme = localStorage.getItem('chimMazeCurrentTheme') || 'default'; applyTheme(savedTheme);
+
+            if (subjectSelected) {
+                 console.log("Subject selected, starting game automatically.");
+                 gameStarted = true; lastTime = performance.now(); canvas.style.cursor = 'none';
+            } else { console.log("No subject selected, game will start on scroll/interaction."); }
+
+            if (animationFrameId) { cancelAnimationFrame(animationFrameId); animationFrameId = null; }
+            if (!animationFrameId) { console.log("Requesting animation frame..."); animationFrameId = requestAnimationFrame(gameLoop); }
+            console.log("Game initialization complete. Game Started:", gameStarted);
+        }
+        function addObstacle() {
+             if (!currentSubject || !questions[currentSubject]) return;
+             let topicToUse = currentTopic; let questionPool = [];
+
+             if (topicToUse === 'All') {
+                 getTopicsForSubject(currentSubject).forEach(topicKey => {
+                     questionPool.push(...getQuestionList(currentSubject, topicKey));
+                 });
+             } else {
+                  questionPool = getQuestionList(currentSubject, topicToUse);
+             }
+
+             if (!questionPool || questionPool.length === 0) {
+                 console.warn(`No questions found for ${currentSubject} - ${topicToUse}`);
+                 return; // No questions to add
+             }
+
+             // Select question: Use index for specific topic, random for 'All'
+             let questionData;
+             if (topicToUse === 'All') {
+                 const randomIndex = Math.floor(Math.random() * questionPool.length);
+                 questionData = questionPool[randomIndex];
+             } else {
+                 let questionIndex = currentQuestionIndices[currentSubject][topicToUse] % questionPool.length;
+                 questionData = questionPool[questionIndex];
+                 currentQuestionIndices[currentSubject][topicToUse]++;
+             }
+
+             if (questionData) {
+                 obstacles.push(new Obstacle(canvas.clientWidth + questionObstacleGap + 200, obstacleWidth, canvas.clientHeight, questionData));
+             } else {
+                 console.error("Failed to select question data.");
+             }
+          }
+        function addPowerUp() {
+             let spawnY = canvas.clientHeight / 2;
+             if (obstacles.length > 0) {
+               const lastObstacle = obstacles[obstacles.length - 1];
+               if(lastObstacle.gapBounds && lastObstacle.gapBounds.length > 0) {
+                   let avgCenterY = lastObstacle.gapBounds.reduce((sum, gap) => sum + gap.top + gap.gapHeight / 2, 0) / lastObstacle.gapBounds.length;
+                   spawnY = avgCenterY + (Math.random() - 0.5) * (canvas.clientHeight * 0.4);
+               } else { spawnY = canvas.clientHeight / 2 + (Math.random() - 0.5) * (canvas.clientHeight * 0.5); }
+             } else { spawnY = canvas.clientHeight / 2 + (Math.random() - 0.5) * (canvas.clientHeight * 0.5); }
+
+             spawnY = Math.max(powerUpRadius + 10, Math.min(canvas.clientHeight - powerUpRadius - 10, spawnY));
+             // Exclude shield if already invincible from hit, exclude free skip if active
+             const availableTypes = Object.values(POWERUP_TYPES).filter(type =>
+                 !(type === POWERUP_TYPES.SHIELD && isInvincible && invincibilityTimer > 0 && !activePowerUps[POWERUP_TYPES.SHIELD]) &&
+                 !(type === POWERUP_TYPES.FREE_SKIP && freeSkipActive)
+             );
+             if (availableTypes.length === 0) return; // No powerups to spawn
+             const type = availableTypes[Math.floor(Math.random() * availableTypes.length)];
+             powerUps.push(new PowerUp(canvas.clientWidth + obstacleWidth + 50, spawnY, powerUpRadius, type)); // Spawn slightly further out
+          }
+
+        function updateObstacles(dt) {
+             // Spawn new obstacles based on distance/frame count
+             if (gameStarted && frameCount % obstacleFrequency === 0 && !currentTypingObstacle) { // Don't spawn if typing overlay is shown
+                 addObstacle();
+             }
+             // Slightly reduced speed increase
+             currentGameSpeed = baseGameSpeed * (1 + score / 75);
+
+             for (let i = obstacles.length - 1; i >= 0; i--) {
+                 const obstacle = obstacles[i];
+                 obstacle.update(dt);
+
+                 // --- Typing Question Handling ---
+                 if (obstacle.isTypingQuestion && !obstacle.passed && !currentTypingObstacle) {
+                     // Check if typing obstacle is close enough to trigger input
+                     const triggerX = ball.x + 100; // X position to trigger the typing input
+                     if (obstacle.x <= triggerX && obstacle.x + obstacle.width > ball.x) {
+                         triggerTypingInput(obstacle);
+                     }
+                 }
+
+                 // --- Collision detection and scoring (Multiple Choice) ---
+                 if (!obstacle.isTypingQuestion && !obstacle.passed && !obstacle.scored) {
+                     const ballRight = ball.x + ball.radius; const ballLeft = ball.x - ball.radius;
+                     const obstacleFront = obstacle.x; const obstacleBack = obstacle.x + obstacle.width;
+
+                     if (ballRight > obstacleFront && ballLeft < obstacleBack) {
+                         let collisionType = 'pillar'; let passedGap = null;
+                         for (let j = 0; j < obstacle.gapBounds.length; j++) {
+                             const gap = obstacle.gapBounds[j];
+                             if (ball.y - ball.radius > gap.top && ball.y + ball.radius < gap.bottom) {
+                                 collisionType = 'gap'; passedGap = gap; break;
+                             }
+                         }
+
+                         obstacle.passed = true; // Mark as passed once collision check happens
+
+                         if (freeSkipActive) {
+                             // FREE SKIP: Pass through anything, score points, consume skip
+                             obstacle.scored = true; score += (1 * scoreMultiplier); stars += 10 * scoreMultiplier;
+                             correctAnswersCount++; // Count towards next powerup
+                             updateStarsDisplay();
+                             flashScreen(POWERUP_COLORS[POWERUP_TYPES.FREE_SKIP], 0.5); // Yellow flash for skip
+                             freeSkipActive = false; // Consume the power-up
+                             console.log("Free Skip Used");
+                         } else if (isInvincible) {
+                             // INVINCIBLE: Pass through anything, no score/penalty change
+                             flashScreen(POWERUP_COLORS[POWERUP_TYPES.SHIELD], 0.3); // Blue flash for invincible pass
+                         } else {
+                             // NORMAL COLLISION:
+                             if (collisionType === 'gap') {
+                                 if (passedGap.answerIndex === obstacle.correctAnswerIndex) {
+                                      // Correct Answer
+                                      obstacle.scored = true; score += (1 * scoreMultiplier); stars += 10 * scoreMultiplier;
+                                      correctAnswersCount++; // Count towards next powerup
+                                      updateStarsDisplay();
+                                      flashScreen('rgba(0, 255, 0, 0.4)', 0.4); // Green flash
+                                      // Spawn power-up check moved outside collision block
+                                 } else {
+                                      // Incorrect Answer
+                                      loseStar();
+                                      obstacle.startCorrectAnswerFlash(); // <<<<---- Trigger glow effect
+                                      flashScreen('rgba(255, 165, 0, 0.6)', 0.6); // Orange flash
+                                 }
+                             } else {
+                                 // Hit Pillar
+                                 obstacle.markHit(ball.y); // Mark pillar hit for crumble effect
+                                 loseStar();
+                                 flashScreen('rgba(255, 0, 0, 0.6)', 0.6); // Red flash
+                             }
+                         }
+                         // Spawn power-up every 10 correct answers (regardless of how it was passed)
+                         if (obstacle.scored && correctAnswersCount > 0 && correctAnswersCount % 10 === 0) {
+                             addPowerUp();
+                         }
+                     }
+                 }
+                 // Remove obstacles that are far offscreen
+                 if (obstacle.isOffscreen()) {
+                     // If removing the currently active typing obstacle, hide overlay
+                     if (obstacle === currentTypingObstacle) {
+                         hideTypingOverlay(); // Also clears typing state
+                     }
+                     obstacles.splice(i, 1);
+                 }
+             }
+         }
+
+        // --- Typing Input Handling ---
+        // UPDATED triggerTypingInput to reset new hint structure
+        function triggerTypingInput(obstacle) {
+            if (currentTypingObstacle) return; // Already handling one
+
+            console.log("Triggering typing input for:", obstacle.question);
+            currentTypingObstacle = obstacle;
+            if (!isPaused) { // Only set flag if game wasn't already paused by user
+                pausedByTyping = true;
+            }
+            isPaused = true; // Pause the game physics/updates
+
+            // Reset overlay state
+            typingQuestionText.textContent = obstacle.question;
+            typingInput.value = '';
+            typingInput.disabled = false;
+            typingAnswerReveal.style.display = 'none';
+            typingSkipMessage.style.display = 'none';
+            typingTimerDisplay.style.color = '#ffcc00'; // Reset timer color
+
+            // Reset Hint state using the new structure
+            hintRevealed = false;
+            typingHint.classList.remove('revealed');    // Remove revealed styling from the div
+            hintLabelSpan.style.display = 'inline-block'; // Ensure label is visible
+            hintCostDisplaySpan.style.display = 'inline-block'; // Ensure cost is visible
+            hintContentSpan.textContent = '';           // Clear old hint content
+            hintContentSpan.style.filter = 'blur(4px)'; // Re-apply blur to content span
+            hintContentSpan.style.display = 'none';    // Hide the content span initially
+            typingHint.onclick = revealTypingHint;      // Re-attach click listener to the div
+
+            typingOverlay.classList.add('visible');
+            gameContainer.classList.add('blurred'); // Blur background
+            typingInput.focus(); // Focus the input field
+
+            // Start Timer
+            typingTimeLeft = TYPING_TIME_LIMIT;
+            typingTimerDisplay.textContent = `Time: ${typingTimeLeft}s`;
+            clearTimeout(typingTimeoutId); // Clear any previous reveal timer
+            clearInterval(typingTimerId); // Clear any previous interval timer
+            typingTimerId = setInterval(() => {
+                typingTimeLeft--;
+                typingTimerDisplay.textContent = `Time: ${typingTimeLeft}s`;
+                if (typingTimeLeft <= 0) {
+                    handleTypingTimeout();
+                } else if (typingTimeLeft <= 3) {
+                    typingTimerDisplay.style.color = '#ff6600'; // Orange warning
+                }
+            }, 1000);
+        }
+
+
+        // Handles timeout for typing questions
+        function handleTypingTimeout() {
+            console.log("Typing time ran out!");
+            clearInterval(typingTimerId); // Stop the timer interval
+            typingTimerId = null;
+
+            // Mark as passed and incorrect
+            if (currentTypingObstacle) {
+                 currentTypingObstacle.passed = true;
+                 currentTypingObstacle.scored = false; // Mark as incorrect since time ran out
+            }
+
+            // Reveal answer and disable input
+            typingInput.disabled = true;
+            typingHint.onclick = null; // Disable hint click
+            typingAnswerRevealText.textContent = currentTypingObstacle ? currentTypingObstacle.answers[0] : 'N/A';
+            typingAnswerReveal.style.display = 'block';
+            typingSkipMessage.style.display = 'block';
+            typingTimerDisplay.textContent = "Time's Up!";
+            typingTimerDisplay.style.color = '#ff0000'; // Red
+
+            // Apply penalty: -1 star (Timeout)
+            if (!gameOver) {
+                stars -= 1;
+                updateStarsDisplay();
+                saveStars();
+                if (stars <= 0) {
+                    stars = 0; // Clamp
+                    updateStarsDisplay();
+                    endGame(); // Check for game over after penalty
+                }
+            }
+
+            // Start timer to automatically close overlay
+            clearTimeout(typingTimeoutId); // Clear previous just in case
+            typingTimeoutId = setTimeout(() => {
+                console.log("Auto-closing typing overlay after reveal.");
+                hideTypingOverlay();
+            }, TYPING_REVEAL_WAIT * 1000);
+        }
+
+        // NEW: Handles correct input for typing questions (Auto-Submit)
+        function handleCorrectTypingInput() {
+             if (!currentTypingObstacle || typingInput.disabled) return;
+
+             clearInterval(typingTimerId); // Stop timer
+             typingTimerId = null;
+             clearTimeout(typingTimeoutId); // Clear auto-close timer
+             typingTimeoutId = null;
+
+             console.log(`Correct Typed Answer Auto-Submitted: '${currentTypingObstacle.answers[0]}'`);
+
+             currentTypingObstacle.passed = true; // Mark as passed
+             currentTypingObstacle.scored = true; // Mark as correct
+
+             // Award stars/score
+             score += (2 * scoreMultiplier);
+             stars += 5 * scoreMultiplier; // +5 stars for correct typing
+             correctAnswersCount++;
+             updateStarsDisplay();
+             saveStars();
+             flashScreen('rgba(0, 255, 0, 0.4)', 0.4); // Green flash
+
+             // Spawn power-up check
+             if (correctAnswersCount > 0 && correctAnswersCount % 10 === 0) {
+                 addPowerUp();
+             }
+
+             // Directly hide overlay
+             hideTypingOverlay();
+        }
+
+        // NEW: Handles incorrect input for typing questions (Reveal Answer)
+        function handleIncorrectTypingInput() {
+             if (!currentTypingObstacle || typingInput.disabled) return;
+
+             clearInterval(typingTimerId); // Stop timer
+             typingTimerId = null;
+             clearTimeout(typingTimeoutId); // Clear auto-close timer
+             typingTimeoutId = null;
+
+             const correctAnswer = currentTypingObstacle.answers[0];
+             console.log(`Incorrect Typed Answer Submitted`);
+
+             currentTypingObstacle.passed = true; // Mark as passed
+             currentTypingObstacle.scored = false; // Mark as incorrect
+
+             flashScreen('rgba(255, 0, 0, 0.6)', 0.6); // Red flash
+
+             // Apply penalty: -3 stars
+             if (!gameOver) {
+                 stars -= 3;
+                 updateStarsDisplay();
+                 saveStars();
+                 if (stars <= 0) {
+                     stars = 0; // Clamp
+                     updateStarsDisplay();
+                     endGame(); // Check for game over after penalty
+                 }
+             }
+
+             // Reveal answer and start timer to close
+             typingInput.disabled = true;
+             typingHint.onclick = null; // Disable hint click
+             typingAnswerRevealText.textContent = correctAnswer;
+             typingAnswerReveal.style.display = 'block';
+             typingSkipMessage.style.display = 'block';
+
+             clearTimeout(typingTimeoutId); // Clear previous just in case
+             typingTimeoutId = setTimeout(() => {
+                 console.log("Auto-closing typing overlay after incorrect reveal.");
+                 hideTypingOverlay();
+             }, TYPING_REVEAL_WAIT * 1000);
+        }
+
+        // UPDATED revealTypingHint for new structure
+        function revealTypingHint(event) {
+            event?.stopPropagation(); // Prevent click from propagating to overlay skip
+
+            if (hintRevealed || !currentTypingObstacle || typingInput.disabled) return; // Already shown, no question, or input disabled
+
+            if (stars >= 1) {
+                stars -= 1;
+                updateStarsDisplay();
+                saveStars();
+
+                const correctAnswer = currentTypingObstacle.answers[0];
+                let hintDisplay = ""; // This will hold only the hint text (e.g., "H___")
+
+                // Generate hint based on answer length
+                if (correctAnswer.length === 1) {
+                    hintDisplay = "Single Character";
+                } else if (correctAnswer.length <= 4) {
+                    hintDisplay = correctAnswer[0] + "_".repeat(correctAnswer.length - 1);
+                } else {
+                    hintDisplay = correctAnswer[0] + "_".repeat(correctAnswer.length - 2) + correctAnswer[correctAnswer.length - 1];
+                }
+
+                // Update the hint content span ONLY
+                hintContentSpan.textContent = `: ${hintDisplay}`; // Add a colon for visual separation
+                hintContentSpan.style.filter = 'none'; // Remove blur from the content span
+                hintContentSpan.style.display = 'inline-block'; // Show the content span
+
+                // Update the main hint div's state
+                typingHint.classList.add('revealed'); // Add revealed styling (border, background)
+                hintRevealed = true;
+                typingHint.onclick = null; // Prevent further clicks on the div
+
+                // Optional: Hide the cost span after revealing, if desired
+                // hintCostDisplaySpan.style.display = 'none';
+
+                // Add time bonus only if timer is still running
+                if (typingTimerId) {
+                    typingTimeLeft += TYPING_HINT_TIME_BONUS;
+                    typingTimerDisplay.textContent = `Time: ${typingTimeLeft}s`;
+                    // Reset timer color if it was red/orange
+                    if(typingTimeLeft > 3) {
+                        typingTimerDisplay.style.color = '#ffcc00';
+                    }
+                    showMessage(`Hint revealed! +${TYPING_HINT_TIME_BONUS} seconds added.`, 2000);
+                } else {
+                    showMessage(`Hint revealed!`, 1500); // Show message even if timer expired
+                }
+
+            } else {
+                showMessage("Not enough stars for hint (Cost: 1 ⭐)!", 1500);
+            }
+        }
+
+
+        // Clears all typing-related state variables and timers
+        function clearTypingState() {
+            clearInterval(typingTimerId);
+            clearTimeout(typingTimeoutId);
+            typingTimerId = null;
+            typingTimeoutId = null;
+            currentTypingObstacle = null;
+            typingTimeLeft = 0;
+            pausedByTyping = false; // Reset typing pause flag
+            hintRevealed = false; // Reset hint flag
+        }
+
+        // Hides the typing overlay and handles game resume logic
+        function hideTypingOverlay() {
+            typingOverlay.classList.remove('visible');
+            const wasPausedByTyping = pausedByTyping; // Store flag before clearing state
+            clearTypingState(); // Clear timers and obstacle reference
+
+            // Resume game ONLY if it was paused specifically by the typing overlay
+            if (wasPausedByTyping && gameStarted && !gameOver) {
+                isPaused = false; // Unpause the game
+                lastTime = performance.now(); // Reset delta time calculation
+                canvas.style.cursor = 'none'; // Re-hide cursor
+                 // Ensure blur is removed if game is resuming
+                gameContainer.classList.remove('blurred');
+                if (!animationFrameId) {
+                    console.log("Restarting animation frame after typing overlay.");
+                    animationFrameId = requestAnimationFrame(gameLoop);
+                }
+                 console.log("Game Resumed after typing overlay.");
+            } else if (!isPaused) { // If game wasn't paused by user beforehand
+                 canvas.style.cursor = gameStarted && !gameOver ? 'none' : 'default';
+                 // Remove blur if game isn't paused by user or over
+                 if (!gameOver) {
+                    gameContainer.classList.remove('blurred');
+                 }
+            } else {
+                 // Game was paused by user before typing, leave it paused and blurred
+                 console.log("Typing overlay hidden, game remains paused by user.");
+                 gameContainer.classList.add('blurred'); // Ensure blur stays if paused by user
+            }
+        }
+
+        // Allows skipping the 3-second wait after an incorrect/timeout reveal
+        function skipTypingRevealWait() {
+            // Only allow skipping if the reveal timer is active
+            if (typingTimeoutId) {
+                console.log("Skipping typing reveal wait.");
+                hideTypingOverlay(); // This also clears the timeout
+            }
+        }
+
+
+        function updatePowerUps(dt) {
+             // Check powerup collection only if not paused for typing
+             if (!currentTypingObstacle) {
+                 for (let i = powerUps.length - 1; i >= 0; i--) {
+                     powerUps[i].update(dt);
+                     const dx = ball.x - powerUps[i].x; const dy = ball.y - powerUps[i].y; const distance = Math.sqrt(dx * dx + dy * dy);
+                     if (distance < ball.radius + powerUps[i].radius) {
+                         applyPowerUp(powerUps[i].type);
+                         powerUps.splice(i, 1); // Remove collected power-up
+                     }
+                     else if (powerUps[i].isOffscreen()) {
+                         powerUps.splice(i, 1); // Remove offscreen power-up
+                     }
+                 }
+             }
+         }
+        function applyPowerUp(type) {
+             // Don't apply duration based powerups if game is about to pause for typing
+             if (!currentTypingObstacle) {
+                 activePowerUps[type] = powerUpBaseDuration; // Set duration for timed effects
+             } else if (type !== POWERUP_TYPES.GREY_OUT && type !== POWERUP_TYPES.FREE_SKIP) {
+                 // If typing is active, maybe just discard timed powerups? Or queue them?
+                 // For now, let's discard timed ones collected *just* before typing prompt.
+                 console.log("Discarding timed powerup due to active typing prompt:", type);
+                 return;
+             }
+
+             flashScreen(POWERUP_COLORS[type], 0.5); // Visual feedback always
+
+             if (type === POWERUP_TYPES.SHIELD) {
+                 isInvincible = true;
+                 invincibilityTimer = Math.max(invincibilityTimer, powerUpBaseDuration); // Reset or extend shield timer
+             } else if (type === POWERUP_TYPES.SLOW_MO) {
+                 slowMoFactor = 0.5;
+             } else if (type === POWERUP_TYPES.SHRINK) {
+                 currentBallRadius = baseBallRadius * 0.6;
+             } else if (type === POWERUP_TYPES.SCORE_MULTIPLIER) {
+                 scoreMultiplier = 2;
+             } else if (type === POWERUP_TYPES.GREY_OUT) {
+                 greyOutActive = true; // Set flag, effect applied in next Obstacle constructor
+                 delete activePowerUps[type]; // No duration needed
+                 console.log("Grey Out Powerup Activated");
+             } else if (type === POWERUP_TYPES.FREE_SKIP) {
+                 freeSkipActive = true; // Set flag, effect applied in updateObstacles
+                 delete activePowerUps[type]; // No duration needed
+                 console.log("Free Skip Powerup Activated");
+             }
+          }
+        function updateEffects(dt) {
+             let statusChanged = false;
+
+             // Update post-hit invincibility timer
+             if (invincibilityTimer > 0) {
+                 invincibilityTimer -= dt;
+                 if (invincibilityTimer <= 0) {
+                     // Only turn off invincibility if a SHIELD power-up isn't also active
+                     if (!activePowerUps[POWERUP_TYPES.SHIELD] || activePowerUps[POWERUP_TYPES.SHIELD] <= 0) {
+                         isInvincible = false;
+                         statusChanged = true;
+                     }
+                 } else {
+                     // Ensure isInvincible is true while timer runs
+                     if (!isInvincible) {
+                         isInvincible = true;
+                         statusChanged = true;
+                     }
+                 }
+             }
+
+             let stillHasShieldPowerup = false;
+             // Update active power-up durations
+             for (const type in activePowerUps) {
+                 if (activePowerUps[type] > 0) {
+                     activePowerUps[type] -= dt;
+                     statusChanged = true;
+                     if (activePowerUps[type] <= 0) {
+                         delete activePowerUps[type];
+                         // Deactivate effects when timer runs out
+                         if (type === POWERUP_TYPES.SLOW_MO) slowMoFactor = 1.0;
+                         if (type === POWERUP_TYPES.SHRINK) currentBallRadius = baseBallRadius;
+                         if (type === POWERUP_TYPES.SCORE_MULTIPLIER) scoreMultiplier = 1;
+                         if (type === POWERUP_TYPES.SHIELD) {
+                             // Only turn off invincibility if post-hit timer is also done
+                             if (invincibilityTimer <= 0) {
+                                 isInvincible = false;
+                             }
+                         }
+                     } else {
+                         // Check if shield power-up is still active
+                         if (type === POWERUP_TYPES.SHIELD) {
+                             stillHasShieldPowerup = true;
+                         }
+                     }
+                 }
+             }
+
+             // Ensure invincibility status is correct based on timers and power-ups
+             const newInvincibleStatus = invincibilityTimer > 0 || stillHasShieldPowerup;
+             if (isInvincible !== newInvincibleStatus) {
+                 isInvincible = newInvincibleStatus;
+                 statusChanged = true;
+             }
+
+             // Free skip is handled instantly on collision, no timer needed here
+             // Grey out is handled instantly on next obstacle spawn, no timer needed here
+          }
+        function loseStar() {
+             if (gameOver || isInvincible || freeSkipActive) return; // Don't lose stars if game over, invincible, or skipping
+
+             stars--;
+             updateStarsDisplay();
+             if (stars <= 0) {
+                 stars = 0; // Clamp to 0
+                 updateStarsDisplay();
+                 saveStars(); // Save the zero stars state
+                 endGame(); // Trigger game over
+             } else {
+                 // Grant temporary invincibility after losing a star
+                 isInvincible = true;
+                 invincibilityTimer = postHitInvincibilityDuration;
+                 saveStars(); // Save the reduced star count
+             }
+        }
+
+        // --- UI Update Functions ---
+        function flashScreen(color, maxOpacity = 0.7) { const flashDiv = document.createElement('div'); flashDiv.style.position = 'fixed'; flashDiv.style.top = '0'; flashDiv.style.left = '0'; flashDiv.style.width = '100%'; flashDiv.style.height = '100%'; flashDiv.style.backgroundColor = color; flashDiv.style.opacity = maxOpacity; flashDiv.style.zIndex = '25'; flashDiv.style.pointerEvents = 'none'; document.body.appendChild(flashDiv); let opacity = maxOpacity; const fadeInterval = setInterval(() => { opacity -= 0.05; flashDiv.style.opacity = opacity; if (opacity <= 0) { clearInterval(fadeInterval); if (flashDiv.parentNode) { document.body.removeChild(flashDiv); } } }, 20); }
+        function updateStarsDisplay() { starsDisplay.innerHTML = `${stars} <span>⭐</span>`; }
+        function updateSubjectDisplay() { if(currentSubject) { subjectNameDisplay.textContent = currentSubject; subjectNameDisplay.classList.remove('hidden'); } else { subjectNameDisplay.textContent = 'None'; subjectNameDisplay.classList.add('hidden'); } }
+        function updateLevelButtonText() {
+             // Use numerical index if available, otherwise topic name or infinity symbol
+             const levelText = currentLevelIndex !== null ? `Level: ${currentLevelIndex}` : (currentTopic === 'All' ? 'Level: ♾️' : `Level: ${currentTopic}`);
+             levelButton.textContent = levelText;
+         }
+        function showGameOverMessage() {
+             gameOverText.innerHTML = `Subject: ${currentSubject}<br>Topic: ${currentTopic}<br>Final Score: ${score}<br><br>Out of stars! Restart or get more stars to continue.`;
+             openModal('gameOverBox'); // Use openModal to handle pausing/blurring
+             canvas.style.cursor = 'default';
+             libraryButton.style.display = 'inline-flex';
+             levelButton.style.display = 'inline-flex';
+         }
+        function endGame() {
+             if (!gameOver) {
+                 console.log("Ending Game");
+                 gameOver = true;
+                 gameStarted = false;
+                 clearTypingState(); // Make sure typing overlay is gone
+                 saveStars(); // Save final (likely 0) stars
+                 showGameOverMessage();
+                 if (animationFrameId) {
+                     cancelAnimationFrame(animationFrameId);
+                     animationFrameId = null;
+                 }
+             }
+        }
+
+        // --- Modal Handling & Pause/Resume ---
+        function openModal(modalId) {
+            // Block modal opening ONLY if typing input is active
+            if (!modalId || currentTypingObstacle) {
+                console.log("Modal opening blocked (typing active).");
+                return;
+            }
+
+            closeModal(); // Close any existing modal first
+
+            const modal = document.getElementById(modalId);
+            if (modal) {
+                // Pause game updates ONLY if it's not the game over modal AND game is actually running AND not already paused
+                if (modalId !== 'gameOverBox' && gameStarted && !gameOver && !isPaused) {
+                    isPaused = true; // Pause the game
+                    console.log("Game Paused, Modal Opened:", modalId);
+                } else if (modalId === 'gameOverBox') {
+                    console.log("Opening Game Over Modal");
+                    // Ensure game is considered paused if game over modal is shown
+                    if (!gameOver) isPaused = true; // Pause if showing game over prematurely? (Shouldn't happen)
+                } else {
+                    console.log("Opening Modal (Game not running or already paused):", modalId);
+                }
+
+                activeModalId = modalId;
+                modal.style.display = 'block';
+                gameContainer.classList.add('blurred'); // Always blur for modals
+                canvas.style.cursor = 'default'; // Show cursor when modal open
+            }
+        }
+
+        function closeModal() {
+            if (activeModalId) {
+                const modal = document.getElementById(activeModalId);
+                if(modal) { modal.style.display = 'none'; }
+                const wasGameOverModal = activeModalId === 'gameOverBox';
+                const previouslyPaused = isPaused; // Check if game was paused before closing
+                const wasPausedByModal = activeModalId && activeModalId !== 'gameOverBox'; // Check if pause was due to a non-gameover modal
+                activeModalId = null;
+
+                 // --- Resume Logic ---
+                 // Conditions to UNPAUSE:
+                 // 1. Game should be running (started, not over)
+                 // 2. Not currently paused by typing overlay
+                 // 3. Game was paused *specifically by the modal we just closed* (not by user pause)
+                 if (!wasGameOverModal && gameStarted && !gameOver && !pausedByTyping && wasPausedByModal) {
+                     isPaused = false; // Unpause the game
+                     lastTime = performance.now(); // Reset lastTime on resume
+                     console.log("Game Resumed, Modal Closed");
+                     if (!animationFrameId) { animationFrameId = requestAnimationFrame(gameLoop); }
+                     canvas.style.cursor = 'none'; // Hide cursor when resuming game
+                     gameContainer.classList.remove('blurred');
+                     pauseOverlay.classList.remove('visible');
+                 }
+                 // Conditions to KEEP BLUR/PAUSE OVERLAY:
+                 // 1. Game is over
+                 // 2. Game is paused by user (spacebar) - isPaused will still be true and wasPausedByModal will be false
+                 // 3. Game is paused by typing - pausedByTyping will be true (handled by hideTypingOverlay)
+                 else if (gameOver || (isPaused && !pausedByTyping)) {
+                     console.log("Modal Closed (Game Over or Paused by User)");
+                     canvas.style.cursor = 'default';
+                     // Keep blur if game is over or paused by user
+                     gameContainer.classList.add('blurred');
+                     if (isPaused && !pausedByTyping) { // Show pause overlay only if paused by user
+                         pauseOverlay.classList.add('visible');
+                     } else {
+                         pauseOverlay.classList.remove('visible');
+                     }
+                 }
+                 // Other cases (game not started, etc.)
+                 else {
+                      console.log("Modal Closed (Game not running or paused by typing)");
+                      canvas.style.cursor = 'default';
+                      gameContainer.classList.remove('blurred'); // Remove blur if not paused/over
+                      pauseOverlay.classList.remove('visible');
+                 }
+            }
+        }
+
+        function togglePause(triggeredBySpacebar = false) {
+            if (gameOver || pausedByTyping) return; // Can't pause/unpause if game over or paused for typing
+
+            if (isPaused) {
+                // --- Unpausing ---
+                // Only unpause if not blocked by an active modal
+                if (!activeModalId) {
+                    isPaused = false;
+                    pauseOverlay.classList.remove('visible');
+                    gameContainer.classList.remove('blurred');
+                    canvas.style.cursor = 'none';
+                    lastTime = performance.now(); // Reset delta time calculation
+                    if (!animationFrameId) {
+                        animationFrameId = requestAnimationFrame(gameLoop);
+                    }
+                    console.log("Game Resumed (User Unpause).");
+                } else {
+                     console.log("Cannot unpause, modal is active:", activeModalId);
+                }
+            } else {
+                 // --- Pausing ---
+                 let canPause = true;
+                 if (triggeredBySpacebar) {
+                     if (!firstPauseUsed) {
+                         firstPauseUsed = true;
+                         showMessage("First pause is free! Press Space again to resume.", 3000);
+                     } else {
+                         // UPDATED COST CHECK
+                         if (stars >= 2) {
+                             stars -= 2; // UPDATED COST
+                             saveStars();
+                             updateStarsDisplay();
+                             showMessage("Paused. Cost: 2 Stars. Press Space to resume.", 3000); // UPDATED MESSAGE
+                         } else {
+                             showMessage("Not enough stars to pause (Cost: 2 Stars)!", 2500); // UPDATED MESSAGE
+                             canPause = false;
+                         }
+                     }
+                 }
+
+                 if (canPause) {
+                     isPaused = true;
+                     pauseOverlay.classList.add('visible'); // Show visual pause indicator
+                     gameContainer.classList.add('blurred'); // Blur background
+                     canvas.style.cursor = 'default';
+                     // Game loop continues but updates are skipped due to isPaused flag
+                     console.log("Game Paused (User Pause).");
+                 }
+            }
+        }
+
+
+        // --- Message Flash ---
+        let messageTimeout; function showMessage(message, duration = 2000) { messageFlash.textContent = message; messageFlash.classList.add('visible'); clearTimeout(messageTimeout); messageTimeout = setTimeout(() => { messageFlash.classList.remove('visible'); }, duration); }
+
+        // --- Star & Theme Persistence ---
+        function saveStars() { localStorage.setItem('chimMazeStars', stars.toString()); }
+        function loadStars() { stars = parseInt(localStorage.getItem('chimMazeStars') || '200'); }
+        function savePurchasedThemes() { localStorage.setItem('chimMazePurchasedThemes', JSON.stringify(purchasedThemes)); }
+        function loadPurchasedThemes() { purchasedThemes = JSON.parse(localStorage.getItem('chimMazePurchasedThemes') || '{}'); }
+
+        // --- Theme Store Functions ---
+        function openThemeStore() { populateThemeStore(); openModal('themeStoreModal'); }
+        function populateThemeStore() {
+             themeStoreContent.innerHTML = '';
+             const items = [
+                 { id: 'default', name: 'Default Theme', cost: 0, money: null },
+                 { id: 'matrix', name: 'Matrix Theme', cost: THEME_COSTS.matrix, money: '$2.99' },
+                 { id: 'solarized', name: 'Solarized Light Theme', cost: THEME_COSTS.solarized, money: '$2.99' },
+                 { id: 'orangeAccent', name: 'Accent Color: Orange', cost: THEME_COSTS.orangeAccent, money: '$2.99' },
+                 { id: 'custom', name: 'Custom Theme', cost: THEME_COSTS.custom, money: '$4.99' }, // Changed action below
+                 { id: 'font', name: 'Change Font', cost: THEME_COSTS.font, money: null },
+                 { id: 'get1000', name: 'Get 1000 Stars', cost: 0, money: '$0.99' } // Adjusted price
+             ];
+             items.forEach(item => {
+                 const div = document.createElement('div'); div.className = 'theme-item';
+                 const span = document.createElement('span'); span.textContent = item.name; div.appendChild(span);
+                 const buttonsDiv = document.createElement('div'); buttonsDiv.className = 'buttons';
+                 const isPurchased = purchasedThemes[item.id] || item.id === 'default';
+                 const isActive = currentTheme === item.id;
+
+                 // Star Button / Apply Button / Edit Button (for custom)
+                 if (item.cost > 0 || item.id === 'default' || item.id === 'custom') {
+                     const starButton = document.createElement('button');
+                     starButton.className = 'star-button';
+
+                     if (item.id === 'custom') {
+                         if (isPurchased) {
+                             starButton.textContent = 'Edit';
+                             starButton.onclick = () => { closeModal(); openCustomThemeEditor(); }; // Open editor
+                         } else {
+                             starButton.textContent = `${item.cost} ⭐`;
+                             starButton.onclick = () => purchaseTheme(item.id, item.cost);
+                             if (stars < item.cost) starButton.disabled = true;
+                         }
+                     } else if (item.id === 'font') {
+                          starButton.textContent = `${item.cost} ⭐`;
+                          starButton.onclick = () => purchaseFontChange(item.cost);
+                          if (stars < item.cost) starButton.disabled = true;
+                     } else { // Default and other purchasable themes
+                         if (isActive) {
+                             starButton.textContent = 'Active';
+                             starButton.classList.add('active-theme');
+                             starButton.disabled = true;
+                         } else if (isPurchased) {
+                             starButton.textContent = 'Apply';
+                             starButton.onclick = () => applyTheme(item.id);
+                         } else {
+                             starButton.textContent = `${item.cost} ⭐`;
+                             starButton.onclick = () => purchaseTheme(item.id, item.cost);
+                             if (stars < item.cost) starButton.disabled = true;
+                         }
+                     }
+                     buttonsDiv.appendChild(starButton);
+                 }
+
+                 // Money Button
+                 if (item.money) {
+                     const moneyButton = document.createElement('button');
+                     moneyButton.className = 'money-button';
+                     moneyButton.textContent = item.money;
+                     moneyButton.onclick = () => {
+                         if (item.id === 'get1000') { purchaseStarsWithMoney(1000); }
+                         else if (!isPurchased) {
+                             // Simulate purchase - grant theme and stars
+                             showMessage(`Simulating purchase of "${item.name}"...`);
+                             purchasedThemes[item.id] = true;
+                             savePurchasedThemes();
+                             if (item.id === 'custom') {
+                                 closeModal();
+                                 openCustomThemeEditor();
+                             } else {
+                                 applyTheme(item.id);
+                                 populateThemeStore(); // Update store buttons
+                             }
+                         }
+                     };
+                     // Disable money button if theme is already purchased (except for buying stars)
+                     if (isPurchased && item.id !== 'get1000') {
+                         moneyButton.disabled = true;
+                     }
+                     buttonsDiv.appendChild(moneyButton);
+                 }
+                 div.appendChild(buttonsDiv); themeStoreContent.appendChild(div);
+             });
+          }
+        function purchaseTheme(themeName, cost) {
+             if (stars >= cost) {
+                 stars -= cost; purchasedThemes[themeName] = true;
+                 updateStarsDisplay(); saveStars(); savePurchasedThemes();
+                 showMessage(`"${themeName}" theme purchased for ${cost} stars!`);
+                 if (themeName === 'custom') {
+                     // Immediately open editor after purchasing custom theme
+                     closeModal(); // Close store modal first
+                     openCustomThemeEditor();
+                 } else {
+                    applyTheme(themeName); // Apply other themes directly
+                    populateThemeStore(); // Update store buttons
+                 }
+             } else { showMessage(`Not enough stars! Need ${cost}.`); }
+          }
+        function purchaseFontChange(cost) { if (stars >= cost) { stars -= cost; updateStarsDisplay(); saveStars(); showMessage(`Font change purchased for ${cost} stars! (Font change not implemented)`); populateThemeStore(); } else { showMessage(`Not enough stars for font change! Need ${cost}.`); } }
+        function purchaseStarsWithMoney(amount) { stars += amount; updateStarsDisplay(); saveStars(); showMessage(`Added ${amount} stars! (Simulated purchase)`); populateThemeStore(); }
+
+        // --- Game Loop ---
+        function gameLoop(currentTime) {
+            // --- Ensure loop continues ---
+            // Request the next frame *before* doing work.
+            animationFrameId = requestAnimationFrame(gameLoop);
+
+            if (gameOver) {
+                // Keep drawing the last frame if game over, but don't update
+                return;
+            }
+
+            if (lastTime === 0) { lastTime = currentTime; }
+            deltaTime = (currentTime - lastTime) / 1000;
+            lastTime = currentTime;
+            const maxDeltaTime = 1 / 30; // Cap delta time
+            if (deltaTime > maxDeltaTime) { deltaTime = maxDeltaTime; }
+
+            // Skip updates if paused (by modal, spacebar, or typing input)
+            if (isPaused) {
+                // Still draw if paused, just don't update game state
+                 // --- Clearing and Drawing Background ---
+                 ctx.save();
+                 ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform for clearing
+                 if (isGradientBackground) {
+                     const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height / (window.devicePixelRatio || 1));
+                     gradient.addColorStop(0, currentBgColor1);
+                     gradient.addColorStop(1, currentBgColor2);
+                     ctx.fillStyle = gradient;
+                 } else { ctx.fillStyle = currentBgColor1; }
+                 ctx.fillRect(0, 0, canvas.width, canvas.height);
+                 ctx.restore(); // Restore previous transform (scaling)
+                 const logicalWidth = canvas.clientWidth; const logicalHeight = canvas.clientHeight;
+                 drawBackground(logicalWidth, logicalHeight);
+
+                 // --- Draw game elements (static when paused) ---
+                 obstacles.forEach(obstacle => obstacle.draw());
+                 powerUps.forEach(powerUp => powerUp.draw());
+                 if (ball) ball.draw();
+                 return; // Skip updates
+            }
+
+            // --- Clearing and Drawing Background ---
+            ctx.save();
+            ctx.setTransform(1, 0, 0, 1, 0, 0); // Reset transform for clearing
+            if (isGradientBackground) {
+                 const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height / (window.devicePixelRatio || 1));
+                 gradient.addColorStop(0, currentBgColor1);
+                 gradient.addColorStop(1, currentBgColor2);
+                 ctx.fillStyle = gradient;
+            } else { ctx.fillStyle = currentBgColor1; }
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            ctx.restore(); // Restore previous transform (scaling)
+            const logicalWidth = canvas.clientWidth; const logicalHeight = canvas.clientHeight;
+            drawBackground(logicalWidth, logicalHeight);
+
+            // --- Update and Draw Game Elements ---
+            if (gameStarted) {
+                if(ball) ball.update(deltaTime);
+                updateObstacles(deltaTime); // Handles obstacle movement, collision, scoring, power-up spawn, typing trigger
+                updatePowerUps(deltaTime); // Handles power-up movement and collection
+                updateEffects(deltaTime); // Handles timed effects (invincibility, slow-mo etc.)
+                frameCount++;
+            }
+
+            // --- Draw game elements ---
+            // Draw obstacles first so ball is on top
+            obstacles.forEach(obstacle => obstacle.draw());
+            powerUps.forEach(powerUp => powerUp.draw());
+            if (ball) ball.draw(); // Draw ball last
+        }
+
+        // --- Event Listeners ---
+        function handleScroll(event) {
+             event.preventDefault();
+             // Don't scroll if paused or typing input is active
+             if (isPaused || currentTypingObstacle) return;
+
+             if (!gameStarted && subjectSelected && !gameOver) {
+                 console.log("Starting game via scroll..."); gameStarted = true; lastTime = performance.now(); canvas.style.cursor = 'none';
+             }
+             if (gameStarted && !gameOver) { if (ball) { ball.move(event.deltaY); } }
+         }
+        canvas.addEventListener('wheel', handleScroll, { passive: false });
+        restartButton.addEventListener('click', () => { closeModal(); initGame(false); });
+        buyStarsButton.addEventListener('click', () => {
+            purchaseStarsWithMoney(1000); // Simulate purchase
+            closeModal(); // Close game over screen
+            initGame(false); // Restart game with new stars
+        });
+        window.addEventListener('resize', resizeCanvas);
+        pauseOverlay.addEventListener('click', () => togglePause(false)); // Click overlay to unpause
+
+        // --- Keyboard Listener for Pause (Spacebar) ---
+        window.addEventListener('keydown', (event) => {
+            // Don't pause/unpause if a modal is open or typing input is active/focused
+            if (activeModalId || currentTypingObstacle || event.target === typingInput) {
+                 // Allow space within the typing input
+                 if (event.code === 'Space' && event.target !== typingInput) {
+                     event.preventDefault(); // Prevent space scrolling page if not in input
+                 }
+                 return;
+            }
+
+            if (event.code === 'Space') {
+                event.preventDefault(); // Prevent space scrolling the page
+                if (gameStarted && !gameOver) {
+                    togglePause(true); // True indicates triggered by spacebar for cost check
+                }
+            }
+        });
+
+        // --- Typing Input Listener (Auto-Submit) ---
+        typingInput.addEventListener('input', () => {
+            if (!currentTypingObstacle || typingInput.disabled) return;
+
+            const userAnswer = typingInput.value.trim();
+            const correctAnswer = currentTypingObstacle.answers[0];
+
+            // Check for correct answer (case-insensitive)
+            if (userAnswer.toLowerCase() === correctAnswer.toLowerCase()) {
+                handleCorrectTypingInput();
+            }
+        });
+
+        // --- Typing Input Listener (Enter Key - Incorrect Submit) ---
+        // This allows submitting an incorrect answer early with Enter
+        typingInput.addEventListener('keydown', (event) => {
+            if (event.key === 'Enter') {
+                event.preventDefault(); // Prevent form submission if inside one
+                if (!currentTypingObstacle || typingInput.disabled) return;
+
+                const userAnswer = typingInput.value.trim();
+                const correctAnswer = currentTypingObstacle.answers[0];
+
+                // Only trigger if the answer isn't already correct
+                if (userAnswer.toLowerCase() !== correctAnswer.toLowerCase()) {
+                    handleIncorrectTypingInput();
+                }
+            }
+        });
+
+
+        // --- Button Listeners (Library, Level, Stars/Theme) ---
+        // Helper function to handle penalty for opening modals during gameplay
+        function handleModalOpenPenalty(modalOpenFunction) {
+             // Check if game is actively running
+             if (gameStarted && !isPaused && !gameOver && !currentTypingObstacle) {
+                 // UPDATED COST CHECK
+                 if (stars >= 2) {
+                     stars -= 2; // UPDATED COST
+                     updateStarsDisplay();
+                     saveStars();
+                     showMessage("Opened menu during play! Cost: 2 Stars.", 2500); // UPDATED MESSAGE
+                     modalOpenFunction(); // Proceed to open modal
+                 } else {
+                     showMessage("Not enough stars to open menu (Cost: 2 Stars)!", 2500); // UPDATED MESSAGE
+                     // Don't open modal
+                 }
+             } else {
+                 modalOpenFunction(); // Open modal without penalty if game not active
+             }
+        }
+
+        libraryButton.addEventListener('click', () => {
+            if (currentTypingObstacle) { console.log("Library button blocked (typing active)."); return; }
+            handleModalOpenPenalty(() => { // Wrap modal opening logic
+                 const openLibraryModalAction = () => {
+                     libraryContent.innerHTML = '';
+                     subjectKeys.forEach(subj => {
+                         const btn = document.createElement('button'); btn.textContent = subj; btn.dataset.subject = subj;
+                         btn.onclick = () => {
+                             currentSubject = subj; localStorage.setItem('chimMazeLastSubject', currentSubject);
+                             currentTopic = 'All'; currentLevelIndex = null; // Reset level
+                             localStorage.setItem('chimMazeLastTopic', currentTopic);
+                             subjectSelected = true;
+                             updateSubjectDisplay(); updateLevelButtonText();
+                             obstacles = []; frameCount = 0; correctAnswersCount = 0; // Reset counter
+                             currentQuestionIndices = {};
+                             getTopicsForSubject(currentSubject).forEach(topic => { currentQuestionIndices[currentSubject][topic] = 0; });
+                             closeModal(); // This will handle resume logic if needed
+                             redrawStaticElements();
+                             // Reset game state if already running
+                             if (gameStarted && !gameOver) {
+                                 obstacles = []; powerUps = []; activePowerUps = {}; slowMoFactor = 1.0; scoreMultiplier = 1;
+                                 currentBallRadius = baseBallRadius; greyOutActive = false; freeSkipActive = false;
+                                 invincibilityTimer = 0; isInvincible = false;
+                                 redrawStaticElements(); // Clear old obstacles visually
+                             } else if (!gameStarted) {
+                                 // Start game if not already started
+                                 gameStarted = true; lastTime = performance.now(); canvas.style.cursor = 'none';
+                                 if (!animationFrameId) animationFrameId = requestAnimationFrame(gameLoop);
+                             }
+                         };
+                         libraryContent.appendChild(btn);
+                     });
+                     openModal('libraryModal');
+                 };
+                 openLibraryModalAction();
+            });
+        });
+
+        levelButton.addEventListener('click', () => {
+            if (currentTypingObstacle) { console.log("Level button blocked (typing active)."); return; }
+            if (!currentSubject) { showMessage("Please choose a subject first!"); return; }
+            handleModalOpenPenalty(() => { // Wrap modal opening logic
+                 const openLevelModalAction = () => {
+                     topicContent.innerHTML = ''; topicModal.querySelector('h2').textContent = `Select Level (${currentSubject})`;
+                     // Add "All Topics" option
+                     const allContainer = document.createElement('div'); allContainer.className = 'topic-item-container all-topics';
+                     allContainer.onclick = () => {
+                         currentTopic = 'All'; currentLevelIndex = null;
+                         localStorage.setItem('chimMazeLastTopic', currentTopic);
+                         updateLevelButtonText(); obstacles = []; frameCount = 0; correctAnswersCount = 0; // Reset counter
+                         closeModal(); // Handles resume logic
+                         if (gameStarted && !gameOver) { /* Reset game state */
+                             obstacles = []; powerUps = []; activePowerUps = {}; slowMoFactor = 1.0; scoreMultiplier = 1;
+                             currentBallRadius = baseBallRadius; greyOutActive = false; freeSkipActive = false;
+                             invincibilityTimer = 0; isInvincible = false; redrawStaticElements();
+                         }
+                     };
+                     allContainer.innerHTML = `<span class="topic-title">Level ♾️: All Topics</span><span class="topic-description">Test your knowledge across all concepts in ${currentSubject}.</span>`;
+                     topicContent.appendChild(allContainer);
+
+                     // Add specific topic levels
+                     const topics = getTopicsForSubject(currentSubject);
+                     topics.forEach((topicKey, index) => {
+                         const levelNum = index + 1;
+                         const topicContainer = document.createElement('div'); topicContainer.className = 'topic-item-container'; topicContainer.dataset.topic = topicKey;
+                         topicContainer.onclick = () => {
+                             currentTopic = topicKey; currentLevelIndex = levelNum;
+                             localStorage.setItem('chimMazeLastTopic', currentTopic);
+                             updateLevelButtonText(); obstacles = []; frameCount = 0; correctAnswersCount = 0; // Reset counter
+                             currentQuestionIndices[currentSubject][topicKey] = 0;
+                             closeModal(); // Handles resume logic
+                              if (gameStarted && !gameOver) { /* Reset game state */
+                                  obstacles = []; powerUps = []; activePowerUps = {}; slowMoFactor = 1.0; scoreMultiplier = 1;
+                                  currentBallRadius = baseBallRadius; greyOutActive = false; freeSkipActive = false;
+                                  invincibilityTimer = 0; isInvincible = false; redrawStaticElements();
+                              }
+                         };
+                         topicContainer.innerHTML = `<span class="topic-title">Level ${levelNum}: ${topicKey}</span><span class="topic-description">${getTopicDescription(currentSubject, topicKey)}</span>`;
+                         topicContent.appendChild(topicContainer);
+                     });
+                     openModal('topicModal');
+                 };
+                 openLevelModalAction(); // Call the function
+            });
+        });
+
+        starsDisplay.addEventListener('click', () => {
+            if (currentTypingObstacle) { console.log("Stars button blocked (typing active)."); return; }
+             handleModalOpenPenalty(() => { // Wrap modal opening logic
+                 const openThemeStoreAction = () => { populateThemeStore(); openModal('themeStoreModal'); };
+                 openThemeStoreAction(); // Call the function
+             });
+        });
+
+        // --- Initial Setup ---
+        window.onload = () => {
+            console.log("Window loaded, initializing game...");
+            initGame(); // Initialize game automatically on load
+        };
+
+    </script>
+</body>
+</html>

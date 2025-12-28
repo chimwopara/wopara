@@ -1,0 +1,1530 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ChimType</title>
+    <style>
+        /* CSS Variables for Theming */
+        :root {
+            --bg-color: #1a1a2e;
+            --word-preview-color: rgba(233, 69, 96, 0.5);
+            --word-typing-color: white;
+            --word-typing-shadow: rgba(255, 215, 0, 0.8); /* Base shadow color for typing */
+            --word-completed-color: gold;
+            --word-completed-shadow: rgba(255, 215, 0, 0.8); /* Base shadow color for completed */
+            --word-incorrect-color: #ff4a4a;
+            --word-incorrect-shadow: rgba(255, 74, 74, 0.8);
+            --menu-bg-color: #16213e;
+            --logo-color: #e94560;
+            --star-color: #ffd700;
+            --ui-text-color: #a0aec0; /* Stopwatch, best score, etc. */
+            --button-primary-bg: #e94560;
+            --button-primary-hover-bg: #c13150;
+            --button-secondary-bg: #4a5568;
+            --button-secondary-hover-bg: #2d3748;
+            --button-text-color: white;
+            --url-word-color: rgba(0, 255, 255, 0.7);
+            --url-word-typing-color: cyan;
+            --url-word-typing-shadow: rgba(0, 255, 255, 0.8);
+            --url-word-completed-color: #00ffff;
+            --url-word-completed-shadow: rgba(0, 255, 255, 0.9);
+            --url-link-color: #38bdf8; /* Color for the clickable link text */
+            --url-link-hover-color: #7dd3fc;
+            --url-link-bg-color: rgba(22, 33, 62, 0.9); /* Background for the link display */
+            --message-box-bg: #16213e;
+            --message-box-text: #fff;
+            --hint-bg-color: rgba(56, 189, 248, 0.85); /* Background for the hint */
+            --hint-text-color: #ffffff; /* Text color for the hint */
+            --button-disabled-bg: #2d3748; /* Added for disabled/purchased buttons */
+            --button-disabled-text: #a0aec0;
+            --button-purchased-opacity: 0.85; /* Slightly different look for purchased but clickable */
+        }
+
+        /* Basic styling */
+        body {
+            margin: 0; padding: 0; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color); color: var(--ui-text-color);
+            overflow: hidden; display: flex; flex-direction: column; height: 100vh; touch-action: none;
+        }
+        .game-container { flex: 1; position: relative; overflow: hidden; touch-action: none; }
+        .word {
+            position: absolute; font-size: 72px; font-weight: bold;
+            color: var(--word-preview-color); transition: left 0.05s linear;
+            white-space: nowrap; padding: 2px 8px; user-select: none;
+        }
+        .letter { display: inline-block; transition: color 0.1s ease, text-shadow 0.3s ease; }
+        .word.active .letter { text-shadow: 0 0 5px var(--word-typing-shadow), 0 0 10px var(--word-typing-shadow); }
+        .letter.correct { color: var(--word-typing-color); text-shadow: 0 0 10px var(--word-typing-shadow), 0 0 20px var(--word-typing-shadow); }
+        .letter.completed { color: var(--word-completed-color); text-shadow: 0 0 10px var(--word-completed-shadow), 0 0 20px var(--word-completed-shadow); }
+        .letter.incorrect { color: var(--word-incorrect-color); text-shadow: 0 0 10px var(--word-incorrect-shadow), 0 0 20px var(--word-incorrect-shadow); }
+
+        /* Styling for URL words */
+        .word.word-url { color: var(--url-word-color); }
+        .word.word-url.active .letter { text-shadow: 0 0 5px var(--url-word-typing-shadow), 0 0 10px var(--url-word-typing-shadow); }
+        .word.word-url .letter.correct { color: var(--url-word-typing-color); text-shadow: 0 0 10px var(--url-word-typing-shadow), 0 0 20px var(--url-word-typing-shadow); }
+        .word.word-url .letter.completed { color: var(--url-word-completed-color); text-shadow: 0 0 10px var(--url-word-completed-shadow), 0 0 20px var(--url-word-completed-shadow); }
+
+        /* Top Stats Bar */
+        .stats {
+            display: flex; align-items: center; padding: 10px 15px;
+            background-color: var(--menu-bg-color); box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+            z-index: 10; gap: 10px;
+        }
+        .stats-title { margin: 0; margin-right: auto; font-size: 28px; color: var(--logo-color); font-weight: bold; flex-shrink: 0; }
+        #stopwatch, #best-score-display {
+            font-size: 16px; color: var(--ui-text-color); font-weight: bold; flex-shrink: 0; min-width: 70px;
+            text-align: right; white-space: nowrap; background-color: rgba(0,0,0,0.2); padding: 3px 6px; border-radius: 4px;
+        }
+        .stars { font-size: 24px; font-weight: bold; color: var(--star-color); display: flex; align-items: center; gap: 8px; flex-shrink: 0; margin-left: 5px; }
+        .star-icon { font-size: 28px; color: var(--star-color); }
+        #star-count { color: var(--star-color); }
+
+        /* Pause Screen Overlay */
+        .pause-screen {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(0, 0, 0, 0.85); display: none; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 100; text-align: center; cursor: pointer;
+        }
+        .pause-container {
+            background-color: var(--menu-bg-color); padding: 30px; border-radius: 10px;
+            display: flex; flex-direction: column; align-items: center; gap: 18px;
+            max-height: 85vh; width: 90%; max-width: 450px; overflow-y: auto;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.4); cursor: default; color: var(--ui-text-color);
+        }
+        .pause-section { display: flex; flex-direction: column; align-items: center; width: 100%; gap: 15px;}
+        /* Hide sections by default */
+        #customize-section, #song-mode-section, #hashtag-selection-section {
+             display: none;
+        }
+
+        /* Buttons */
+        .action-btn {
+            padding: 12px 25px; font-size: 18px; background-color: var(--button-primary-bg);
+            color: var(--button-text-color); border: none; border-radius: 5px; cursor: pointer;
+            transition: background-color 0.2s, color 0.2s, opacity 0.2s; width: 90%; max-width: 300px; text-align: center;
+            touch-action: manipulation; flex-shrink: 0; text-transform: capitalize; /* Capitalize hashtag buttons */
+        }
+        .action-btn:hover:not(.secondary):not(.buy-stars):not(.purchased) { background-color: var(--button-primary-hover-bg); }
+        .action-btn.secondary { background-color: var(--button-secondary-bg); }
+        .action-btn.secondary:hover:not(.purchased) { background-color: var(--button-secondary-hover-bg); }
+        .action-btn.buy-stars { background-color: #38a169; }
+        .action-btn.buy-stars:hover { background-color: #2f855a; }
+        .action-btn.hashtag-category-btn { background-color: var(--button-secondary-bg); /* Style category buttons */ }
+        .action-btn.hashtag-category-btn:hover:not(.purchased) { background-color: var(--button-secondary-hover-bg); }
+        /* Style for purchased but still clickable mode buttons */
+        .action-btn.mode-btn.purchased {
+            opacity: var(--button-purchased-opacity);
+            /* Keep background color, allow hover effect */
+        }
+        .action-btn.mode-btn.purchased:hover {
+             /* Define hover for purchased button if needed, e.g., slightly darker */
+             filter: brightness(90%);
+        }
+
+
+        /* Customize Button Container */
+        .customize-container { display: flex; align-items: center; justify-content: center; gap: 10px; width: 90%; max-width: 300px; }
+        .customize-container .action-btn { flex-grow: 1; width: auto; }
+        .cost-indicator { font-size: 16px; font-weight: bold; color: var(--star-color); background-color: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 5px; white-space: nowrap; }
+
+        /* Customize/Song/Hashtag Section Styling */
+        #customize-section h3, #song-mode-section h3, #hashtag-selection-section h3 {
+            color: var(--logo-color); margin-bottom: 15px; margin-top: 0; font-size: 24px;
+           }
+        .color-picker-row { display: flex; justify-content: space-between; align-items: center; width: 90%; max-width: 350px; margin-bottom: 10px; }
+        .color-picker-row label { margin-right: 15px; flex-shrink: 0; color: var(--ui-text-color); }
+        .color-picker-row input[type="color"] { width: 60px; height: 30px; border: 1px solid var(--ui-text-color); border-radius: 4px; cursor: pointer; background-color: transparent; padding: 2px; }
+        .color-picker-row input[type="color"]::-webkit-color-swatch-wrapper { padding: 0; }
+        .color-picker-row input[type="color"]::-webkit-color-swatch { border: none; border-radius: 3px; }
+        .color-picker-row input[type="color"]::-moz-color-swatch { border: none; border-radius: 3px; }
+
+        #song-mode-section textarea {
+            width: 90%; max-width: 380px; height: 150px; background-color: rgba(0,0,0,0.2);
+            border: 1px solid var(--ui-text-color); color: var(--button-text-color);
+            border-radius: 5px; padding: 10px; font-family: inherit; font-size: 14px; resize: vertical;
+        }
+        /* Hashtag button container */
+        #hashtag-buttons-container {
+            display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; width: 100%;
+        }
+        #hashtag-buttons-container .action-btn {
+            width: calc(50% - 10px); /* Two buttons per row approx */
+            max-width: 180px; /* Max width for category buttons */
+        }
+
+
+        /* Message Overlay & Confirmation */
+        #message-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.7); display: none; justify-content: center; align-items: center; z-index: 200; }
+        #message-box { background-color: var(--message-box-bg); padding: 30px; border-radius: 8px; color: var(--message-box-text); text-align: center; box-shadow: 0 5px 15px rgba(0,0,0,0.5); max-width: 80%; }
+        #message-box p { margin: 0 0 20px 0; font-size: 18px; }
+        #message-box .button-container { display: flex; justify-content: center; gap: 15px; }
+        #message-box button { padding: 10px 20px; font-size: 16px; background-color: var(--button-primary-bg); color: var(--button-text-color); border: none; border-radius: 5px; cursor: pointer; min-width: 80px; }
+        #message-box button:hover { background-color: var(--button-primary-hover-bg); }
+        #message-confirm-no-btn { background-color: var(--button-secondary-bg); display: none; /* Hidden by default */ }
+        #message-confirm-no-btn:hover { background-color: var(--button-secondary-hover-bg); }
+
+
+        /* Start Message */
+        .start-message { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); font-size: 48px; color: var(--logo-color); z-index: 20; display: none; text-align: center; padding: 20px; background-color: rgba(26, 26, 46, 0.8); border-radius: 10px; }
+
+        /* MODIFIED: Hint Styling */
+        .swipe-hint {
+            position: absolute;
+            background-color: var(--hint-bg-color);
+            color: var(--hint-text-color);
+            border-radius: 6px;
+            padding: 5px 10px; /* Added padding */
+            display: flex; /* Use flex for alignment if needed */
+            align-items: center;
+            justify-content: center;
+            font-size: 24px; /* Increased font size for emoji */
+            font-weight: bold;
+            z-index: 50;
+            opacity: 1; /* Show directly */
+            pointer-events: none;
+            user-select: none;
+            white-space: nowrap; /* Prevent wrapping */
+            transition: opacity 0.3s ease; /* Keep fade out transition */
+        }
+
+
+        /* Game Over Screen */
+         #game-over { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(0, 0, 0, 0.85); display: none; flex-direction: column; justify-content: center; align-items: center; z-index: 150; text-align: center; color: var(--ui-text-color); }
+         #game-over h2 { font-size: 48px; color: var(--logo-color); margin-bottom: 20px; }
+         #game-over p { font-size: 20px; margin-bottom: 10px; }
+         .restart-btn { padding: 15px 30px; font-size: 20px; background-color: var(--button-primary-bg); color: var(--button-text-color); border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.2s; width: 200px; text-align: center; touch-action: manipulation; margin-top: 20px; }
+         .restart-btn:hover { background-color: var(--button-primary-hover-bg); }
+
+        /* URL Link Display Area */
+        #url-link-display { position: absolute; bottom: 10px; left: 50%; transform: translateX(-50%); background-color: var(--url-link-bg-color); color: var(--ui-text-color); padding: 8px 15px; border-radius: 6px; font-size: 16px; z-index: 60; display: none; text-align: center; box-shadow: 0 2px 5px rgba(0,0,0,0.3); }
+        #url-link-display a { color: var(--url-link-color); text-decoration: underline; font-weight: bold; margin-left: 8px; }
+        #url-link-display a:hover { color: var(--url-link-hover-color); }
+
+    </style>
+</head>
+<body>
+    <div class="stats">
+        <h1 class="stats-title">ChimType</h1>
+        <span id="stopwatch">0.0s</span>
+        <span id="best-score-display">Best: 0.0s</span>
+        <div class="stars">
+            <span class="star-icon">★</span>
+            <span id="star-count">0</span>
+        </div>
+    </div>
+
+    <div class="game-container" id="game-container">
+        <div id="url-link-display"></div>
+    </div>
+
+    <div class="pause-screen" id="pause-screen">
+        <div class="pause-container">
+            <div id="main-pause-section" class="pause-section">
+                <button id="buy-stars-btn" class="action-btn buy-stars">Buy 3000 Stars ($4.99)</button>
+                <div class="customize-container">
+                     <button id="customize-btn" class="action-btn secondary">Customize</button>
+                     <span id="customize-cost-indicator" class="cost-indicator">⭐️ 1000</span>
+                </div>
+                <button class="action-btn mode-btn" data-mode="song" data-cost="1000" data-name="Song Mode">Song Mode (⭐️ 1000)</button>
+                <button class="action-btn mode-btn" data-mode="story" data-cost="1000" data-name="Story Mode">Story Mode (⭐️ 1000)</button>
+                <button class="action-btn mode-btn" data-mode="hashtag" data-cost="1000" data-name="Hashtag Mode">Hashtag Mode (⭐️ 1000)</button>
+                <button id="resume-btn" class="action-btn">Resume Game</button>
+            </div>
+
+            <div id="customize-section" class="pause-section">
+                 <h3>Customize Colors</h3>
+                 <div class="color-picker-row"><label for="bg-color-input">Background:</label><input type="color" id="bg-color-input" data-css-var="--bg-color"></div>
+                 <div class="color-picker-row"><label for="menu-color-input">Menu Background:</label><input type="color" id="menu-color-input" data-css-var="--menu-bg-color"></div>
+                 <div class="color-picker-row"><label for="logo-color-input">Logo:</label><input type="color" id="logo-color-input" data-css-var="--logo-color"></div>
+                 <div class="color-picker-row"><label for="star-color-input">Stars:</label><input type="color" id="star-color-input" data-css-var="--star-color"></div>
+                 <div class="color-picker-row"><label for="ui-text-color-input">UI Text:</label><input type="color" id="ui-text-color-input" data-css-var="--ui-text-color"></div>
+                 <div class="color-picker-row"><label for="word-preview-color-input">Word Preview:</label><input type="color" id="word-preview-color-input" data-css-var="--word-preview-color"></div>
+                 <div class="color-picker-row"><label for="word-typing-color-input">Word Typing:</label><input type="color" id="word-typing-color-input" data-css-var="--word-typing-color"></div>
+                 <div class="color-picker-row"><label for="word-completed-color-input">Word Completed:</label><input type="color" id="word-completed-color-input" data-css-var="--word-completed-color"></div>
+                 <div class="color-picker-row"><label for="url-word-color-input">URL Word:</label><input type="color" id="url-word-color-input" data-css-var="--url-word-color"></div>
+                 <div class="color-picker-row"><label for="url-link-color-input">URL Link Text:</label><input type="color" id="url-link-color-input" data-css-var="--url-link-color"></div>
+                 <div class="color-picker-row"><label for="button-primary-input">Primary Button:</label><input type="color" id="button-primary-input" data-css-var="--button-primary-bg"></div>
+                 <div class="color-picker-row"><label for="button-primary-hover-input">Primary Btn Hover:</label><input type="color" id="button-primary-hover-input" data-css-var="--button-primary-hover-bg"></div>
+                 <div class="color-picker-row"><label for="button-secondary-input">Secondary Button:</label><input type="color" id="button-secondary-input" data-css-var="--button-secondary-bg"></div>
+                 <button id="apply-colors-btn" class="action-btn">Apply & Back</button>
+                 <button id="reset-colors-btn" class="action-btn secondary">Reset to Default</button>
+            </div>
+
+            <div id="song-mode-section" class="pause-section">
+                 <h3>Song Mode</h3>
+                 <p>Paste song lyrics below:</p>
+                 <textarea id="lyrics-input" placeholder="Paste lyrics here...\n\nExample:\nRow, row, row your boat\nGently down the stream..." rows="8"></textarea>
+                 <button id="start-song-mode-btn" class="action-btn">Start Song</button>
+                 <button id="song-mode-back-btn" class="action-btn secondary">Back to Menu</button>
+            </div>
+
+             <div id="hashtag-selection-section" class="pause-section">
+                 <h3>Select Hashtag Category</h3>
+                 <div id="hashtag-buttons-container">
+                     </div>
+                 <button id="hashtag-selection-back-btn" class="action-btn secondary">Back to Menu</button>
+            </div>
+
+        </div>
+    </div>
+
+    <div id="game-over">
+         <h2>Out of Stars!</h2>
+         <p>Score: <span id="final-run-time">0.0s</span></p>
+         <p>Best Score: <span id="game-over-best-time">0.0s</span></p>
+         <button class="restart-btn" id="restart-btn">Play Again</button>
+    </div>
+
+    <div class="start-message" id="start-message"></div>
+
+    <div id="message-overlay">
+        <div id="message-box">
+            <p id="message-text"></p>
+            <div class="button-container">
+                 <button id="message-ok-btn">OK</button>
+                 <button id="message-confirm-no-btn">No</button> </div>
+        </div>
+    </div>
+
+    <script>
+        // --- DOM Element References ---
+        const gameContainer = document.getElementById('game-container');
+        const starCount = document.getElementById('star-count');
+        const pauseScreen = document.getElementById('pause-screen');
+        const startMessageDisplay = document.getElementById('start-message');
+        const messageOverlay = document.getElementById('message-overlay');
+        const messageText = document.getElementById('message-text');
+        const messageOkBtn = document.getElementById('message-ok-btn');
+        const messageConfirmNoBtn = document.getElementById('message-confirm-no-btn');
+        const stopwatchDisplay = document.getElementById('stopwatch');
+        const gameOverScreen = document.getElementById('game-over');
+        const finalRunTime = document.getElementById('final-run-time');
+        const gameOverBestTime = document.getElementById('game-over-best-time');
+        const restartBtn = document.getElementById('restart-btn');
+        const bestScoreDisplay = document.getElementById('best-score-display');
+        const urlLinkDisplay = document.getElementById('url-link-display');
+        const mainPauseSection = document.getElementById('main-pause-section');
+        const customizeSection = document.getElementById('customize-section');
+        const songModeSection = document.getElementById('song-mode-section');
+        const hashtagSelectionSection = document.getElementById('hashtag-selection-section'); // New section
+        const hashtagButtonsContainer = document.getElementById('hashtag-buttons-container'); // New button container
+        const hashtagSelectionBackBtn = document.getElementById('hashtag-selection-back-btn'); // New back button
+        const customizeBtn = document.getElementById('customize-btn');
+        const customizeCostIndicator = document.getElementById('customize-cost-indicator');
+        const buyStarsBtn = document.getElementById('buy-stars-btn');
+        const applyColorsBtn = document.getElementById('apply-colors-btn');
+        const resetColorsBtn = document.getElementById('reset-colors-btn');
+        const resumeBtn = document.getElementById('resume-btn');
+        const lyricsInput = document.getElementById('lyrics-input');
+        const startSongModeBtn = document.getElementById('start-song-mode-btn');
+        const songModeBackBtn = document.getElementById('song-mode-back-btn');
+
+        // --- Game State Variables ---
+        let stars = 0;
+        let activeWords = [];
+        let wordsInterval;
+        let gameActive = false;
+        let gamePaused = false;
+        let interactionAllowed = false;
+        let currentSpeed = 2.0;
+        let currentTyping = '';
+        let currentWordIndex = null;
+        let animationFrameId = null;
+        let swipeHintTimeout = null;
+        let activeSwipeHint = null;
+        let purchasedItems = ['default'];
+        let unlockedModes = [];
+        let stopwatchTime = 0;
+        let stopwatchInterval = null;
+        let highScoreTime = 0;
+        let wordsSinceLastUrl = 0;
+        let urlDisplayTimeout = null;
+        let isSongModeActive = false; // For song mode
+        let songModeWords = [];
+        let songModeWordIndex = 0;
+        let songStartTime = 0;
+        let isHashtagModeActive = false; // For hashtag mode
+        let currentHashtagCategory = null; // Currently selected hashtag
+        let hashtagSpawnCounter = 0; // Counter for hashtag mode spawn throttling
+        const hashtagSpawnDelay = 90; // Approx 1.5 seconds at 60fps
+        let confirmYesCallback = null;
+        let confirmNoCallback = null;
+
+        // --- Default Colors ---
+        const defaultColors = { /* ... colors ... */
+            '--bg-color': '#1a1a2e', '--word-preview-color': 'rgba(233, 69, 96, 0.5)', '--word-typing-color': '#ffffff', '--word-completed-color': '#ffd700', '--menu-bg-color': '#16213e', '--logo-color': '#e94560', '--star-color': '#ffd700', '--ui-text-color': '#a0aec0', '--url-word-color': 'rgba(0, 255, 255, 0.7)', '--url-link-color': '#38bdf8', '--button-primary-bg': '#e94560', '--button-primary-hover-bg': '#c13150', '--button-secondary-bg': '#4a5568', '--button-secondary-hover-bg': '#2d3748', '--word-typing-shadow': 'rgba(255, 215, 0, 0.8)', '--word-completed-shadow': 'rgba(255, 215, 0, 0.8)', '--word-incorrect-color': '#ff4a4a', '--word-incorrect-shadow': 'rgba(255, 74, 74, 0.8)', '--button-text-color': '#ffffff', '--url-word-typing-color': '#00ffff', '--url-word-typing-shadow': 'rgba(0, 255, 255, 0.8)', '--url-word-completed-color': '#00ffff', '--url-word-completed-shadow': 'rgba(0, 255, 255, 0.9)', '--url-link-hover-color': '#7dd3fc', '--url-link-bg-color': 'rgba(22, 33, 62, 0.9)', '--message-box-bg': '#16213e', '--message-box-text': '#ffffff', '--hint-bg-color': 'rgba(56, 189, 248, 0.85)', '--hint-text-color': '#ffffff', '--button-disabled-bg': '#2d3748', '--button-disabled-text': '#a0aec0', '--button-purchased-opacity': 0.85
+        };
+        let currentColors = { ...defaultColors };
+
+        // --- LocalStorage Keys ---
+        const STORAGE_KEYS = { /* ... keys ... */
+            STARS: 'chimtype_stars', PURCHASED_ITEMS: 'chimtype_purchasedItems', UNLOCKED_MODES: 'chimtype_unlockedModes', HIGH_SCORE_TIME: 'chimtype_highScoreTime', CUSTOM_COLORS: 'chimtype_customColors'
+        };
+
+        // --- Keyboard Layout Data ---
+        const keyboardLayout = { /* ... layout data ... */
+            '`': {row: 0, col: 0}, '1': {row: 0, col: 1}, '2': {row: 0, col: 2}, '3': {row: 0, col: 3}, '4': {row: 0, col: 4}, '5': {row: 0, col: 5}, '6': {row: 0, col: 6}, '7': {row: 0, col: 7}, '8': {row: 0, col: 8}, '9': {row: 0, col: 9}, '0': {row: 0, col: 10}, '-': {row: 0, col: 11}, '=': {row: 0, col: 12}, 'q': {row: 1, col: 1.5}, 'w': {row: 1, col: 2.5}, 'e': {row: 1, col: 3.5}, 'r': {row: 1, col: 4.5}, 't': {row: 1, col: 5.5}, 'y': {row: 1, col: 6.5}, 'u': {row: 1, col: 7.5}, 'i': {row: 1, col: 8.5}, 'o': {row: 1, col: 9.5}, 'p': {row: 1, col: 10.5}, '[': {row: 1, col: 11.5}, ']': {row: 1, col: 12.5}, '\\': {row: 1, col: 13.5}, 'a': {row: 2, col: 1.8}, 's': {row: 2, col: 2.8}, 'd': {row: 2, col: 3.8}, 'f': {row: 2, col: 4.8}, 'g': {row: 2, col: 5.8}, 'h': {row: 2, col: 6.8}, 'j': {row: 2, col: 7.8}, 'k': {row: 2, col: 8.8}, 'l': {row: 2, col: 9.8}, ';': {row: 2, col: 10.8}, "'": {row: 2, col: 11.8}, 'z': {row: 3, col: 2.1}, 'x': {row: 3, col: 3.1}, 'c': {row: 3, col: 4.1}, 'v': {row: 3, col: 5.1}, 'b': {row: 3, col: 6.1}, 'n': {row: 3, col: 7.1}, 'm': {row: 3, col: 8.1}, ',': {row: 3, col: 9.1}, '.': {row: 3, col: 10.1}, '/': {row: 3, col: 11.1}, ' ': {row: 4, col: 6.5}
+           };
+
+        // --- Word Lists ---
+        // Default Word List
+        const wordList = [ /* ... word list data restored ... */
+            'cat', 'dog', 'run', 'jump', 'play', 'book', 'tree', 'fish', 'bird', 'car', 'home', 'time', 'love', 'work', 'food', 'park', 'city', 'game', 'moon', 'star', 'rain', 'snow', 'wind', 'fire', 'water', 'earth', 'light', 'dark', 'happy', 'sad', 'amazing', 'beautiful', 'creative', 'dazzling', 'elephant', 'fantastic', 'graceful', 'harmony', 'imagine', 'journey', 'knowledge', 'laughter', 'mountain', 'navigate', 'octopus', 'paradise', 'question', 'rainbow', 'sunshine', 'treasure', 'umbrella', 'victory', 'whisper', 'xylophone', 'yesterday', 'zephyr', 'adventure', 'butterfly', 'calendar', 'delicious', 'accomplishment', 'breathtaking', 'collaboration', 'determination', 'extraordinary', 'fascinating', 'handcrafted', 'imagination', 'juxtaposition', 'kaleidoscope', 'luminescent', 'magnificent', 'negotiations', 'opportunity', 'perseverance', 'qualification', 'revolutionary', 'sophisticated', 'technological', 'understanding', 'visualization', 'wonderfully', 'xenophobia', 'zoological', 'appreciation', 'bureaucratic', 'catastrophic', 'deliberately', 'enthusiastic'
+        ];
+        // URL List
+        const urlList = [ /* ... url list data restored ... */
+            { text: 'chimwopara.com', url: 'https://chimwopara.com' }, { text: 'fivetaps.com', url: 'https://fivetaps.com' }, { text: 'fromsupply.com', url: 'https://fromsupply.com' }
+        ];
+        // NEW: Hashtag Word Lists
+        const hashtagWords = {
+            food: [ /* ... food words ... */
+                'apple', 'apricot', 'avocado', 'banana', 'blackberry', 'blueberry', 'cantaloupe', 'cherry', 'coconut', 'cranberry',
+                'date', 'fig', 'grape', 'grapefruit', 'guava', 'honeydew', 'kiwi', 'lemon', 'lime', 'mango',
+                'nectarine', 'orange', 'papaya', 'peach', 'pear', 'persimmon', 'pineapple', 'plum', 'pomegranate', 'raspberry',
+                'strawberry', 'tangerine', 'watermelon', 'artichoke', 'asparagus', 'broccoli', 'cabbage', 'carrot', 'cauliflower', 'celery',
+                'corn', 'cucumber', 'eggplant', 'garlic', 'ginger', 'kale', 'lettuce', 'mushroom', 'onion', 'peas',
+                'pepper', 'potato', 'pumpkin', 'radish', 'spinach', 'squash', 'sweet_potato', 'tomato', 'zucchini', 'almond',
+                'cashew', 'chia', 'flax', 'hazelnut', 'macadamia', 'peanut', 'pecan', 'pistachio', 'sesame', 'sunflower',
+                'walnut', 'bagel', 'bread', 'biscuit', 'cereal', 'cracker', 'croissant', 'muffin', 'oatmeal', 'pancake',
+                'pasta', 'pita', 'pretzel', 'quinoa', 'rice', 'toast', 'tortilla', 'waffle', 'beef', 'bacon',
+                'chicken', 'duck', 'ham', 'lamb', 'pork', 'sausage', 'steak', 'turkey', 'veal', 'venison',
+                'anchovy', 'catfish', 'cod', 'crab', 'halibut', 'herring', 'lobster', 'mackerel', 'mussel', 'oyster',
+                'salmon', 'sardine', 'scallop', 'shrimp', 'squid', 'tilapia', 'trout', 'tuna', 'butter', 'cheese',
+                'cream', 'custard', 'egg', 'ghee', 'ice_cream', 'milk', 'yogurt', 'basil', 'cardamom', 'chili',
+                'cinnamon', 'clove', 'coriander', 'cumin', 'dill', 'fennel', 'lavender', 'marjoram', 'mint', 'mustard',
+                'nutmeg', 'oregano', 'paprika', 'parsley', 'pepper', 'rosemary', 'saffron', 'sage', 'thyme', 'turmeric',
+                'vanilla', 'vinegar', 'barbecue', 'ketchup', 'mayonnaise', 'pesto', 'relish', 'salsa', 'soy_sauce', 'syrup',
+                'tabasco', 'teriyaki', 'vinaigrette', 'wasabi', 'cake', 'candy', 'chocolate', 'cookie', 'doughnut', 'fudge',
+                'honey', 'jam', 'jelly', 'marshmallow', 'marzipan', 'pudding', 'sorbet', 'truffle', 'beer', 'cider',
+                'coffee', 'cola', 'espresso', 'juice', 'lemonade', 'liqueur', 'matcha', 'milkshake', 'smoothie', 'soda',
+                'tea', 'water', 'wine', 'breakfast', 'brunch', 'lunch', 'dinner', 'supper', 'snack', 'dessert'
+            ],
+            tech: [ /* ... tech words ... */
+                'algorithm', 'analog', 'android', 'api', 'app', 'application', 'archive', 'artificial', 'intelligence', 'assembly',
+                'augmented', 'reality', 'automation', 'avatar', 'backup', 'bandwidth', 'beta', 'binary', 'biometrics', 'bitcoin',
+                'blockchain', 'blog', 'bluetooth', 'boot', 'bot', 'broadband', 'browser', 'bug', 'buffer', 'byte',
+                'cache', 'cad', 'captcha', 'cdrom', 'cellphone', 'chatbot', 'chip', 'circuit', 'client', 'cloud',
+                'cluster', 'code', 'codec', 'compile', 'compress', 'computer', 'console', 'cookie', 'cpu', 'crawler',
+                'cryptocurrency', 'cyber', 'security', 'cyberspace', 'dashboard', 'data', 'database', 'debug', 'decode', 'decrypt',
+                'deepfake', 'default', 'delete', 'desktop', 'developer', 'device', 'digital', 'directory', 'display', 'dns',
+                'domain', 'dongle', 'download', 'drone', 'driver', 'dvd', 'ecommerce', 'email', 'emoji', 'emulate',
+                'encode', 'encrypt', 'engineer', 'ethernet', 'exploit', 'export', 'faq', 'fiber', 'optic', 'file',
+                'filter', 'firewall', 'firmware', 'flash', 'folder', 'font', 'forum', 'framework', 'freeware', 'frontend',
+                'ftp', 'function', 'gadget', 'gateway', 'geotagging', 'gif', 'gigabyte', 'glitch', 'gpu', 'graphics',
+                'gui', 'hack', 'hacker', 'hard_drive', 'hardware', 'hashtag', 'header', 'hertz', 'hosting', 'hotspot',
+                'html', 'http', 'https', 'hub', 'hyperlink', 'icon', 'import', 'inbox', 'index', 'input',
+                'install', 'interface', 'internet', 'intranet', 'iot', 'ip_address', 'isp', 'java', 'javascript', 'joystick',
+                'jpeg', 'json', 'kernel', 'key', 'keyboard', 'keyword', 'kilobyte', 'lan', 'laptop', 'latency',
+                'library', 'link', 'linux', 'load', 'login', 'logic', 'loop', 'machine', 'learning', 'macro',
+                'malware', 'mainframe', 'malware', 'media', 'megabyte', 'memory', 'menu', 'metadata', 'microchip', 'microphone',
+                'modem', 'monitor', 'motherboard', 'mouse', 'mp3', 'multimedia', 'nanotechnology', 'navigate', 'netiquette', 'network',
+                'neural', 'node', 'notebook', 'offline', 'online', 'opensource', 'operating', 'system', 'output', 'packet',
+                'page', 'parameter', 'password', 'patch', 'peripheral', 'phishing', 'phreaking', 'ping', 'pixel', 'platform',
+                'plugin', 'podcast', 'pop_up', 'portal', 'post', 'printer', 'privacy', 'processor', 'program', 'programming',
+                'protocol', 'proxy', 'python', 'query', 'queue', 'qwerty', 'ram', 'ransomware', 'real_time', 'reboot',
+                'refresh', 'register', 'remote', 'resolution', 'restore', 'robot', 'robotics', 'rom', 'root', 'router',
+                'runtime', 'sass', 'scan', 'scanner', 'script', 'scroll', 'sdk', 'search', 'engine', 'security',
+                'semiconductor', 'sensor', 'seo', 'server', 'shareware', 'shell', 'simulation', 'smartphone', 'sms', 'social',
+                'software', 'spam', 'spreadsheet', 'spyware', 'sql', 'ssd', 'ssl', 'storage', 'stream', 'stylesheet',
+                'subnet', 'subscribe', 'supercomputer', 'support', 'surf', 'svg', 'syntax', 'sysadmin', 'system', 'tablet',
+                'tag', 'tcp', 'template', 'terabyte', 'terminal', 'tertiary', 'thread', 'thumbnail', 'token', 'toolbar',
+                'touchpad', 'touchscreen', 'transistor', 'trojan', 'troubleshoot', 'tutorial', 'tweet', 'typeface', 'udp', 'ui',
+                'undo', 'unicode', 'uninstall', 'unix', 'upload', 'url', 'usb', 'user', 'utility', 'ux',
+                'variable', 'vector', 'version', 'video', 'virtual', 'virtualization', 'virus', 'vlan', 'vlog', 'voip',
+                'vpn', 'vr', 'vulnerability', 'wan', 'wearable', 'webcam', 'webinar', 'website', 'widget', 'wifi',
+                'wiki', 'window', 'wireless', 'wizard', 'word', 'processor', 'workstation', 'worm', 'www', 'wysiwyg',
+                'xhtml', 'xml', 'yaml', 'zip', 'zombie'
+            ],
+            football: [ /* ... football words ... */
+                'football', 'soccer', 'touchdown', 'goal', 'field_goal', 'kickoff', 'punt', 'pass', 'run', 'tackle',
+                'block', 'interception', 'fumble', 'sack', 'blitz', 'huddle', 'snap', 'scrimmage', 'offense', 'defense',
+                'quarterback', 'receiver', 'running_back', 'lineman', 'tight_end', 'cornerback', 'safety', 'linebacker', 'kicker', 'punter',
+                'coach', 'referee', 'umpire', 'linesman', 'penalty', 'foul', 'flag', 'offsides', 'holding', 'interference',
+                'delay_of_game', 'false_start', 'roughing', 'unsportsmanlike', 'conduct', 'first_down', 'touchback', 'turnover', 'drive', 'play',
+                'audible', 'formation', 'shotgun', 'pistol', 'i_formation', 'wildcat', 'playbook', 'route', 'slant', 'post',
+                'corner', 'fly', 'hail_mary', 'screen_pass', 'draw_play', 'counter', 'sweep', 'option', 'quarter', 'halftime',
+                'overtime', 'sudden_death', 'two_minute_warning', 'challenge', 'replay', 'booth_review', 'stadium', 'field', 'pitch', 'gridiron',
+                'end_zone', 'goalpost', 'uprights', 'sideline', 'hash_marks', 'yard_line', 'chains', 'down_marker', 'ball', 'pigskin',
+                'helmet', 'pads', 'shoulder_pads', 'jersey', 'cleats', 'gloves', 'mouthguard', 'team', 'roster', 'depth_chart',
+                'draft', 'free_agent', 'trade', 'contract', 'salary_cap', 'scout', 'combine', 'practice', 'training_camp', 'preseason',
+                'regular_season', 'playoffs', 'championship', 'super_bowl', 'grey_cup', 'world_cup', 'euro', 'copa_america', 'league', 'conference',
+                'division', 'rivalry', 'fan', 'tailgate', 'cheerleader', 'mascot', 'anthem', 'coin_toss', 'injury', 'concussion',
+                'stats', 'yards', 'completion', 'attempt', 'rating', 'average', 'touchback', 'safety_score', 'rouge', 'single', // Canadian terms
+                'dribble', 'header', 'volley', 'bicycle_kick', 'nutmeg', 'cross', 'throw_in', 'corner_kick', 'free_kick', 'penalty_kick', // Soccer terms
+                'goalie', 'goalkeeper', 'striker', 'forward', 'midfielder', 'defender', 'sweeper', 'winger', 'captain', 'manager',
+                'red_card', 'yellow_card', 'booking', 'injury_time', 'stoppage_time', 'aggregate', 'away_goal', 'clean_sheet', 'hat_trick', 'man_of_the_match',
+                'transfer_window', 'loan', 'academy', 'supporter', 'hooligan', 'ultras', 'chant', 'scarf', 'banner', 'fixture',
+                'table', 'relegation', 'promotion', 'derby', 'classic', 'final', 'semifinal', 'group_stage', 'knockout', 'tournament'
+            ],
+            basketball: [ /* ... basketball words ... */
+                'basketball', 'hoop', 'net', 'rim', 'backboard', 'court', 'basket', 'ball', 'team', 'player',
+                'coach', 'referee', 'score', 'point', 'shoot', 'pass', 'dribble', 'rebound', 'assist', 'steal',
+                'block', 'turnover', 'foul', 'free_throw', 'layup', 'jump_shot', 'dunk', 'slam_dunk', 'three_pointer', 'buzzer_beater',
+                'point_guard', 'shooting_guard', 'small_forward', 'power_forward', 'center', 'bench', 'sixth_man', 'rookie', 'veteran', 'all_star',
+                'mvp', 'defense', 'offense', 'man_to_man', 'zone_defense', 'full_court_press', 'fast_break', 'pick_and_roll', 'screen', 'iso',
+                'post_up', 'cut', 'drive', 'fadeaway', 'hook_shot', 'floater', 'bank_shot', 'air_ball', 'brick', 'swish',
+                'double_dribble', 'traveling', 'carrying', 'goaltending', 'charge', 'blocking_foul', 'technical_foul', 'flagrant_foul', 'ejection', 'foul_out',
+                'bonus', 'and_one', 'timeout', 'quarter', 'halftime', 'overtime', 'shot_clock', 'game_clock', 'possession', 'arrow',
+                'inbound', 'sideline', 'baseline', 'key', 'paint', 'lane', 'free_throw_line', 'three_point_line', 'center_circle', 'jump_ball',
+                'stats', 'box_score', 'field_goal', 'percentage', 'turnovers', 'plus_minus', 'efficiency', 'triple_double', 'double_double', 'quadruple_double',
+                'sneakers', 'jersey', 'shorts', 'headband', 'arm_sleeve', 'sweatband', 'whistle', 'scoreboard', 'arena', 'stadium',
+                'fans', 'cheerleaders', 'mascot', 'anthem', 'tip_off', 'warmup', 'practice', 'drill', 'scrimmage', 'training',
+                'draft', 'lottery', 'trade', 'free_agency', 'contract', 'salary_cap', 'luxury_tax', 'scouting', 'combine', 'agent',
+                'league', 'nba', 'wnba', 'fiba', 'euroleague', 'college', 'ncaa', 'march_madness', 'high_school', 'amateur',
+                'olympics', 'world_championship', 'conference', 'division', 'rivalry', 'playoffs', 'finals', 'championship', 'ring', 'trophy',
+                'dynasty', 'legend', 'hall_of_fame', 'retirement', 'comeback', 'injury', 'rehab', 'suspension', 'analytics', 'sabermetrics',
+                'transition', 'spacing', 'rotation', 'switch', 'hedge', 'trap', 'closeout', 'box_out', 'outlet_pass', 'give_and_go',
+                'backdoor_cut', 'lob', 'alley_oop', 'pump_fake', 'jab_step', 'crossover', 'behind_the_back', 'spin_move', 'step_back', 'euro_step',
+                'finger_roll', 'reverse_layup', 'power_dribble', 'no_look_pass', 'bounce_pass', 'chest_pass', 'overhead_pass', 'skip_pass', 'heat_check', 'clutch'
+            ],
+            geography: [ /* ... geography words ... */
+                'geography', 'earth', 'world', 'planet', 'map', 'atlas', 'globe', 'continent', 'africa', 'antarctica',
+                'asia', 'australia', 'europe', 'north_america', 'south_america', 'ocean', 'pacific', 'atlantic', 'indian', 'arctic',
+                'southern', 'sea', 'mediterranean', 'caribbean', 'baltic', 'coral', 'arabian', 'caspian', 'country', 'nation',
+                'state', 'province', 'territory', 'region', 'border', 'boundary', 'capital', 'city', 'megacity', 'metropolis',
+                'town', 'village', 'urban', 'rural', 'suburb', 'island', 'archipelago', 'peninsula', 'isthmus', 'mainland',
+                'coast', 'shore', 'beach', 'bay', 'gulf', 'cove', 'fjord', 'strait', 'channel', 'sound',
+                'river', 'stream', 'creek', 'brook', 'tributary', 'delta', 'estuary', 'mouth', 'source', 'basin',
+                'lake', 'pond', 'reservoir', 'lagoon', 'loch', 'crater_lake', 'oxbow_lake', 'salt_lake', 'mountain', 'range',
+                'peak', 'summit', 'ridge', 'foothill', 'highland', 'lowland', 'plateau', 'mesa', 'butte', 'volcano',
+                'hill', 'valley', 'canyon', 'gorge', 'ravine', 'gully', 'plain', 'prairie', 'steppe', 'savanna',
+                'tundra', 'desert', 'oasis', 'dune', 'forest', 'woodland', 'jungle', 'rainforest', 'taiga', 'wetland',
+                'swamp', 'marsh', 'bog', 'fen', 'glacier', 'iceberg', 'ice_sheet', 'ice_cap', 'permafrost', 'latitude',
+                'longitude', 'equator', 'tropic', 'cancer', 'capricorn', 'arctic_circle', 'antarctic_circle', 'prime_meridian', 'hemisphere', 'northern',
+                'southern', 'eastern', 'western', 'pole', 'north_pole', 'south_pole', 'axis', 'rotation', 'orbit', 'solstice',
+                'equinox', 'climate', 'weather', 'atmosphere', 'troposphere', 'stratosphere', 'mesosphere', 'thermosphere', 'exosphere', 'temperature',
+                'precipitation', 'humidity', 'wind', 'pressure', 'monsoon', 'hurricane', 'typhoon', 'cyclone', 'tornado', 'blizzard',
+                'drought', 'flood', 'erosion', 'weathering', 'deposition', 'sediment', 'soil', 'loam', 'clay', 'silt',
+                'sand', 'gravel', 'bedrock', 'mantle', 'crust', 'core', 'tectonic', 'plate', 'fault', 'earthquake',
+                'tsunami', 'magma', 'lava', 'geyser', 'hot_spring', 'mineral', 'rock', 'igneous', 'sedimentary', 'metamorphic',
+                'fossil', 'topography', 'elevation', 'altitude', 'bathymetry', 'cartography', 'demography', 'population', 'density', 'migration',
+                'immigration', 'emigration', 'census', 'culture', 'language', 'religion', 'politics', 'economy', 'agriculture', 'industry',
+                'tourism', 'transportation', 'navigation', 'compass', 'gps', 'gis', 'remote_sensing', 'surveying', 'projection', 'scale'
+            ],
+            chemistry: [ /* ... chemistry words ... */
+                'chemistry', 'atom', 'element', 'molecule', 'compound', 'ion', 'cation', 'anion', 'isotope', 'proton',
+                'neutron', 'electron', 'nucleus', 'orbital', 'shell', 'valence', 'bond', 'covalent', 'ionic', 'metallic',
+                'hydrogen_bond', 'van_der_waals', 'reaction', 'reactant', 'product', 'catalyst', 'inhibitor', 'enzyme', 'acid', 'base',
+                'alkali', 'salt', 'ph', 'indicator', 'litmus', 'neutralization', 'titration', 'burette', 'pipette', 'meniscus',
+                'solution', 'solvent', 'solute', 'aqueous', 'concentration', 'molarity', 'molality', 'mole', 'avogadro', 'mass',
+                'weight', 'density', 'volume', 'pressure', 'temperature', 'kelvin', 'celsius', 'fahrenheit', 'gas', 'liquid',
+                'solid', 'plasma', 'phase', 'transition', 'melting', 'freezing', 'boiling', 'evaporation', 'condensation', 'sublimation',
+                'deposition', 'mixture', 'homogeneous', 'heterogeneous', 'suspension', 'colloid', 'emulsion', 'aerosol', 'distillation', 'filtration',
+                'chromatography', 'electrolysis', 'oxidation', 'reduction', 'redox', 'agent', 'electrochemistry', 'battery', 'cell', 'electrode',
+                'anode', 'cathode', 'electrolyte', 'periodic_table', 'group', 'period', 'metal', 'nonmetal', 'metalloid', 'alkali_metal',
+                'alkaline_earth', 'transition_metal', 'halogen', 'noble_gas', 'lanthanide', 'actinide', 'atomic_number', 'atomic_mass', 'symbol', 'formula',
+                'equation', 'stoichiometry', 'coefficient', 'yield', 'limiting_reactant', 'excess_reactant', 'equilibrium', 'le_chatelier', 'kinetics', 'rate',
+                'activation_energy', 'thermodynamics', 'enthalpy', 'entropy', 'gibbs_free_energy', 'exothermic', 'endothermic', 'spontaneous', 'organic', 'inorganic',
+                'hydrocarbon', 'alkane', 'alkene', 'alkyne', 'alcohol', 'ether', 'aldehyde', 'ketone', 'carboxylic_acid', 'ester',
+                'amine', 'amide', 'functional_group', 'isomer', 'stereoisomer', 'enantiomer', 'polymer', 'monomer', 'plastic', 'protein',
+                'carbohydrate', 'lipid', 'dna', 'rna', 'biochemistry', 'spectroscopy', 'nmr', 'infrared', 'ultraviolet', 'mass_spectrometry',
+                'quantum', 'photon', 'radioactivity', 'half_life', 'decay', 'alpha', 'beta', 'gamma', 'nuclear', 'fission',
+                'fusion', 'lab', 'laboratory', 'beaker', 'flask', 'erlenmeyer', 'volumetric', 'graduated_cylinder', 'test_tube', 'bunsen_burner',
+                'balance', 'centrifuge', 'fume_hood', 'goggles', 'safety', 'hazard', 'msds', 'experiment', 'observation', 'conclusion'
+            ],
+            physics: [ /* ... physics words ... */
+                'physics', 'force', 'mass', 'weight', 'gravity', 'newton', 'inertia', 'momentum', 'impulse', 'velocity',
+                'speed', 'acceleration', 'displacement', 'distance', 'kinematics', 'dynamics', 'vector', 'scalar', 'work', 'energy',
+                'kinetic', 'potential', 'joule', 'power', 'watt', 'efficiency', 'conservation', 'friction', 'drag', 'tension',
+                'normal_force', 'centripetal', 'centrifugal', 'torque', 'lever', 'pulley', 'inclined_plane', 'screw', 'wedge', 'wheel_and_axle',
+                'simple_harmonic_motion', 'oscillation', 'pendulum', 'spring', 'hooke_law', 'wave', 'transverse', 'longitudinal', 'amplitude', 'frequency',
+                'hertz', 'period', 'wavelength', 'speed_of_light', 'sound', 'pitch', 'loudness', 'decibel', 'doppler_effect', 'resonance',
+                'interference', 'diffraction', 'refraction', 'reflection', 'optics', 'lens', 'convex', 'concave', 'mirror', 'prism',
+                'spectrum', 'visible_light', 'infrared', 'ultraviolet', 'x_ray', 'gamma_ray', 'radio_wave', 'microwave', 'photon', 'quantum',
+                'planck_constant', 'photoelectric_effect', 'wave_particle_duality', 'uncertainty_principle', 'schrodinger', 'atom', 'nucleus', 'proton', 'neutron', 'electron',
+                'bohr_model', 'quantum_mechanics', 'relativity', 'special_relativity', 'general_relativity', 'einstein', 'spacetime', 'time_dilation', 'length_contraction', 'mass_energy_equivalence',
+                'black_hole', 'gravity_wave', 'thermodynamics', 'heat', 'temperature', 'kelvin', 'celsius', 'fahrenheit', 'conduction', 'convection',
+                'radiation', 'specific_heat', 'latent_heat', 'entropy', 'zeroth_law', 'first_law', 'second_law', 'third_law', 'engine', 'refrigerator',
+                'electricity', 'charge', 'coulomb', 'current', 'ampere', 'voltage', 'volt', 'potential_difference', 'resistance', 'ohm',
+                'ohm_law', 'circuit', 'series', 'parallel', 'resistor', 'capacitor', 'inductor', 'diode', 'transistor', 'semiconductor',
+                'magnetism', 'magnetic_field', 'tesla', 'gauss', 'magnet', 'north_pole', 'south_pole', 'electromagnet', 'induction', 'faraday_law',
+                'lenz_law', 'motor', 'generator', 'transformer', 'alternating_current', 'direct_current', 'maxwell_equations', 'electromagnetic_wave', 'fluid', 'dynamics',
+                'pressure', 'pascal', 'buoyancy', 'archimedes', 'bernoulli', 'viscosity', 'laminar_flow', 'turbulent_flow', 'plasma', 'solid_state',
+                'crystal', 'lattice', 'superconductivity', 'nuclear_physics', 'radioactivity', 'half_life', 'fission', 'fusion', 'particle_physics', 'standard_model',
+                'quark', 'lepton', 'boson', 'higgs', 'accelerator', 'collider', 'astrophysics', 'cosmology', 'big_bang', 'dark_matter',
+                'dark_energy', 'galaxy', 'star', 'planet', 'moon', 'theory', 'experiment', 'model', 'equation', 'constant'
+            ],
+            anime: [ /* ... anime words ... */
+                'anime', 'manga', 'otaku', 'japan', 'tokyo', 'kawaii', 'chibi', 'senpai', 'kohai', 'sensei',
+                'tsundere', 'yandere', 'kuudere', 'dandere', 'cosplay', 'convention', 'anime_expo', 'comic_con', 'doujinshi', 'fan_art',
+                'fan_fiction', 'amv', 'ost', 'soundtrack', 'opening', 'op', 'ending', 'ed', 'subbed', 'dubbed',
+                'voice_actor', 'seiyuu', 'studio', 'ghibli', 'toei', 'sunrise', 'madhouse', 'bones', 'mappa', 'wit',
+                'kyoto_animation', 'trigger', 'a1_pictures', 'ufotable', 'production_ig', 'director', 'animator', 'mangaka', 'light_novel', 'visual_novel',
+                'genre', 'shonen', 'shojo', 'seinen', 'josei', 'kodomomuke', 'action', 'adventure', 'comedy', 'drama',
+                'fantasy', 'harem', 'historical', 'horror', 'isekai', 'magical_girl', 'mecha', 'music', 'mystery', 'psychological',
+                'romance', 'sci_fi', 'slice_of_life', 'sports', 'supernatural', 'thriller', 'naruto', 'sasuke', 'sakura', 'kakashi',
+                'bleach', 'ichigo', 'rukia', 'aizen', 'one_piece', 'luffy', 'zoro', 'nami', 'sanji', 'dragonball',
+                'goku', 'vegeta', 'gohan', 'piccolo', 'attack_on_titan', 'eren', 'mikasa', 'armin', 'levi', 'death_note',
+                'light', 'ryuk', 'l', 'misa', 'fullmetal_alchemist', 'edward', 'alphonse', 'mustang', 'winry', 'pokemon',
+                'pikachu', 'ash', 'misty', 'brock', 'sailor_moon', 'usagi', 'mamoru', 'tuxedo_mask', 'evangelion', 'shinji',
+                'asuka', 'rei', 'gundam', 'amuro', 'char', 'mobilesuit', 'my_hero_academia', 'deku', 'bakugo', 'all_might',
+                'demon_slayer', 'tanjiro', 'nezuko', 'zenitsu', 'inosuke', 'jujutsu_kaisen', 'yuji', 'megumi', 'nobara', 'gojo',
+                'haikyuu', 'hinata', 'kageyama', 'oikawa', 'hunter_x_hunter', 'gon', 'killua', 'kurapika', 'leorio', 'code_geass',
+                'lelouch', 'suzaku', 'cc', 'kallen', 'cowboy_bebop', 'spike', 'faye', 'jet', 'ed', 'steins_gate',
+                'okabe', 'kurisu', 'mayuri', 'daru', 'clannad', 'tomoya', 'nagisa', 'your_lie_in_april', 'kousei', 'kaori',
+                'sword_art_online', 'kirito', 'asuna', 're_zero', 'subaru', 'emilia', 'rem', 'ram', 'konosuba', 'kazuma',
+                'aqua', 'megumin', 'darkness', 'one_punch_man', 'saitama', 'genos', 'mob_psycho', 'mob', 'reigen', 'vinland_saga',
+                'thorfinn', 'askeladd', 'berserk', 'guts', 'griffith', 'casca', 'made_in_abyss', 'riko', 'reg', 'nanachi',
+                'promised_neverland', 'emma', 'norman', 'ray', 'psycho_pass', 'akane', 'kogami', 'makishima', 'character', 'arc',
+                'plot', 'episode', 'season', 'series', 'ova', 'ona', 'movie', 'figurine', 'merchandise', 'waifu', 'husbando'
+            ],
+            cartoon: [ /* ... cartoon words ... */
+                'cartoon', 'animation', 'cel', 'frame', 'animator', 'drawing', 'sketch', 'storyboard', 'character', 'design',
+                'voice_actor', 'soundtrack', 'theme_song', 'disney', 'mickey_mouse', 'minnie', 'donald_duck', 'goofy', 'pluto', 'pixar',
+                'toy_story', 'woody', 'buzz_lightyear', 'finding_nemo', 'dory', 'incredibles', 'up', 'cars', 'lightning_mcqueen', 'dreamworks',
+                'shrek', 'fiona', 'donkey', 'kung_fu_panda', 'po', 'madagascar', 'alex', 'marty', 'how_to_train_your_dragon', 'hiccup',
+                'toothless', 'nickelodeon', 'spongebob', 'squarepants', 'patrick_star', 'squidward', 'mr_krabs', 'rugrats', 'tommy', 'chuckie',
+                'hey_arnold', 'arnold', 'gerald', 'helga', 'avatar', 'aang', 'katara', 'sokka', 'zuko', 'korra',
+                'cartoon_network', 'powerpuff_girls', 'blossom', 'bubbles', 'buttercup', 'dexter_laboratory', 'dexter', 'dee_dee', 'johnny_bravo', 'samurai_jack',
+                'adventure_time', 'finn', 'jake', 'princess_bubblegum', 'ice_king', 'regular_show', 'mordecai', 'rigby', 'benson', 'pops',
+                'steven_universe', 'steven', 'garnet', 'amethyst', 'pearl', 'gravity_falls', 'dipper', 'mabel', 'grunkle_stan', 'soos',
+                'hanna_barbera', 'flintstones', 'fred', 'wilma', 'barney', 'betty', 'jetsons', 'george', 'jane', 'judy',
+                'scooby_doo', 'shaggy', 'velma', 'daphne', 'yogi_bear', 'boo_boo', 'huckleberry_hound', 'quick_draw_mcgraw', 'looney_tunes', 'bugs_bunny',
+                'daffy_duck', 'porky_pig', 'tweety', 'sylvester', 'elmer_fudd', 'yosemite_sam', 'road_runner', 'wile_coyote', 'tom_and_jerry', 'simpsons',
+                'homer', 'marge', 'bart', 'lisa', 'maggie', 'family_guy', 'peter', 'lois', 'meg', 'chris',
+                'stewie', 'brian', 'south_park', 'stan', 'kyle', 'cartman', 'kenny', 'futurama', 'fry', 'leela',
+                'bender', 'professor_farnsworth', 'bojack_horseman', 'bojack', 'diane', 'mr_peanutbutter', 'rick_and_morty', 'rick', 'morty', 'summer',
+                'archer', 'sterling', 'lana', 'cyril', 'bob_burgers', 'bob', 'linda', 'tina', 'gene', 'louise',
+                'king_of_the_hill', 'hank', 'peggy', 'bobby', 'dale', 'beavis_and_butthead', 'ren_and_stimpy', 'rocko_modern_life', 'invader_zim', 'daria',
+                'animaniacs', 'yakko', 'wakko', 'dot', 'pinky_and_the_brain', 'darkwing_duck', 'ducktales', 'scrooge_mcduck', 'chip_and_dale', 'gargoyles',
+                'x_men', 'batman', 'superman', 'justice_league', 'spider_man', 'classic', 'modern', 'retro', 'saturday_morning', 'comic_strip',
+                'graphic_novel', 'webcomic', 'stop_motion', 'claymation', 'cgi', '2d', '3d', 'rotoscope', 'anthology', 'short'
+            ]
+        };
+
+
+        // --- Game Settings ---
+        const settings = {
+            initialSpeed: 1.0, // Adjusted speed
+            wordInterval: 1500, // Default interval (not used in hashtag mode directly)
+            maxActiveWords: 5,
+            minActiveWords: 2, // Min words for default mode refill trigger
+            swipeHintDuration: 1200, // Increased duration slightly
+            maxSwipeDistance: 35, baseSwipeDistance: 10, swipeScaleFactor: 3, startMessageDuration: 3000,
+            verticalBufferMultiplier: 1.8, initialStars: 0, urlFrequency: 15, urlDisplayDuration: 7000, customizeCost: 1000,
+            songModeSpeed: 1.5,
+            hashtagModeSpeed: 1.2, // Speed for hashtag mode
+            hintVerticalOffset: 10 // Pixels above/below word
+        };
+
+        // --- Initialization & Persistence ---
+        /** Initializes or restarts the game */
+        function initGame(startMode = 'default') {
+            console.log(`Initializing game in mode: ${startMode}, Hashtag Category: ${currentHashtagCategory}`); // Debug log
+            stopGame(); // Resets most states including mode flags
+            loadState();
+            const savedStarsExist = localStorage.getItem(STORAGE_KEYS.STARS) !== null;
+            if (gameOverScreen.style.display === 'flex' || !savedStarsExist) {
+                stars = settings.initialStars;
+            }
+            currentTyping = '';
+            currentWordIndex = null;
+            interactionAllowed = false;
+            activeWords = [];
+            stopwatchTime = 0; // Reset stopwatch for new game
+            if (stopwatchInterval) clearInterval(stopwatchInterval);
+            stopwatchInterval = null;
+            stopwatchDisplay.textContent = formatTime(stopwatchTime);
+            wordsSinceLastUrl = 0;
+            if (urlDisplayTimeout) clearTimeout(urlDisplayTimeout);
+            urlLinkDisplay.style.display = 'none';
+            hashtagSpawnCounter = 0; // Reset hashtag spawn counter
+
+            // Clear specific mode states (mostly handled by stopGame)
+            isSongModeActive = false;
+            isHashtagModeActive = false;
+            // currentHashtagCategory is set BEFORE calling initGame for hashtag mode
+
+            applyCustomColors(currentColors);
+            updateStarDisplay();
+            updateBestScoreDisplay();
+            updateCustomizeButton();
+            updateModeButtons(); // Update mode buttons based on unlocked status
+            gameOverScreen.style.display = 'none';
+            pauseScreen.style.display = 'none'; // Ensure pause screen is hidden
+
+            // --- Mode Specific Setup ---
+            if (startMode === 'song' && songModeWords.length > 0) {
+                console.log("Setting up Song Mode");
+                isSongModeActive = true;
+                currentSpeed = settings.songModeSpeed;
+                startSongModeGameplay(); // Contains its own start message logic
+            } else if (startMode === 'hashtag' && currentHashtagCategory && hashtagWords[currentHashtagCategory]) {
+                console.log("Setting up Hashtag Mode");
+                isHashtagModeActive = true; // Set the flag HERE
+                currentSpeed = settings.hashtagModeSpeed;
+                // Show start message, then start loop & word generation
+                showStartMessage(() => {
+                    gameActive = true;
+                    interactionAllowed = true;
+                    if (!stopwatchInterval) stopwatchInterval = setInterval(updateStopwatch, 100);
+                    // No interval needed, game loop handles hashtag word spawning
+                    startGameLoop();
+                });
+            } else {
+                 // Default Mode
+                console.log("Setting up Default Mode");
+                currentSpeed = settings.initialSpeed;
+                showStartMessage(() => {
+                    gameActive = true;
+                    interactionAllowed = true;
+                    if (!stopwatchInterval) stopwatchInterval = setInterval(updateStopwatch, 100);
+                    startWordGeneration(); // Start interval for default mode
+                    startGameLoop();
+                });
+            }
+        }
+        /** Loads game state from localStorage */
+        function loadState() { /* ... load state (unchanged) ... */
+             try { const savedStars = localStorage.getItem(STORAGE_KEYS.STARS); stars = savedStars !== null ? parseInt(savedStars, 10) : settings.initialStars; const savedItems = localStorage.getItem(STORAGE_KEYS.PURCHASED_ITEMS); purchasedItems = savedItems ? JSON.parse(savedItems) : ['default']; if (!purchasedItems.includes('default')) purchasedItems.push('default'); const savedModes = localStorage.getItem(STORAGE_KEYS.UNLOCKED_MODES); unlockedModes = savedModes ? JSON.parse(savedModes) : []; const savedHighScore = localStorage.getItem(STORAGE_KEYS.HIGH_SCORE_TIME); highScoreTime = savedHighScore !== null ? parseFloat(savedHighScore) : 0; const savedColors = localStorage.getItem(STORAGE_KEYS.CUSTOM_COLORS); if (savedColors) { currentColors = { ...defaultColors, ...JSON.parse(savedColors) }; } else { currentColors = { ...defaultColors }; } } catch (error) { console.error("Error loading saved state:", error); stars = settings.initialStars; purchasedItems = ['default']; unlockedModes = []; highScoreTime = 0; currentColors = { ...defaultColors }; } if (isNaN(stars)) stars = settings.initialStars; if (isNaN(highScoreTime)) highScoreTime = 0;
+        }
+        /** Saves game state to localStorage */
+        function saveState() { /* ... save state (unchanged) ... */
+             try { localStorage.setItem(STORAGE_KEYS.STARS, stars.toString()); localStorage.setItem(STORAGE_KEYS.PURCHASED_ITEMS, JSON.stringify(purchasedItems)); localStorage.setItem(STORAGE_KEYS.UNLOCKED_MODES, JSON.stringify(unlockedModes)); localStorage.setItem(STORAGE_KEYS.HIGH_SCORE_TIME, highScoreTime.toString()); localStorage.setItem(STORAGE_KEYS.CUSTOM_COLORS, JSON.stringify(currentColors)); } catch (error) { console.error("Error saving state:", error); showMessage("Warning: Could not save game progress. Storage might be full or disabled."); }
+        }
+
+        // --- Color Customization Functions ---
+        /** Applies the given color object to CSS variables */
+        function applyCustomColors(colors) { /* ... apply colors (unchanged) ... */
+            const root = document.documentElement; for (const cssVar in colors) { if (defaultColors.hasOwnProperty(cssVar)) { root.style.setProperty(cssVar, colors[cssVar]); } }
+        }
+        /** Sets color picker values based on currentColors */
+        function populateColorPickers() { /* ... populate pickers (unchanged) ... */
+            const colorInputs = customizeSection.querySelectorAll('input[type="color"]'); colorInputs.forEach(input => { const cssVar = input.dataset.cssVar; if (cssVar && currentColors[cssVar]) { input.value = currentColors[cssVar]; } else { input.value = defaultColors[cssVar] || '#000000'; } });
+        }
+        /** Handles changes in color picker inputs */
+        function handleColorInputChange(event) { /* ... handle color input change (unchanged) ... */
+            const input = event.target; const cssVar = input.dataset.cssVar; const newColor = input.value; if (cssVar && currentColors.hasOwnProperty(cssVar)) { currentColors[cssVar] = newColor; applyCustomColors(currentColors); }
+        }
+        /** Shows or hides the customize color view */
+        function showCustomizeView(show) { /* ... show/hide customize view ... */
+             if (show) {
+                 mainPauseSection.style.display = 'none';
+                 songModeSection.style.display = 'none';
+                 hashtagSelectionSection.style.display = 'none'; // Hide other sections
+                 customizeSection.style.display = 'flex';
+                 populateColorPickers();
+             } else {
+                 // Return to main pause menu
+                 mainPauseSection.style.display = 'flex';
+                 customizeSection.style.display = 'none';
+             }
+        }
+        /** Shows or hides the song mode input view */
+        function showSongModeView(show) { /* ... show/hide song mode view ... */
+             if (show) {
+                 mainPauseSection.style.display = 'none';
+                 customizeSection.style.display = 'none';
+                 hashtagSelectionSection.style.display = 'none'; // Hide other sections
+                 songModeSection.style.display = 'flex';
+             } else {
+                 // Return to main pause menu
+                 mainPauseSection.style.display = 'flex';
+                 songModeSection.style.display = 'none';
+             }
+        }
+        /** Shows or hides the hashtag category selection view */
+        function showHashtagSelectionView(show) {
+             if (show) {
+                 mainPauseSection.style.display = 'none';
+                 customizeSection.style.display = 'none';
+                 songModeSection.style.display = 'none'; // Hide other sections
+                 populateHashtagButtons(); // Create buttons if not already done
+                 hashtagSelectionSection.style.display = 'flex';
+             } else {
+                 // Return to main pause menu
+                 mainPauseSection.style.display = 'flex';
+                 hashtagSelectionSection.style.display = 'none';
+             }
+        }
+        /** Creates hashtag category buttons if they don't exist */
+        function populateHashtagButtons() {
+            if (hashtagButtonsContainer.children.length > 0) return; // Only populate once
+
+            Object.keys(hashtagWords).forEach(category => {
+                const btn = document.createElement('button');
+                btn.textContent = category;
+                btn.className = 'action-btn hashtag-category-btn'; // Added specific class
+                btn.dataset.category = category; // Store category name
+                btn.addEventListener('click', handleHashtagCategorySelect);
+                hashtagButtonsContainer.appendChild(btn);
+            });
+        }
+        /** Handles clicking a hashtag category button */
+        function handleHashtagCategorySelect(event) {
+            const selectedCategory = event.target.dataset.category;
+            if (selectedCategory && hashtagWords[selectedCategory]) {
+                currentHashtagCategory = selectedCategory;
+                console.log(`Selected Hashtag Category: ${currentHashtagCategory}`); // Debug log
+                // Don't set isHashtagModeActive here, initGame will do it
+                initGame('hashtag'); // Start game in hashtag mode
+            } else {
+                console.error("Invalid hashtag category selected:", selectedCategory);
+                showMessage("Error starting Hashtag Mode.");
+                showHashtagSelectionView(false); // Go back to main menu
+            }
+        }
+
+        /** Updates the Customize button text/cost based on purchase status */
+        function updateCustomizeButton() { /* ... update customize button text/cost (unchanged) ... */
+            if (purchasedItems.includes('customize')) { customizeBtn.textContent = 'Customize'; customizeCostIndicator.style.display = 'none'; } else { customizeBtn.textContent = 'Unlock Customize'; customizeCostIndicator.textContent = `⭐️ ${settings.customizeCost}`; customizeCostIndicator.style.display = 'inline-block'; }
+        }
+
+        /** Updates the text and state of all mode buttons */
+        function updateModeButtons() {
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                const modeId = btn.dataset.mode;
+                const cost = parseInt(btn.dataset.cost);
+                const modeName = btn.dataset.name; // Get the base name
+
+                if (unlockedModes.includes(modeId)) {
+                    btn.textContent = `${modeName} (Purchased)`;
+                    // btn.disabled = true; // REMOVED: Allow clicking purchased modes
+                    btn.classList.add('purchased'); // Add class for styling purchased state
+                } else {
+                    btn.textContent = `${modeName} (⭐️ ${cost})`;
+                    // btn.disabled = false; // Ensure it's enabled if not purchased
+                    btn.classList.remove('purchased'); // Remove class if not purchased
+                }
+            });
+        }
+
+
+        // --- Game Loop and Logic ---
+        /** Stops all game activity, intervals, and animations */
+        function stopGame() {
+            gameActive = false;
+            gamePaused = false;
+            interactionAllowed = false;
+            isSongModeActive = false; // Reset mode flag
+            isHashtagModeActive = false; // Reset mode flag
+            currentHashtagCategory = null; // Reset category
+            clearInterval(wordsInterval); wordsInterval = null; // Clear default interval
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
+            if (stopwatchInterval) clearInterval(stopwatchInterval); stopwatchInterval = null;
+            gameContainer.innerHTML = ''; // Clear words from screen
+            activeWords = [];
+            removeSwipeHint();
+            pauseScreen.style.display = 'none';
+            startMessageDisplay.style.display = 'none';
+            if (urlDisplayTimeout) clearTimeout(urlDisplayTimeout); urlDisplayTimeout = null;
+            urlLinkDisplay.style.display = 'none';
+        }
+        /** Shows the initial instruction message */
+        function showStartMessage(callback) { /* ... show start message (unchanged) ... */
+             startMessageDisplay.innerHTML = "Type as fast as you can!<br>Press ENTER to switch words.<br>Press SPACE to Pause / Save Run."; startMessageDisplay.style.display = 'block'; setTimeout(() => { startMessageDisplay.style.display = 'none'; if (callback) callback(); }, settings.startMessageDuration);
+        }
+        /** Starts the interval for generating words in default mode */
+        function startWordGeneration() {
+            if (isSongModeActive || isHashtagModeActive) return; // Don't start interval for song/hashtag modes
+            if (gameActive && !gamePaused) {
+                while (activeWords.length < settings.minActiveWords) {
+                    generateWordOrUrl();
+                }
+            }
+            if (wordsInterval) clearInterval(wordsInterval); // Clear existing interval if any
+            wordsInterval = setInterval(() => {
+                // Check flags again just in case state changes mid-interval
+                if (!gamePaused && gameActive && !isSongModeActive && !isHashtagModeActive) {
+                    if (activeWords.length < settings.maxActiveWords || activeWords.length < settings.minActiveWords) {
+                        generateWordOrUrl();
+                    }
+                } else {
+                    clearInterval(wordsInterval); // Stop interval if not in default mode
+                    wordsInterval = null;
+                }
+            }, settings.wordInterval);
+        }
+
+        /** Starts the main game loop using requestAnimationFrame */
+        function startGameLoop() {
+            function gameLoop() {
+                if (!gameActive) return;
+                if (!gamePaused) {
+                    updateGame(); // Move words, check off-screen
+
+                    // --- Mode-Specific Word Spawning ---
+                    if (isSongModeActive) {
+                        // Spawn next song word if conditions met
+                        if (activeWords.length < settings.maxActiveWords && songModeWordIndex < songModeWords.length) {
+                            spawnNextSongWord();
+                        }
+                    } else if (isHashtagModeActive) {
+                        // Spawn hashtag word if below max limit and delay counter reached
+                        hashtagSpawnCounter++;
+                        if (hashtagSpawnCounter >= hashtagSpawnDelay && activeWords.length < settings.maxActiveWords) {
+                             console.log("Attempting to spawn hashtag word..."); // Debug log
+                             generateHashtagWord();
+                             hashtagSpawnCounter = 0; // Reset counter
+                        }
+                    }
+                    // Default mode word spawning is handled by the separate wordsInterval
+                }
+                animationFrameId = requestAnimationFrame(gameLoop);
+            }
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); // Clear previous loop if any
+            animationFrameId = requestAnimationFrame(gameLoop);
+        }
+
+        /** Generates a regular word or a URL word for default mode */
+        function generateWordOrUrl() {
+            if (isSongModeActive || isHashtagModeActive || !gameActive) return; // Guard clause
+            if (activeWords.length >= settings.maxActiveWords) return; // Don't exceed max
+
+            wordsSinceLastUrl++;
+            if (wordsSinceLastUrl >= settings.urlFrequency && urlList.length > 0) {
+                const randomIndex = Math.floor(Math.random() * urlList.length);
+                const urlData = urlList[randomIndex];
+                generateWordElement(urlData.text, 'url', urlData.url);
+                wordsSinceLastUrl = 0;
+            } else {
+                generateWord();
+            }
+        }
+        /** Generates a regular word from the default word list */
+        function generateWord() {
+            if (isSongModeActive || isHashtagModeActive || !gameActive) return; // Guard clause
+
+            let attempts = 0, wordText, firstLetter, unique = false, maxAttempts = 50;
+            while (!unique && attempts < maxAttempts) {
+                const randomIndex = Math.floor(Math.random() * wordList.length);
+                wordText = wordList[randomIndex];
+                firstLetter = wordText[0].toLowerCase();
+                unique = !activeWords.some(word => word.text[0].toLowerCase() === firstLetter);
+                attempts++;
+            }
+            if (attempts >= maxAttempts) { // Fallback if unique first letter not found quickly
+                const randomIndex = Math.floor(Math.random() * wordList.length);
+                wordText = wordList[randomIndex];
+            }
+            generateWordElement(wordText, 'word');
+        }
+
+        /** Generates a word from the selected hashtag category */
+        function generateHashtagWord() {
+            if (!isHashtagModeActive || !currentHashtagCategory || !gameActive || gamePaused) return; // Guard clause
+            if (activeWords.length >= settings.maxActiveWords) return; // Don't exceed max
+
+            const wordPool = hashtagWords[currentHashtagCategory];
+            if (!wordPool || wordPool.length === 0) {
+                console.error("Hashtag word pool is empty or invalid for category:", currentHashtagCategory);
+                return;
+            }
+            console.log(`Generating word from category: ${currentHashtagCategory}`); // Debug log
+
+            let attempts = 0;
+            let wordText;
+            let isUnique = false;
+            const maxAttempts = 50; // Prevent infinite loop if pool is small & all words are active
+
+            while (!isUnique && attempts < maxAttempts) {
+                const randomIndex = Math.floor(Math.random() * wordPool.length);
+                wordText = wordPool[randomIndex];
+                // Check if this word text is already active on screen (case-insensitive check recommended)
+                isUnique = !activeWords.some(word => word.text.toLowerCase() === wordText.toLowerCase());
+                attempts++;
+            }
+
+             if (!isUnique) {
+                 // Fallback: If after many attempts we couldn't find a unique word (maybe screen is full
+                 // of all short words?), just pick one randomly. This might cause a visual duplicate
+                 // but prevents the game from halting word generation.
+                 const randomIndex = Math.floor(Math.random() * wordPool.length);
+                 wordText = wordPool[randomIndex];
+                 // console.warn("Could not find unique word for hashtag mode, potentially spawning duplicate.");
+             }
+
+
+            if (wordText) {
+                console.log(`Spawning hashtag word: ${wordText}`); // Debug log
+                generateWordElement(wordText, 'word'); // Hashtag words are treated as type 'word'
+            }
+        }
+
+        /** Creates and positions a word element on the screen */
+        function generateWordElement(text, type = 'word', url = null) { /* ... generate element (unchanged) ... */
+             if (!text || text.trim() === '') return; const gameWidth = gameContainer.offsetWidth; const gameHeight = gameContainer.offsetHeight; const wordElement = document.createElement('div'); wordElement.className = 'word'; if (type === 'url') { wordElement.classList.add('word-url'); } Array.from(text).forEach(letter => { const letterSpan = document.createElement('span'); letterSpan.className = 'letter'; letterSpan.textContent = letter; wordElement.appendChild(letterSpan); }); wordElement.style.visibility = 'hidden'; wordElement.style.left = `${gameWidth}px`; gameContainer.appendChild(wordElement); const wordWidth = wordElement.offsetWidth; const wordHeight = wordElement.offsetHeight * settings.verticalBufferMultiplier; wordElement.style.visibility = 'visible'; let top, overlapping = true, positionAttempts = 0, maxPositionAttempts = 50; let topMargin = 20, bottomMargin = 20; while (overlapping && positionAttempts < maxPositionAttempts) { overlapping = false; const maxTop = gameHeight - wordHeight - bottomMargin; if (maxTop < topMargin) { top = topMargin; } else { top = Math.max(topMargin, Math.floor(Math.random() * (maxTop - topMargin + 1)) + topMargin); } for (const word of activeWords) { const existingWordTop = parseInt(word.element.style.top); const existingWordHeight = word.element.offsetHeight * settings.verticalBufferMultiplier; if (Math.max(top, existingWordTop) < Math.min(top + wordHeight, existingWordTop + existingWordHeight)) { overlapping = true; break; } } positionAttempts++; } if (overlapping) { const canPlaceTop = !activeWords.some(w => parseInt(w.element.style.top) < topMargin + wordHeight); const canPlaceBottom = !activeWords.some(w => parseInt(w.element.style.top) + (w.element.offsetHeight * settings.verticalBufferMultiplier) > gameHeight - bottomMargin - wordHeight); if (canPlaceTop) { top = topMargin; } else if (canPlaceBottom) { top = gameHeight - wordHeight - bottomMargin; } else { const maxTop = gameHeight - wordHeight - bottomMargin; top = Math.max(topMargin, Math.floor(Math.random() * Math.max(0, maxTop - topMargin + 1)) + topMargin); } } top = Math.max(0, top); wordElement.style.top = `${top}px`; activeWords.push({ element: wordElement, text: text, type: type, url: url, position: gameWidth, matched: false });
+        }
+        /** Updates word positions and handles off-screen removal */
+        function updateGame() { /* ... updateGame (penalty logic slightly adjusted for clarity) ... */
+            const gameWidth = gameContainer.offsetWidth;
+            for (let i = activeWords.length - 1; i >= 0; i--) {
+                const word = activeWords[i];
+                if (!word || !word.element) { /* ... defensive check (unchanged) ... */
+                    console.warn("Attempted to update a non-existent word at index", i);
+                    activeWords.splice(i, 1); continue;
+                }
+                word.position -= currentSpeed;
+                word.element.style.left = `${word.position}px`;
+
+                if (word.position + word.element.offsetWidth < 0) { // Word went off screen
+                    word.element.remove();
+                    const removedWord = activeWords.splice(i, 1)[0];
+
+                    // Penalty logic: Applies if not matched and type 'word' (includes hashtag words)
+                    // Only apply penalty if game is active and not in song mode
+                    if (removedWord && !removedWord.matched && removedWord.type === 'word' && gameActive && !isSongModeActive) {
+                         // Check if this missed word will cause game over
+                        if (stars <= 1) {
+                            adjustStars(-1); // Deduct the last star
+                            gameOver();      // Trigger game over *after* deducting
+                        } else {
+                            adjustStars(-1); // Deduct star, game continues
+                        }
+                    }
+
+
+                    // Adjust currentWordIndex if the removed word affected it
+                    if (currentWordIndex === i) { /* ... index adjust (unchanged) ... */
+                        currentTyping = ''; currentWordIndex = null; resetAllHighlights();
+                    } else if (currentWordIndex > i) {
+                        currentWordIndex--;
+                    }
+
+                    // Check for song end
+                    if (isSongModeActive && activeWords.length === 0 && songModeWordIndex >= songModeWords.length) {
+                        endSongMode();
+                    }
+                }
+            }
+        }
+
+        /** Handles marking a word as complete, awarding points, and removing it */
+        function completeWord(wordIndexToComplete) { /* ... completeWord (logic unchanged) ... */
+            if (wordIndexToComplete === null || wordIndexToComplete < 0 || wordIndexToComplete >= activeWords.length) { /* ... guard (unchanged) ... */
+                console.warn("Invalid index passed to completeWord:", wordIndexToComplete); return;
+            }
+            const word = activeWords[wordIndexToComplete];
+            if (!word || word.matched) return; // Already completed
+
+            word.matched = true;
+            const letterElements = word.element.querySelectorAll('.letter');
+            letterElements.forEach(letter => { /* ... mark letters (unchanged) ... */
+                letter.classList.remove('correct'); letter.classList.add('completed');
+            });
+
+            // Star awarding logic
+            if (word.type === 'url' && word.url) { /* ... url award (unchanged) ... */
+                adjustStars(5);
+                urlLinkDisplay.innerHTML = `Link typed! <a href="${word.url}" target="_blank" rel="noopener noreferrer">Open ${word.text}</a>`;
+                urlLinkDisplay.style.display = 'block';
+                if (urlDisplayTimeout) { clearTimeout(urlDisplayTimeout); urlDisplayTimeout = null; }
+                const hideDisplay = () => { urlLinkDisplay.style.display = 'none'; urlDisplayTimeout = null; };
+                urlDisplayTimeout = setTimeout(hideDisplay, settings.urlDisplayDuration);
+            } else { // Includes default, song, and hashtag words
+                adjustStars(1); // Award 1 star
+            }
+
+            // Increase speed only in default or hashtag mode (not song mode)
+            if (!isSongModeActive) {
+                currentSpeed *= 1.01; // Slightly reduced speed increase multiplier
+            }
+
+            // Immediately reset typing state
+            currentTyping = '';
+            currentWordIndex = null;
+            word.element.classList.remove('active');
+
+            // Schedule the element removal and array cleanup
+            setTimeout(() => { /* ... timeout logic (unchanged, finds word again) ... */
+                const actualIndex = activeWords.findIndex(w => w === word);
+                if (actualIndex !== -1) {
+                    const wordToRemove = activeWords[actualIndex];
+                    if (wordToRemove.element && wordToRemove.element.parentNode === gameContainer) {
+                        wordToRemove.element.remove();
+                    }
+                    activeWords.splice(actualIndex, 1);
+                    if (isSongModeActive && activeWords.length === 0 && songModeWordIndex >= songModeWords.length) {
+                        endSongMode();
+                    }
+                }
+            }, 300);
+        }
+
+
+        /** Handles keyboard input */
+        function handleKeyPress(e) { /* ... handleKeyPress (logic unchanged, calls modified completeWord) ... */
+            if (e.key === ' ') { e.preventDefault(); if (gameActive && !gamePaused) { pauseGame(); } return; }
+            if (!interactionAllowed || gamePaused || !gameActive) return;
+            if (e.key === 'Enter') { e.preventDefault(); removeSwipeHint(); if (activeWords.length === 0) return; let nextIndex = 0; if (currentWordIndex !== null) { nextIndex = (currentWordIndex + 1) % activeWords.length; } currentTyping = ''; currentWordIndex = nextIndex; updateHighlights(); return; }
+            if (e.key === 'Backspace') { removeSwipeHint(); if (currentTyping.length > 0) { currentTyping = currentTyping.substring(0, currentTyping.length - 1); if (currentTyping === '') { if (currentWordIndex !== null && currentWordIndex < activeWords.length && activeWords[currentWordIndex].element) { activeWords[currentWordIndex].element.classList.remove('active'); } currentWordIndex = null; resetAllHighlights(); } else { updateHighlights(); } } return; }
+            // Allow underscore for hashtag words like 'sweet_potato'
+            if (!/^[a-z0-9.'_\-]$/i.test(e.key)) { return; }
+
+            const typedChar = e.key.toLowerCase();
+            const originalCaseChar = e.key; // Keep original case for typing display
+            let matchFound = false;
+
+            if (currentWordIndex !== null && currentWordIndex < activeWords.length) {
+                const word = activeWords[currentWordIndex];
+                // Ensure word and element still exist (might be removed by timeout)
+                 if (!word || !word.element) {
+                     currentTyping = ''; currentWordIndex = null; return;
+                 }
+
+                const wordTextLower = word.text.toLowerCase();
+                const newTyping = currentTyping + originalCaseChar; // Use original case for comparison
+                const newTypingLower = newTyping.toLowerCase();
+
+                // Use original case for comparison to handle potential case differences in words
+                if (word.text.startsWith(newTyping)) {
+                    matchFound = true;
+                    currentTyping = newTyping;
+                    removeSwipeHint();
+                    if (newTyping.toLowerCase() === wordTextLower) { // Final check is case-insensitive
+                        completeWord(currentWordIndex);
+                    } else {
+                        updateHighlights();
+                    }
+                } else {
+                    matchFound = true; // Still considered a match attempt on the current word
+                    if (currentTyping.length < word.text.length) {
+                        const expectedChar = word.text[currentTyping.length]; // Use original case
+                        showSwipeHint(originalCaseChar, expectedChar, word.element, currentTyping.length);
+                        const letterElement = word.element.querySelectorAll('.letter')[currentTyping.length];
+                        if (letterElement) {
+                            letterElement.classList.add('incorrect');
+                            setTimeout(() => { letterElement.classList.remove('incorrect'); }, 500);
+                        }
+                    }
+                }
+            } else { // No current word selected, try to find a new one
+                removeSwipeHint();
+                let foundNewWordIndex = null;
+                for (let i = 0; i < activeWords.length; i++) {
+                    const word = activeWords[i];
+                    // Start matching based on original case
+                    if (!word.matched && word.text.startsWith(originalCaseChar)) {
+                        matchFound = true;
+                        foundNewWordIndex = i;
+                        currentTyping = originalCaseChar;
+                        break;
+                    }
+                }
+
+                if (foundNewWordIndex !== null) {
+                    currentWordIndex = foundNewWordIndex;
+                    const word = activeWords[currentWordIndex];
+                    const wordTextLower = word.text.toLowerCase();
+                    const currentTypingLower = currentTyping.toLowerCase();
+                    if (currentTypingLower === wordTextLower) { // Final check is case-insensitive
+                        completeWord(currentWordIndex);
+                    } else {
+                        updateHighlights();
+                    }
+                }
+            }
+        }
+
+
+        /** Displays emoji hint based on keyboard layout */
+        function showSwipeHint(typedChar, expectedChar, wordElement, charPosition) { /* ... showSwipeHint (logic unchanged) ... */
+            removeSwipeHint();
+            // Allow underscore in hints
+            const validHintChar = /^[a-z0-9 .'_ -]$/i;
+            if (!validHintChar.test(typedChar) || !validHintChar.test(expectedChar)) return;
+            // Treat underscore like space for layout hint
+            const typedKeyInfo = keyboardLayout[typedChar.toLowerCase() === '_' ? ' ' : typedChar.toLowerCase()];
+            const expectedKeyInfo = keyboardLayout[expectedChar.toLowerCase() === '_' ? ' ' : expectedChar.toLowerCase()];
+
+            if (!typedKeyInfo || !expectedKeyInfo) return;
+
+            const hintElement = document.createElement('div');
+            hintElement.className = 'swipe-hint';
+            activeSwipeHint = hintElement;
+
+            const deltaRow = expectedKeyInfo.row - typedKeyInfo.row;
+            const deltaCol = expectedKeyInfo.col - typedKeyInfo.col;
+            const distance = Math.max(0, Math.round(Math.sqrt(deltaRow * deltaRow + deltaCol * deltaCol)));
+            const angleRad = Math.atan2(deltaRow, deltaCol);
+            let angleDeg = angleRad * (180 / Math.PI);
+
+            let emoji = '❔';
+            if (distance === 0) { emoji = '✅'; }
+            else if (angleDeg >= -22.5 && angleDeg < 22.5) { emoji = '👉'; }
+            else if (angleDeg >= 22.5 && angleDeg < 67.5) { emoji = '↘️'; }
+            else if (angleDeg >= 67.5 && angleDeg < 112.5) { emoji = '👇'; }
+            else if (angleDeg >= 112.5 && angleDeg < 157.5) { emoji = '↙️'; }
+            else if (angleDeg >= 157.5 || angleDeg < -157.5) { emoji = '👈'; }
+            else if (angleDeg >= -157.5 && angleDeg < -112.5) { emoji = '↖️'; }
+            else if (angleDeg >= -112.5 && angleDeg < -67.5) { emoji = '👆'; }
+            else if (angleDeg >= -67.5 && angleDeg < -22.5) { emoji = '↗️'; }
+
+            hintElement.innerHTML = `${emoji} ${distance}`;
+
+            const letterElements = wordElement.querySelectorAll('.letter');
+            if (charPosition < letterElements.length) {
+                const letterElement = letterElements[charPosition];
+                const letterRect = letterElement.getBoundingClientRect();
+                const gameRect = gameContainer.getBoundingClientRect();
+                const wordRect = wordElement.getBoundingClientRect();
+
+                hintElement.style.position = 'absolute';
+                hintElement.style.visibility = 'hidden';
+                hintElement.style.left = '-9999px';
+                hintElement.style.top = '-9999px';
+                gameContainer.appendChild(hintElement);
+                const hintWidth = hintElement.offsetWidth;
+                const hintHeight = hintElement.offsetHeight;
+                hintElement.style.visibility = 'visible';
+
+                const wordCenterY = wordRect.top + wordRect.height / 2;
+                const gameCenterY = gameRect.top + gameRect.height / 2;
+                const placeBelow = wordCenterY < gameCenterY;
+
+                let hintX = letterRect.left - gameRect.left + (letterRect.width / 2) - (hintWidth / 2);
+                let hintY;
+                if (placeBelow) { hintY = wordRect.bottom - gameRect.top + settings.hintVerticalOffset; }
+                else { hintY = wordRect.top - gameRect.top - hintHeight - settings.hintVerticalOffset; }
+
+                if (hintX < 0) { hintX = 0; }
+                else if (hintX + hintWidth > gameRect.width) { hintX = gameRect.width - hintWidth; }
+                if (hintY < 0) { hintY = 0; }
+                else if (hintY + hintHeight > gameRect.height) { hintY = gameRect.height - hintHeight; }
+
+                hintElement.style.left = `${hintX}px`;
+                hintElement.style.top = `${hintY}px`;
+                hintElement.style.opacity = '1';
+
+                swipeHintTimeout = setTimeout(() => { removeSwipeHint(); }, settings.swipeHintDuration);
+            } else {
+                 if(hintElement.parentNode === gameContainer) { gameContainer.removeChild(hintElement); }
+                 activeSwipeHint = null;
+            }
+        }
+        /** Removes the swipe hint */
+        function removeSwipeHint() { /* ... removeSwipeHint (logic unchanged) ... */
+            if (swipeHintTimeout) { clearTimeout(swipeHintTimeout); swipeHintTimeout = null; }
+            if (activeSwipeHint) {
+                const hintToRemove = activeSwipeHint;
+                activeSwipeHint = null;
+                if (hintToRemove.parentNode === gameContainer) {
+                    hintToRemove.style.opacity = '0';
+                    setTimeout(() => {
+                        if (hintToRemove.parentNode === gameContainer) { gameContainer.removeChild(hintToRemove); }
+                    }, 300);
+                }
+            }
+        }
+        /** Updates letter and word highlighting based on current typing */
+        function updateHighlights() { /* ... updateHighlights (uses original case for comparison) ... */
+            activeWords.forEach(word => {
+                if(word.element) {
+                    word.element.classList.remove('active');
+                    const letterElements = word.element.querySelectorAll('.letter');
+                    letterElements.forEach(letter => { letter.classList.remove('correct'); });
+                }
+            });
+            if (currentWordIndex !== null && currentWordIndex < activeWords.length) {
+                const word = activeWords[currentWordIndex];
+                if (word && word.element && !word.matched) {
+                    const wordText = word.text; // Use original case
+                    const letterElements = word.element.querySelectorAll('.letter');
+                    word.element.classList.add('active');
+                    for (let i = 0; i < currentTyping.length && i < letterElements.length; i++) {
+                        // Compare original case typing with original case word text
+                        if (currentTyping[i] === wordText[i]) {
+                            letterElements[i].classList.add('correct');
+                        } else {
+                            letterElements[i].classList.remove('correct');
+                        }
+                    }
+                } else if (word && word.matched) {
+                    // Word was completed while updating highlights? Reset state.
+                    currentTyping = ''; currentWordIndex = null;
+                }
+            }
+        }
+
+
+        /** Removes all letter highlighting */
+        function resetAllHighlights() { /* ... resetAllHighlights (logic unchanged) ... */
+             activeWords.forEach(word => { if (word.element) { const letterElements = word.element.querySelectorAll('.letter'); letterElements.forEach(letter => { letter.classList.remove('correct'); letter.classList.remove('incorrect'); }); } });
+        }
+        /** Adjusts star count and checks for game over */
+        function adjustStars(amount) {
+            let newStars = stars + amount;
+            stars = Math.max(0, newStars);
+            updateStarDisplay();
+            saveState();
+
+            // Game Over Check: Only trigger if stars hit zero or below
+            // AND we are in default or hashtag mode, AND game is currently active.
+            // The check in updateGame handles the case where a missed word causes game over.
+            // This handles cases like buying items.
+            if (stars <= 0 && gameActive && !gamePaused && !isSongModeActive) {
+                 // Check if game over wasn't already triggered by updateGame
+                if (gameOverScreen.style.display !== 'flex') {
+                    gameOver();
+                }
+            }
+        }
+        /** Updates star display in the UI */
+        function updateStarDisplay() { starCount.textContent = stars; }
+        /** Updates best score display in the UI */
+        function updateBestScoreDisplay() { if (bestScoreDisplay) { bestScoreDisplay.textContent = `Best: ${formatTime(highScoreTime)}`; } }
+
+        // --- Stopwatch Logic ---
+        /** Formats time in seconds to a readable string (d h m s) */
+        function formatTime(totalSeconds) { /* ... format time (unchanged) ... */
+             if (totalSeconds < 0) totalSeconds = 0; const days = Math.floor(totalSeconds / 86400); const hours = Math.floor((totalSeconds % 86400) / 3600); const minutes = Math.floor((totalSeconds % 3600) / 60); const seconds = (totalSeconds % 60); let timeString = ''; if (days > 0) { timeString += `${days}d `; } if (hours > 0 || timeString) { timeString += `${hours}h `; } if (minutes > 0 || timeString) { timeString += `${minutes}m `; } timeString += `${seconds.toFixed(1)}s`; return timeString.trim();
+        }
+        /** Increments stopwatch time and updates display */
+        function updateStopwatch() { /* ... update stopwatch (unchanged) ... */
+             if (!gameActive || gamePaused) return; stopwatchTime += 0.1; stopwatchDisplay.textContent = formatTime(stopwatchTime);
+        }
+
+        // --- Pause Screen Logic ---
+        /** Pauses the game and shows the pause menu */
+        function pauseGame() {
+            if (!interactionAllowed || !gameActive || gamePaused) return;
+            gamePaused = true;
+            const timeWhenPaused = stopwatchTime;
+            if (stopwatchInterval) clearInterval(stopwatchInterval); stopwatchInterval = null;
+
+            // Update high score only if NOT in song mode (default and hashtag mode runs count)
+            if (!isSongModeActive && timeWhenPaused > highScoreTime) {
+                highScoreTime = timeWhenPaused;
+            }
+            saveState(); // Save stars and potentially new high score
+            updateBestScoreDisplay(); // Update display
+            updateModeButtons(); // Refresh button states (purchased/locked)
+
+            // Ensure correct pause menu is shown
+            showCustomizeView(false);
+            showSongModeView(false);
+            showHashtagSelectionView(false); // Hide category selection too
+            mainPauseSection.style.display = 'flex'; // Ensure main menu is visible
+            pauseScreen.style.display = 'flex'; // Show the overlay
+
+            removeSwipeHint();
+            if (urlDisplayTimeout) clearTimeout(urlDisplayTimeout);
+            urlLinkDisplay.style.display = 'none';
+        }
+        /** Resumes the game from pause */
+        function resumeGame() {
+            if (!gamePaused || !gameActive) return;
+            pauseScreen.style.display = 'none';
+            gamePaused = false;
+
+            // Restart stopwatch interval regardless of mode
+            if (!stopwatchInterval) {
+                stopwatchInterval = setInterval(updateStopwatch, 100);
+            }
+            // Restart default word generation interval ONLY if in default mode
+            if (!isSongModeActive && !isHashtagModeActive && !wordsInterval) {
+                startWordGeneration();
+            }
+            // Restart animation loop
+            startGameLoop();
+        }
+        /** Handles game over condition (out of stars in default/hashtag mode) */
+        function gameOver() {
+            if (!gameActive || isSongModeActive || gameOverScreen.style.display === 'flex') return; // No game over for song mode, prevent double trigger
+
+            console.log("Game Over Triggered"); // Debug log
+            gameActive = false; // Stop game loop FIRST
+            interactionAllowed = false;
+            if (wordsInterval) clearInterval(wordsInterval); wordsInterval = null; // Stop default word gen
+            if (animationFrameId) cancelAnimationFrame(animationFrameId); animationFrameId = null;
+            if (stopwatchInterval) clearInterval(stopwatchInterval); stopwatchInterval = null;
+            removeSwipeHint();
+
+            // Update high score if this run's time is better (applies to default/hashtag)
+            if (stopwatchTime > highScoreTime) {
+                highScoreTime = stopwatchTime;
+                saveState(); // Save new high score
+            }
+            updateBestScoreDisplay(); // Update header display
+
+            // Show Game Over screen content
+            finalRunTime.textContent = formatTime(stopwatchTime);
+            gameOverBestTime.textContent = formatTime(highScoreTime); // Show overall best
+            gameOverScreen.style.display = 'flex';
+
+            if (urlDisplayTimeout) clearTimeout(urlDisplayTimeout);
+            urlLinkDisplay.style.display = 'none';
+
+            // Reset mode flags after game over processing
+            isHashtagModeActive = false;
+            currentHashtagCategory = null;
+        }
+
+        // --- Song Mode Specific Functions ---
+        /** Processes raw lyrics text into an array of words */
+        function processLyrics(rawLyrics, removeAdlibs = false) { /* ... processLyrics (unchanged) ... */
+            if (!rawLyrics) return []; let processedLyrics = rawLyrics; if (removeAdlibs) { processedLyrics = processedLyrics.replace(/\(.*?\)/g, ''); } const cleaned = processedLyrics .replace(/[\n\r]+/g, ' ') .replace(/[.,!?"“”;:*]/g, '') .replace(/\[.*?\]/g, '') .replace(/\s+/g, ' '); const words = cleaned.split(' ').map(word => word.trim()).filter(word => word.length > 0); console.log("Processed song words:", words); return words;
+        }
+        /** Sets up and starts the song mode gameplay */
+        function startSongModeGameplay() {
+            // Note: isSongModeActive and currentSpeed set in initGame
+            songModeWordIndex = 0;
+            activeWords = []; // Clear any previous words
+            gameContainer.innerHTML = ''; // Clear visually
+            if (urlDisplayTimeout) clearTimeout(urlDisplayTimeout); urlLinkDisplay.style.display = 'none';
+            // Stopwatch setup done in initGame
+
+            // Start game processes after potential start message delay
+            showStartMessage(() => {
+                 gameActive = true;
+                 interactionAllowed = true;
+                 gamePaused = false;
+                 // Spawn initial words
+                 for(let i = 0; i < settings.minActiveWords && songModeWordIndex < songModeWords.length; i++) {
+                     spawnNextSongWord();
+                 }
+                 startGameLoop(); // Start animation loop
+                 // Start stopwatch ticker
+                 if (!stopwatchInterval) {
+                     stopwatchInterval = setInterval(updateStopwatch, 100);
+                 }
+             });
+        }
+        /** Spawns the next word from the song list */
+        function spawnNextSongWord() { /* ... spawnNextSongWord (unchanged) ... */
+            if (!isSongModeActive || !gameActive || gamePaused) return; if (songModeWordIndex < songModeWords.length) { const nextWord = songModeWords[songModeWordIndex]; generateWordElement(nextWord, 'word'); songModeWordIndex++; }
+        }
+        /** Handles the end of a song mode run */
+        function endSongMode() {
+            if (!isSongModeActive) return;
+            const songDuration = stopwatchTime;
+            stopGame(); // Stops timers, clears screen, resets mode flags etc.
+            // stopGame now sets gameActive = false and isSongModeActive = false
+            showMessage(`Song finished in ${formatTime(songDuration)}!`);
+            // Clear song specific data (redundant with stopGame but safe)
+            songModeWords = [];
+            songModeWordIndex = 0;
+        }
+
+        // --- Theme and Store Related Functions ---
+        /** Gets a display name for a theme ID */
+        function getThemeDisplayName(themeId) { /* ... getThemeDisplayName (unchanged) ... */
+             switch(themeId) { case 'default': return 'Default'; case 'theme-ocean': return 'Ocean'; case 'theme-forest': return 'Forest'; case 'theme-custom': return 'Custom Slot'; default: return themeId; }
+        }
+        /** Shows a simple message overlay */
+        function showMessage(message) { /* ... showMessage (unchanged) ... */
+            messageText.textContent = message; messageOkBtn.textContent = 'OK'; messageConfirmNoBtn.style.display = 'none'; confirmYesCallback = null; confirmNoCallback = null; messageOverlay.style.display = 'flex';
+        }
+        /** Shows a confirmation message overlay with Yes/No options */
+        function showConfirmation(message, onYes, onNo) { /* ... showConfirmation (unchanged) ... */
+            messageText.textContent = message; messageOkBtn.textContent = 'Yes'; messageConfirmNoBtn.style.display = 'inline-block'; confirmYesCallback = onYes; confirmNoCallback = onNo; messageOverlay.style.display = 'flex';
+        }
+
+        // --- Pause Menu Button Handlers ---
+        /** Handles clicking the Customize button */
+        function handleCustomizeClick() { /* ... customize click (unchanged) ... */
+            if (purchasedItems.includes('customize')) { showCustomizeView(true); } else { if (stars >= settings.customizeCost) { adjustStars(-settings.customizeCost); purchasedItems.push('customize'); saveState(); updateCustomizeButton(); showMessage(`Customize feature unlocked!`); showCustomizeView(true); } else { showMessage(`Not enough stars! Customize costs ${settings.customizeCost} ★.`); } }
+        }
+        /** Handles clicking a mode button (Song, Story, Hashtag) */
+        function handleModeClick(event) {
+            const button = event.target;
+            const modeId = button.dataset.mode;
+            const cost = parseInt(button.dataset.cost);
+            const modeName = button.dataset.name; // Use data-name
+            let justPurchased = false;
+
+            // Check unlock status and purchase if necessary
+            if (!unlockedModes.includes(modeId)) {
+                if (stars >= cost) {
+                    adjustStars(-cost);
+                    unlockedModes.push(modeId);
+                    saveState();
+                    showMessage(`${modeName} unlocked!`);
+                    updateModeButtons(); // Update button text immediately
+                    justPurchased = true;
+                    // Proceed to show the mode view after unlocking
+                } else {
+                    showMessage(`Not enough stars! ${modeName} costs ${cost} ★.`);
+                    return; // Stop if cannot afford
+                }
+            }
+
+            // If the mode is unlocked (either previously or just now), show the appropriate view
+            if (unlockedModes.includes(modeId)) {
+                if (modeId === 'song') {
+                    showSongModeView(true);
+                } else if (modeId === 'hashtag') {
+                    showHashtagSelectionView(true); // Show category selection
+                } else if (modeId === 'story') {
+                    showMessage("Story Mode not implemented yet.");
+                    // Ensure other views are hidden if implementing Story view later
+                    showSongModeView(false);
+                    showHashtagSelectionView(false);
+                }
+            }
+        }
+        /** Handles clicking the Buy Stars button */
+        function handleBuyStarsClick() { /* ... buy stars click (unchanged) ... */
+            const starsToAdd = 3000; adjustStars(starsToAdd); showMessage(`Added ${starsToAdd} stars! Enjoy!`);
+        }
+
+        // --- Event Listeners Setup ---
+        /** Sets up all necessary event listeners */
+        function setupEventListeners() {
+            document.addEventListener('keydown', handleKeyPress);
+            customizeBtn.addEventListener('click', handleCustomizeClick);
+            buyStarsBtn.addEventListener('click', handleBuyStarsClick);
+            resumeBtn.addEventListener('click', resumeGame);
+            // General mode buttons (Song, Story, Hashtag)
+            document.querySelectorAll('.mode-btn').forEach(btn => {
+                btn.addEventListener('click', handleModeClick);
+            });
+            applyColorsBtn.addEventListener('click', () => { saveState(); showCustomizeView(false); });
+            resetColorsBtn.addEventListener('click', () => { showConfirmation("Reset all colors to default?", () => { currentColors = { ...defaultColors }; applyCustomColors(currentColors); populateColorPickers(); saveState(); messageOverlay.style.display = 'none'; }, () => { messageOverlay.style.display = 'none'; } ); });
+            const colorInputs = customizeSection.querySelectorAll('input[type="color"]');
+            colorInputs.forEach(input => { input.addEventListener('input', handleColorInputChange); });
+
+            // Song Mode specific listeners
+            startSongModeBtn.addEventListener('click', () => { /* ... Start Song confirmation logic (unchanged) ... */
+                const lyrics = lyricsInput.value; if (!lyrics || lyrics.trim() === '') { showMessage("Please paste some lyrics first!"); return; }
+                showConfirmation( "Keep ad-libs (text in parentheses)?", () => { messageOverlay.style.display = 'none'; songModeWords = processLyrics(lyrics, false); if (songModeWords.length === 0) { showMessage("No words found in the lyrics after processing."); return; } initGame('song'); }, () => { messageOverlay.style.display = 'none'; songModeWords = processLyrics(lyrics, true); if (songModeWords.length === 0) { showMessage("No words found in the lyrics after removing ad-libs."); return; } initGame('song'); } );
+            });
+            songModeBackBtn.addEventListener('click', () => { showSongModeView(false); }); // Back to main pause menu
+
+            // Hashtag Mode specific listener
+            hashtagSelectionBackBtn.addEventListener('click', () => { showHashtagSelectionView(false); }); // Back to main pause menu
+
+            // Message Overlay Button Listeners
+            messageOkBtn.addEventListener('click', () => { /* ... OK button logic (unchanged) ... */
+                messageOverlay.style.display = 'none'; if (confirmYesCallback) { const callback = confirmYesCallback; confirmYesCallback = null; confirmNoCallback = null; callback(); }
+            });
+            messageConfirmNoBtn.addEventListener('click', () => { /* ... No button logic (unchanged) ... */
+                messageOverlay.style.display = 'none'; if (confirmNoCallback) { const callback = confirmNoCallback; confirmYesCallback = null; confirmNoCallback = null; callback(); }
+            });
+
+            // Pause screen overlay click (outside container)
+            pauseScreen.addEventListener('click', (event) => {
+                if (event.target === pauseScreen) {
+                    // If any sub-menu is open, clicking outside returns to main pause menu
+                    if (customizeSection.style.display === 'flex' ||
+                        songModeSection.style.display === 'flex' ||
+                        hashtagSelectionSection.style.display === 'flex') {
+                        showCustomizeView(false); // These functions now handle returning to main menu
+                        showSongModeView(false);
+                        showHashtagSelectionView(false);
+                    } else {
+                        resumeGame(); // If only main pause menu is shown, resume
+                    }
+                }
+            });
+            restartBtn.addEventListener('click', () => initGame('default')); // Restart always goes to default mode for now
+            document.addEventListener('touchstart', preventDefaultTouch, { passive: false });
+            document.addEventListener('touchmove', preventDefaultTouch, { passive: false });
+            document.addEventListener('touchend', preventDefaultTouch, { passive: false });
+            document.addEventListener('mousedown', (e) => { if (gamePaused && !e.target.closest('.pause-container button, .pause-container textarea, .pause-container input')) { e.preventDefault(); } }); // Allow interaction with inputs
+        }
+
+        // --- Touch Prevention Helper ---
+        /** Prevents default touch behavior to avoid scrolling/zooming */
+        function preventDefaultTouch(e) { /* ... prevent default touch (unchanged) ... */
+             if (gamePaused && !e.target.closest('.pause-container button, .pause-container textarea, .pause-container input')) { e.preventDefault(); } else if (!gamePaused && !e.target.closest('button')) { e.preventDefault(); }
+        }
+
+        // --- Initial Setup ---
+        setupEventListeners();
+        initGame(); // Start in default mode initially
+
+    </script>
+</body>
+</html>

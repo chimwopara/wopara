@@ -1,0 +1,680 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Billing - Fromsupply</title>
+    <link rel="icon" href="../../assets/logos/logo.jpg" type="image/jpeg" onerror="this.onerror=null; this.href='https://placehold.co/32x32/030712/FFFFFF?text=FS';">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+
+    <style>
+      /* Base body styling */
+      body {
+        font-family: 'Space Grotesk', sans-serif;
+        background-color: #030712; /* gray-950 */
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        position: relative;
+      }
+
+      /* Header/Nav Styling */
+      .top-nav {
+        background-color: rgba(3, 7, 18, 0.6);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+      }
+
+      /* Interactive Blobs Container */
+      #blobs-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: -2;
+      }
+
+      /* Interactive Blobs */
+      .interactive-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.35;
+        mix-blend-mode: screen;
+        transition: background-color 2s ease-in-out;
+        pointer-events: none;
+      }
+
+      /* Page Specific Styles */
+      .page-header {
+        padding-top: 10rem; /* Space below fixed nav */
+        padding-bottom: 4rem;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+      }
+
+      /* Styling for content sections (history, subscription, refund form) */
+      .content-section {
+        max-width: 4xl; /* Limit width */
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        z-index: 10;
+        background-color: rgba(15, 23, 42, 0.6); /* slate-900 with opacity */
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(71, 85, 105, 0.2); /* slate-700 border */
+        border-radius: 0.75rem; /* rounded-xl */
+        padding: 2rem; /* Add padding */
+        margin-bottom: 2rem; /* Space between sections */
+      }
+
+      .section-title {
+        font-size: 1.875rem; /* text-3xl */
+        font-weight: 600;
+        color: #F9FAFB; /* gray-50 */
+        margin-bottom: 1.5rem; /* space below title */
+        padding-bottom: 0.75rem; /* space below title */
+        border-bottom: 1px solid rgba(71, 85, 105, 0.3); /* subtle separator */
+      }
+
+      /* Billing History Table */
+      .billing-table {
+        width: 100%;
+        text-align: left;
+        border-collapse: collapse; /* Use collapse for cleaner lines */
+      }
+      .billing-table th, .billing-table td {
+        padding: 0.75rem 1rem;
+        border-bottom: 1px solid rgba(55, 65, 81, 0.4); /* gray-700 border */
+        font-size: 0.875rem; /* text-sm */
+        vertical-align: middle; /* Align content vertically */
+      }
+      .billing-table th {
+        color: #9CA3AF; /* gray-400 */
+        font-weight: 500;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+      }
+      .billing-table td {
+        color: #D1D5DB; /* gray-300 */
+      }
+      .billing-table tbody tr:last-child td {
+        border-bottom: none; /* Remove border from last row */
+      }
+      /* Status colors */
+      .billing-table .status-paid { color: #34D399; font-weight: 500; }
+      .billing-table .status-refunded { color: #F87171; font-weight: 500; }
+      .billing-table .status-pending { color: #FBBF24; font-weight: 500; }
+
+      /* Download Button */
+      .download-button {
+        background-color: rgba(55, 65, 81, 0.7); /* gray-700 */
+        color: #E5E7EB; /* gray-200 */
+        padding: 0.3rem 0.75rem;
+        border-radius: 0.375rem; /* rounded-md */
+        font-size: 0.75rem; /* text-xs */
+        font-weight: 500;
+        transition: background-color 0.2s ease, color 0.2s ease, opacity 0.2s ease;
+        border: 1px solid rgba(71, 85, 105, 0.5);
+        cursor: pointer;
+        display: inline-flex; /* Align icon and text */
+        align-items: center;
+      }
+      .download-button:hover:not(:disabled) {
+        background-color: rgba(75, 85, 99, 0.9); /* gray-600 */
+        color: #ffffff;
+      }
+      .download-button:disabled { opacity: 0.5; cursor: not-allowed; }
+      .download-button i { margin-right: 0.25rem; }
+
+      /* Subscription Section */
+      .subscription-info {
+        color: #D1D5DB; /* gray-300 */
+        font-size: 0.95rem;
+        line-height: 1.6;
+        margin-bottom: 1.5rem;
+      }
+      .subscription-info strong { color: #F9FAFB; } /* gray-50 */
+
+      /* Cancel Button */
+      .cancel-button {
+        background-color: #DC2626; /* red-600 */
+        color: #ffffff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px; /* pill shape */
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: inline-flex; /* Align icon */
+        align-items: center;
+      }
+      .cancel-button:hover:not(:disabled) {
+        background-color: #B91C1C; /* red-700 */
+        transform: scale(1.03);
+      }
+      .cancel-button:disabled {
+          background-color: #9CA3AF; /* gray-400 */
+          cursor: not-allowed;
+          opacity: 0.6;
+      }
+      .cancel-button i { margin-right: 0.5rem; }
+
+
+      /* Refund Form */
+      .refund-form label {
+        display: block;
+        color: #9CA3AF; /* gray-400 */
+        font-weight: 500;
+        margin-bottom: 0.5rem;
+        font-size: 0.875rem;
+      }
+      .refund-form input[type="email"],
+      .refund-form input[type="text"],
+      .refund-form textarea {
+        width: 100%;
+        background-color: rgba(30, 41, 59, 0.7); /* slate-800 */
+        border: 1px solid rgba(71, 85, 105, 0.4); /* slate-700 */
+        border-radius: 0.5rem; /* rounded-lg */
+        padding: 0.75rem 1rem;
+        color: #F3F4F6; /* gray-100 */
+        font-size: 0.9rem;
+        transition: border-color 0.2s ease, box-shadow 0.2s ease;
+      }
+      .refund-form input:focus,
+      .refund-form textarea:focus {
+        outline: none;
+        border-color: #60A5FA; /* blue-400 */
+        box-shadow: 0 0 0 2px rgba(96, 165, 250, 0.3);
+      }
+      .refund-form textarea { min-height: 120px; resize: vertical; }
+      .refund-form .form-group { margin-bottom: 1.5rem; }
+
+      /* Submit Button (Refund Form) */
+      .submit-button {
+        background-color: #4B5563; /* gray-600 */
+        color: #ffffff;
+        font-size: 0.9rem;
+        font-weight: 600;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px; /* pill shape */
+        transition: all 0.2s ease;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        display: inline-flex; /* Align icon */
+        align-items: center;
+      }
+      .submit-button:hover {
+        background-color: #374151; /* gray-700 */
+        transform: scale(1.03);
+      }
+      .submit-button i { margin-right: 0.5rem; }
+
+      /* General Text & Links */
+      .glow-text { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.2); }
+      .footer-link { transition: color 0.2s ease; }
+      .footer-link:hover { color: #ffffff; }
+      .social-icon { transition: all 0.3s ease; }
+      .social-icon:hover { background-color: #ffffff; color: #030712; transform: scale(1.1); }
+
+      /* Particle animation */
+      .particle {
+        position: fixed; border-radius: 50%; pointer-events: none; z-index: 5;
+        opacity: 0; animation: particleFade 3s ease-out forwards;
+      }
+      @keyframes particleFade {
+        0% { opacity: 0.7; transform: translate(0, 0) scale(1); }
+        100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.5); }
+      }
+
+      /* Utility to hide scrollbars */
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+
+      /* Message Box Styling */
+      #message-box {
+        position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+        background-color: rgba(30, 41, 59, 0.9); color: #e5e7eb;
+        padding: 1rem 1.5rem; border-radius: 0.5rem; border: 1px solid rgba(71, 85, 105, 0.5);
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3); z-index: 100;
+        opacity: 0; visibility: hidden; transition: opacity 0.3s ease, visibility 0.3s ease, bottom 0.3s ease;
+        backdrop-filter: blur(5px); max-width: 90%; text-align: center;
+      }
+      #message-box.show { opacity: 1; visibility: visible; bottom: 30px; }
+      #message-box.success { background-color: rgba(5, 150, 105, 0.8); color: #d1fae5; border-color: rgba(6, 182, 212, 0.4); }
+      #message-box.error { background-color: rgba(220, 38, 38, 0.8); color: #fee2e2; border-color: rgba(239, 68, 68, 0.4); }
+      #message-box.warning { background-color: rgba(245, 158, 11, 0.8); color: #fef3c7; border-color: rgba(251, 191, 36, 0.5); } /* Added warning style */
+
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col justify-between">
+  <div id="blobs-container">
+      <div class="interactive-blob blob-1 absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw]"></div>
+      <div class="interactive-blob blob-2 absolute bottom-[-20%] right-[-15%] w-[55vw] h-[55vw]"></div>
+      <div class="interactive-blob blob-3 absolute top-[30%] right-[10%] w-[50vw] h-[50vw]"></div>
+      <div class="interactive-blob blob-4 absolute bottom-[5%] left-[20%] w-[45vw] h-[45vw]"></div>
+  </div>
+
+  <nav class="top-nav fixed top-0 left-0 right-0 z-50 h-20">
+    <div class="mx-auto h-full flex items-center justify-between px-4 sm:px-6">
+      <div class="flex items-center gap-4">
+        <a href="../main/index.html" class="flex items-center gap-3 group">
+          <img
+            src="../../assets/logos/logo.jpg" alt="Fromsupply Logo" class="h-10 w-10 object-contain rounded-md flex-shrink-0"
+            id="logo-image" onerror="this.onerror=null; this.src='https://placehold.co/40x40/030712/FFFFFF?text=FS';"
+          />
+          <span class="text-lg font-semibold text-gray-200 group-hover:text-white transition-colors duration-200 hidden sm:inline">Fromsupply</span>
+        </a>
+      </div>
+      <div class="flex items-center gap-4">
+         <a href="../main/index.html" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm font-medium">Home</a>
+         <span class="text-gray-600">|</span>
+         <a href="support.html" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm font-medium">Support</a>
+         <span class="text-gray-600">|</span>
+         <span class="text-white text-sm font-medium">Billing</span> </div>
+    </div>
+  </nav>
+
+  <div class="w-full flex-grow flex flex-col items-center pt-20 relative z-10">
+    <header class="page-header w-full px-4 sm:px-6">
+      <h1 class="text-4xl md:text-5xl font-bold glow-text mb-4">Billing Management</h1>
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+        View your billing history, manage your subscription, and request refunds.
+      </p>
+    </header>
+
+    <section id="billing-history" class="content-section w-full px-4 sm:px-6">
+      <h2 class="section-title">Billing History</h2>
+      <div class="overflow-x-auto hide-scrollbar">
+        <table class="billing-table min-w-full">
+          <thead>
+            <tr>
+              <th>Date</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Status</th>
+              <th>Invoice</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>2025-05-01</td>
+              <td>fs Membership (Monthly)</td>
+              <td>$5.99</td>
+              <td class="status-paid">Paid</td>
+              <td><button class="download-button" data-invoice-id="inv-003"><i class="fas fa-download"></i>PDF</button></td>
+            </tr>
+            <tr>
+              <td>2025-04-15</td>
+              <td>Cheat Code (10k Reserves)</td>
+              <td>$19.99</td>
+              <td class="status-paid">Paid</td>
+              <td><button class="download-button" data-invoice-id="inv-002"><i class="fas fa-download"></i>PDF</button></td>
+            </tr>
+             <tr>
+              <td>2025-04-01</td>
+              <td>fs Membership (Monthly)</td>
+              <td>$5.99</td>
+              <td class="status-refunded">Refunded</td>
+              <td><button class="download-button" data-invoice-id="inv-001"><i class="fas fa-download"></i>PDF</button></td>
+            </tr>
+             <tr>
+              <td>2025-05-05</td>
+              <td>Upgrade ? (fs v0.5)</td>
+              <td>$2.49</td>
+              <td class="status-pending">Pending</td>
+              <td><button class="download-button" data-invoice-id="inv-004" disabled><i class="fas fa-download"></i>PDF</button></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+       <p class="text-xs text-gray-500 mt-4 italic">Note: Billing history may take a few minutes to update after a transaction.</p>
+    </section>
+
+    <section id="manage-subscription" class="content-section w-full px-4 sm:px-6">
+        <h2 class="section-title">Manage Subscription</h2>
+        <div id="active-subscription-details">
+            <p class="subscription-info">
+                You currently have an active <strong>fs Membership</strong>.
+                <br>Next billing date: <strong>June 1, 2025</strong> for <strong>$5.99</strong>.
+            </p>
+            <p class="text-gray-400 mb-4 text-sm">
+                Cancelling your membership will stop future charges. You will retain access to membership benefits until the end of the current billing period (May 31, 2025).
+            </p>
+            <button id="cancel-membership-button" class="cancel-button">
+                <i class="fas fa-ban"></i>Cancel Membership
+            </button>
+        </div>
+        <div id="no-subscription-details" class="hidden">
+             <p class="subscription-info">
+                You do not currently have an active fs Membership.
+            </p>
+            <p class="text-gray-400 mb-4 text-sm">
+                Purchase a membership from the star menu on the homepage to access premium features.
+            </p>
+        </div>
+         <div id="cancelled-subscription-details" class="hidden">
+             <p class="subscription-info">
+                Your fs Membership is set to cancel at the end of the current billing period (May 31, 2025).
+            </p>
+             <p class="text-gray-400 mb-4 text-sm">
+                You can re-subscribe at any time.
+            </p>
+        </div>
+    </section>
+
+    <section id="refund-request" class="content-section w-full px-4 sm:px-6">
+      <h2 class="section-title">Request Refund</h2>
+      <form id="refund-form" class="refund-form">
+        <p class="text-gray-400 mb-6 text-sm">If you need a refund for a recent charge (e.g., Cheat Code, Upgrade), please fill out the form below. Note: Membership fees are generally non-refundable after cancellation unless required by law. Please allow 3-5 business days for processing.</p>
+        <div class="form-group">
+          <label for="refund-email">Your Account Email</label>
+          <input type="email" id="refund-email" name="email" required placeholder="you@example.com">
+        </div>
+        <div class="form-group">
+          <label for="refund-order-id">Order ID (from history above, e.g., inv-002)</label>
+          <input type="text" id="refund-order-id" name="order_id" required placeholder="e.g., inv-002">
+        </div>
+        <div class="form-group">
+          <label for="refund-reason">Reason for Refund Request</label>
+          <textarea id="refund-reason" name="reason" required placeholder="Please provide details about your refund request..."></textarea>
+        </div>
+        <div class="text-right">
+            <button type="submit" class="submit-button">
+                <i class="fas fa-paper-plane"></i>Submit Refund Request
+            </button>
+        </div>
+      </form>
+    </section>
+
+  </div>
+
+  <footer class="w-full bg-gray-900/80 backdrop-blur-md border-t border-gray-800 pt-12 pb-6 relative z-10">
+    <div class="mx-auto px-6 max-w-7xl">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 items-start md:justify-items-stretch">
+        <div class="md:text-left">
+            <h3 class="text-white font-semibold mb-4">Resources</h3>
+            <ul class="space-y-2 text-sm">
+                <li><a href="https://www.youtube.com/playlist?list=PLaXy2djTTbXh0hlOvARCHAiGFo2n-EdyT&playnext=1&index=1" target="_blank" rel="noopener noreferrer" class="text-gray-400 footer-link">Tutorials</a></li>
+                <li><a href="terms.html" class="text-gray-400 footer-link">Terms</a></li>
+            </ul>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 justify-center">
+                <img src="../../assets/logos/logo.jpg" alt="Fromsupply Logo" class="h-6 w-6 rounded-sm inline-block" onerror="this.onerror=null; this.style.display='none'; const newImg = document.createElement('span'); newImg.textContent='FS'; newImg.classList.add('w-6', 'h-6', 'rounded-sm', 'bg-gray-700', 'text-white', 'flex', 'items-center', 'justify-center', 'font-bold'); this.parentNode.insertBefore(newImg, this); this.remove();"> Fromsupply <span id="app-version-display" class="text-xs font-normal text-gray-500 opacity-75">fs v</span>
+            </h3>
+            <p class="text-gray-400 text-sm mb-6 text-center">Building the future of developer tools and experiences through innovative solutions.</p>
+            <div class="flex space-x-3 justify-center">
+                <a href="https://github.com/chimwopara/fromsupply" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://instagram.com/fromsupply" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 social-icon"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="mt-6 text-gray-500 text-xs text-center">© 2025 Fromsupply. All rights reserved.</div>
+        </div>
+
+        <div class="md:text-right">
+            <h3 class="text-white font-semibold mb-4">Contact</h3>
+            <ul class="space-y-2 text-sm mb-6">
+                <li class="flex items-center md:justify-end gap-2 text-gray-400"><i class="fa-regular fa-envelope w-4 text-center"></i><a href="mailto:support@fromsupply.com" class="footer-link">support@fromsupply.com</a></li>
+                <li class="flex items-center md:justify-end gap-2 text-gray-400"><i class="fa-solid fa-location-dot w-4 text-center"></i><span>Alberta, Canada</span></li>
+                <li><a href="support.html" class="text-gray-400 footer-link flex items-center md:justify-end gap-2"><i class="fa-regular fa-life-ring w-4 text-center"></i>Support Center</a></li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <div id="message-box"></div>
+
+  <script>
+    // Wait for the DOM to be fully loaded
+    document.addEventListener('DOMContentLoaded', () => {
+      // --- Basic Setup (Blobs, Particles, Version, Image Errors) ---
+      const blobsContainer = document.getElementById('blobs-container');
+      const blobs = blobsContainer ? blobsContainer.querySelectorAll('.interactive-blob') : [];
+      const appVersionDisplay = document.getElementById('app-version-display');
+      const APP_VERSION = "0.5"; // Keep consistent
+      if (appVersionDisplay) appVersionDisplay.textContent = `fs v${APP_VERSION}`;
+      let blobHues = [270, 220, 170, 250]; // Initial Hues
+      let animationFrameId = null;
+      let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX; mouseY = e.clientY;
+        if (Math.random() > 0.97) createParticle(e.clientX, e.clientY);
+      });
+
+      function animateBackgroundBlobs() {
+         if (blobsContainer && blobs.length > 0) {
+            blobs.forEach((blob, index) => {
+                 blobHues[index] = (blobHues[index] + 0.1) % 360;
+                 blob.style.backgroundColor = `hsl(${blobHues[index]}, 70%, 60%)`;
+            });
+         }
+         animationFrameId = requestAnimationFrame(animateBackgroundBlobs);
+      }
+      if (blobsContainer && blobs.length > 0) animateBackgroundBlobs();
+
+      function createParticle(x, y) {
+        const p = document.createElement('div'); p.className = 'particle';
+        const s = Math.random()*2.5+1; p.style.width=`${s}px`; p.style.height=`${s}px`;
+        const c = ['#FFFFFF','#E5E7EB','#D1D5DB','#9CA3AF'][Math.floor(Math.random()*4)]; p.style.backgroundColor=c;
+        p.style.position='fixed'; p.style.left=`${x}px`; p.style.top=`${y}px`;
+        const tx = (Math.random()-0.5)*60, ty = (Math.random()-0.5)*60;
+        p.style.setProperty('--tx',`${tx}px`); p.style.setProperty('--ty',`${ty}px`);
+        document.body.appendChild(p);
+        setTimeout(() => { if (p.parentNode) p.parentNode.removeChild(p); }, 3000);
+      }
+
+      document.querySelectorAll('img').forEach(img => {
+        if (((img.complete && img.naturalWidth === 0) || !img.src) && !img.getAttribute('data-error-handled')) handleImageError(img);
+        else if (!img.getAttribute('data-error-handled')) img.onerror = function() { if (!this.getAttribute('data-error-handled')) handleImageError(this); };
+      });
+
+      function handleImageError(img) {
+          img.setAttribute('data-error-handled', 'true');
+          const w = img.getAttribute('width')||img.offsetWidth||40, h = img.getAttribute('height')||img.offsetHeight||40;
+          const alt = img.alt || 'Err';
+          const placeholder = `https://placehold.co/${w}x${h}/1f2937/6B7280?text=${encodeURIComponent(alt)}`;
+          console.warn(`Image error: ${img.src || 'No src'}. Replacing with: ${placeholder}`);
+          img.src = placeholder; img.style.objectFit='contain'; img.style.backgroundColor='#1f2937'; img.onerror=null;
+      }
+
+      // --- Message Box Functionality ---
+      const messageBox = document.getElementById('message-box');
+      let messageTimeout;
+
+      function showMessage(message, type = 'info', duration = 3500) {
+          if (!messageBox) { console.error("Message box element not found!"); return; }
+          messageBox.textContent = message;
+          messageBox.className = ''; // Reset classes
+          messageBox.classList.add('show');
+          if (type === 'success') messageBox.classList.add('success');
+          else if (type === 'error') messageBox.classList.add('error');
+          else if (type === 'warning') messageBox.classList.add('warning'); // Added warning
+          clearTimeout(messageTimeout);
+          messageTimeout = setTimeout(() => {
+              messageBox.classList.remove('show', 'success', 'error', 'warning');
+          }, duration);
+      }
+
+      // --- Refund Form Submission (Same as before) ---
+      const refundForm = document.getElementById('refund-form');
+      if (refundForm) {
+        refundForm.addEventListener('submit', (event) => {
+          event.preventDefault();
+          const submitButton = refundForm.querySelector('button[type="submit"]');
+          const formData = new FormData(refundForm);
+          const email = formData.get('email');
+          const orderId = formData.get('order_id');
+          const reason = formData.get('reason');
+
+          if (!email || !orderId || !reason) { showMessage('Please fill out all fields.', 'error'); return; }
+
+          console.log('Simulating Refund Request:', { email, orderId, reason });
+          submitButton.disabled = true; submitButton.textContent = 'Submitting...'; submitButton.style.opacity = '0.7';
+
+          setTimeout(() => {
+              showMessage('Refund request submitted successfully!', 'success');
+              refundForm.reset();
+              submitButton.disabled = false; submitButton.innerHTML = '<i class="fas fa-paper-plane"></i>Submit Refund Request'; submitButton.style.opacity = '1';
+          }, 1500);
+        });
+      } else { console.warn("Refund form element not found."); }
+
+
+      // --- PDF Download Functionality (Same as before) ---
+      const downloadButtons = document.querySelectorAll('.download-button');
+      downloadButtons.forEach(button => {
+        button.addEventListener('click', () => {
+          if (button.disabled) return;
+          const invoiceId = button.getAttribute('data-invoice-id');
+          const row = button.closest('tr');
+          if (!row) { showMessage('Could not find invoice details row.', 'error'); return; }
+          const cells = row.querySelectorAll('td');
+          const date = cells[0]?.textContent?.trim() || 'N/A';
+          const description = cells[1]?.textContent?.trim() || 'N/A';
+          const amount = cells[2]?.textContent?.trim() || 'N/A';
+          const status = cells[3]?.textContent?.trim() || 'N/A';
+
+          try {
+            if (typeof window.jspdf === 'undefined' || typeof window.jspdf.jsPDF === 'undefined') throw new Error('jsPDF core library not loaded.');
+            if (typeof window.jspdf.jsPDF.API.autoTable !== 'function') throw new Error('jsPDF autoTable plugin not loaded.');
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            // --- PDF Content Generation (Same as before) ---
+            doc.setFontSize(10); doc.setTextColor(100);
+            doc.text('Fromsupply Inc.', 195, 15, { align: 'right' }); doc.text('Alberta, Canada', 195, 20, { align: 'right' }); doc.text('support@fromsupply.com', 195, 25, { align: 'right' });
+            doc.setFontSize(22); doc.setTextColor(40); doc.setFont('helvetica', 'bold'); doc.text('INVOICE', 15, 30);
+            doc.setFontSize(10); doc.setFont('helvetica', 'normal'); doc.setTextColor(50);
+            doc.text(`Invoice ID: ${invoiceId}`, 15, 40); doc.text(`Date: ${date}`, 15, 45); doc.text(`Status: ${status}`, 15, 50);
+            doc.setFont('helvetica', 'bold'); doc.text('Bill To:', 15, 65); doc.setFont('helvetica', 'normal'); doc.text('Valued Customer', 15, 70);
+            doc.autoTable({
+                startY: 85, head: [['Description', 'Amount']], body: [[description, amount]], theme: 'grid',
+                headStyles: { fillColor: [31, 41, 55], textColor: [243, 244, 246] }, styles: { cellPadding: 3, fontSize: 10, valign: 'middle' },
+                columnStyles: { 1: { halign: 'right' } },
+                didDrawPage: function (data) {
+                    const totalY = data.cursor.y + 10;
+                    doc.setFontSize(12); doc.setFont('helvetica', 'bold'); doc.setTextColor(40);
+                    doc.text('Total:', 15, totalY); doc.text(amount, 195, totalY, { align: 'right'});
+                }
+            });
+            const finalY = doc.lastAutoTable.finalY || 120;
+            doc.setFontSize(9); doc.setTextColor(100);
+            doc.text('Notes:', 15, finalY + 25); doc.text('Thank you for choosing Fromsupply!', 15, finalY + 30);
+            if (status === 'Refunded') doc.text('This invoice amount has been refunded.', 15, finalY + 35);
+            doc.text(`Payment due upon receipt unless otherwise noted.`, 15, finalY + 40);
+            // --- End PDF Content ---
+            doc.save(`Fromsupply_Invoice_${invoiceId}.pdf`);
+            showMessage('Invoice PDF generated successfully!', 'success');
+          } catch (error) {
+              console.error("Error generating PDF:", error);
+              showMessage(`Error generating PDF: ${error.message}`, 'error');
+          }
+        });
+      });
+
+      // --- NEW: Membership Cancellation Logic ---
+      const cancelBtn = document.getElementById('cancel-membership-button');
+      const activeSubDetails = document.getElementById('active-subscription-details');
+      const cancelledSubDetails = document.getElementById('cancelled-subscription-details');
+      // const noSubDetails = document.getElementById('no-subscription-details'); // For potential future use
+
+      // Simulate initial state (user has active subscription)
+      let isSubscriptionActive = true; // In real app, get this status from backend/localStorage
+
+      function updateSubscriptionUI() {
+          if (!activeSubDetails || !cancelledSubDetails) return;
+
+          if (isSubscriptionActive) {
+              activeSubDetails.classList.remove('hidden');
+              cancelledSubDetails.classList.add('hidden');
+              if(cancelBtn) cancelBtn.disabled = false;
+          } else {
+              activeSubDetails.classList.add('hidden');
+              cancelledSubDetails.classList.remove('hidden');
+              // No need for a cancel button if already cancelled
+          }
+          // Add logic for noSubDetails if needed
+      }
+
+      if (cancelBtn) {
+          cancelBtn.addEventListener('click', () => {
+              // Confirmation Step (using browser confirm for simplicity)
+              const confirmCancel = confirm("Are you sure you want to cancel your fs Membership? This action cannot be undone, but you will retain access until the end of the current billing period.");
+
+              if (confirmCancel) {
+                  console.log('Simulating Membership Cancellation...');
+                  cancelBtn.disabled = true;
+                  cancelBtn.textContent = 'Processing...';
+                  cancelBtn.style.opacity = '0.7';
+
+                  // Simulate API call
+                  setTimeout(() => {
+                      // --- Success Simulation ---
+                      isSubscriptionActive = false; // Update state
+                      updateSubscriptionUI(); // Update the UI
+                      showMessage('Membership cancelled successfully. Access remains until the end of the billing period.', 'success');
+                      // No need to re-enable button as the section changes
+
+                       // --- Error Simulation (Uncomment to test) ---
+                       // showMessage('Failed to cancel membership. Please try again or contact support.', 'error');
+                       // cancelBtn.disabled = false;
+                       // cancelBtn.innerHTML = '<i class="fas fa-ban"></i>Cancel Membership';
+                       // cancelBtn.style.opacity = '1';
+
+                  }, 1500); // Simulate delay
+
+                   // --- Real Application Logic ---
+                   // fetch('/api/cancel-subscription', { method: 'POST', /* add auth headers */ })
+                   // .then(response => {
+                   //    if (!response.ok) throw new Error('Cancellation failed');
+                   //    return response.json();
+                   // })
+                   // .then(data => {
+                   //     isSubscriptionActive = false;
+                   //     updateSubscriptionUI();
+                   //     showMessage('Membership cancelled successfully.', 'success');
+                   // })
+                   // .catch(error => {
+                   //     console.error('Cancellation error:', error);
+                   //     showMessage(`Error: ${error.message || 'Could not cancel membership.'}`, 'error');
+                   //     cancelBtn.disabled = false; // Re-enable on error
+                   //     cancelBtn.innerHTML = '<i class="fas fa-ban"></i>Cancel Membership';
+                   //     cancelBtn.style.opacity = '1';
+                   // });
+                   // --- End Real Application Logic ---
+
+              } else {
+                  showMessage('Membership cancellation aborted.', 'info');
+              }
+          });
+      } else {
+          console.warn("Cancel membership button not found.");
+      }
+
+      // Initial UI setup based on simulated state
+      updateSubscriptionUI();
+
+    }); // End DOMContentLoaded
+  </script>
+</body>
+</html>

@@ -1,0 +1,506 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+    <title>Support Center - Fromsupply</title>
+    <link rel="icon" href="../../assets/logos/logo.jpg" type="image/jpeg" onerror="this.onerror=null; this.href='https://placehold.co/32x32/030712/FFFFFF?text=FS';">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      /* Base body styling */
+      body {
+        font-family: 'Space Grotesk', sans-serif;
+        background-color: #030712; /* gray-950 */
+        overflow-x: hidden; /* Prevent horizontal scroll */
+        position: relative; /* Needed for z-index context */
+      }
+
+      /* Header/Nav Styling */
+      .top-nav {
+        background-color: rgba(3, 7, 18, 0.6);
+        backdrop-filter: blur(10px);
+        border-bottom: 1px solid rgba(55, 65, 81, 0.3);
+      }
+
+      /* Interactive Blobs Container */
+      #blobs-container {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        pointer-events: none;
+        z-index: -2; /* Behind everything */
+      }
+
+      /* Interactive Blobs */
+      .interactive-blob {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(120px);
+        opacity: 0.35;
+        mix-blend-mode: screen;
+        transition: background-color 2s ease-in-out;
+        pointer-events: none;
+      }
+
+      /* Support Page Specific Styles */
+      .support-header {
+        padding-top: 10rem;
+        padding-bottom: 4rem;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+      }
+
+      .faq-section {
+        max-width: 4xl;
+        margin-left: auto;
+        margin-right: auto;
+        position: relative;
+        z-index: 10;
+      }
+
+      .faq-item details {
+        background-color: rgba(15, 23, 42, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(71, 85, 105, 0.2);
+        border-radius: 0.75rem;
+        margin-bottom: 1rem;
+        transition: background-color 0.3s ease, border-color 0.3s ease;
+      }
+
+      .faq-item details[open] {
+         background-color: rgba(30, 41, 59, 0.7);
+         border-color: rgba(71, 85, 105, 0.4);
+      }
+
+      .faq-item summary {
+        padding: 1.25rem 1.5rem;
+        font-weight: 600;
+        font-size: 1.125rem;
+        color: #F9FAFB;
+        cursor: pointer;
+        list-style: none;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        transition: color 0.3s ease;
+      }
+
+      .faq-item summary::-webkit-details-marker { display: none; }
+      .faq-item summary::marker { display: none; }
+
+      .faq-item summary:hover {
+        color: #ffffff;
+      }
+
+      /* Custom Chevron Icon */
+      .faq-item summary .chevron {
+        transition: transform 0.3s ease;
+        color: #9CA3AF;
+      }
+      .faq-item details[open] summary .chevron {
+        transform: rotate(180deg);
+        color: #E5E7EB;
+      }
+
+      .faq-answer {
+        padding: 0 1.5rem 1.25rem 1.5rem;
+        color: #D1D5DB;
+        font-size: 0.95rem;
+        line-height: 1.6;
+        border-top: 1px solid rgba(71, 85, 105, 0.2);
+        margin-top: 0.75rem;
+      }
+      .faq-answer p { margin-bottom: 0.75rem; }
+      .faq-answer a:not(.action-button) { /* Avoid styling button like text link */
+        color: #60A5FA;
+        text-decoration: underline;
+        text-underline-offset: 2px;
+        transition: color 0.2s ease;
+      }
+      .faq-answer a:not(.action-button):hover { color: #93C5FD; }
+      .faq-answer ul { list-style: disc; padding-left: 1.25rem; margin-bottom: 0.75rem; }
+      .faq-answer code {
+        background-color: rgba(55, 65, 81, 0.5); /* gray-700 with opacity */
+        color: #E5E7EB; /* gray-200 */
+        padding: 0.15rem 0.4rem;
+        border-radius: 0.25rem; /* rounded-sm */
+        font-size: 0.85em; /* Slightly smaller */
+        font-family: 'Space Grotesk', monospace; /* Consistent font */
+      }
+      /* Button style for FAQ answer */
+      .faq-answer .action-button {
+        display: inline-block;
+        background-color: #4B5563; /* gray-600 */
+        color: #ffffff;
+        font-size: 0.875rem;
+        font-weight: 600;
+        padding: 0.5rem 1rem;
+        border-radius: 9999px;
+        transition: all 0.2s ease;
+        white-space: nowrap;
+        border: none;
+        cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        text-decoration: none; /* Remove underline */
+        margin-top: 0.5rem; /* Add some space */
+      }
+      .faq-answer .action-button:hover {
+        background-color: #374151; /* gray-700 */
+        transform: scale(1.05);
+        color: #ffffff; /* Ensure text remains white */
+      }
+
+
+      .github-link-section {
+        background-color: rgba(15, 23, 42, 0.5);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(71, 85, 105, 0.2);
+        border-radius: 0.75rem;
+        padding: 2rem;
+        text-align: center;
+        position: relative;
+        z-index: 10;
+      }
+
+      .github-button {
+        background-color: #25292E;
+        color: #ffffff;
+        padding: 0.75rem 1.5rem;
+        border-radius: 9999px;
+        font-weight: 600;
+        display: inline-flex;
+        align-items: center;
+        gap: 0.5rem;
+        transition: background-color 0.3s ease, transform 0.2s ease;
+        border: 1px solid rgba(255, 255, 255, 0.1);
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      }
+      .github-button:hover {
+        background-color: #32383F;
+        transform: translateY(-2px);
+      }
+
+      /* General Text & Links */
+      .glow-text {
+        color: #ffffff;
+        text-shadow: 0 0 8px rgba(255, 255, 255, 0.2);
+      }
+      .footer-link { transition: color 0.2s ease; }
+      .footer-link:hover { color: #ffffff; }
+      .social-icon { transition: all 0.3s ease; }
+      .social-icon:hover { background-color: #ffffff; color: #030712; transform: scale(1.1); }
+
+      /* Particle animation */
+      .particle {
+        position: fixed;
+        border-radius: 50%;
+        pointer-events: none;
+        z-index: 5;
+        opacity: 0;
+        animation: particleFade 3s ease-out forwards;
+      }
+      @keyframes particleFade {
+        0% { opacity: 0.7; transform: translate(0, 0) scale(1); }
+        100% { opacity: 0; transform: translate(var(--tx), var(--ty)) scale(0.5); }
+      }
+
+      /* Utility to hide scrollbars */
+      .hide-scrollbar {
+        -ms-overflow-style: none; /* IE and Edge */
+        scrollbar-width: none; /* Firefox */
+      }
+      .hide-scrollbar::-webkit-scrollbar {
+        display: none; /* Chrome, Safari, Opera */
+      }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col justify-between">
+  <div id="blobs-container">
+      <div class="interactive-blob blob-1 absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw]"></div>
+      <div class="interactive-blob blob-2 absolute bottom-[-20%] right-[-15%] w-[55vw] h-[55vw]"></div>
+      <div class="interactive-blob blob-3 absolute top-[30%] right-[10%] w-[50vw] h-[50vw]"></div>
+      <div class="interactive-blob blob-4 absolute bottom-[5%] left-[20%] w-[45vw] h-[45vw]"></div>
+  </div>
+
+  <nav class="top-nav fixed top-0 left-0 right-0 z-50 h-20">
+    <div class="mx-auto h-full flex items-center justify-between px-4 sm:px-6">
+      <div class="flex items-center gap-4">
+        <a href="index.html" class="flex items-center gap-3 group">
+          <img
+            src="../../assets/logos/logo.jpg" alt="Fromsupply Logo" class="h-10 w-10 object-contain rounded-md flex-shrink-0"
+            id="logo-image" onerror="this.onerror=null; this.src='https://placehold.co/40x40/030712/FFFFFF?text=FS';"
+          />
+          <span class="text-lg font-semibold text-gray-200 group-hover:text-white transition-colors duration-200 hidden sm:inline">Fromsupply</span>
+        </a>
+      </div>
+      <div class="flex items-center gap-4">
+         <a href="index.html" class="text-gray-400 hover:text-white transition-colors duration-200 text-sm font-medium">Home</a>
+         <span class="text-gray-600">|</span>
+         <span class="text-white text-sm font-medium">Support</span>
+      </div>
+    </div>
+  </nav>
+
+  <div class="w-full flex-grow flex flex-col items-center pt-20 relative z-10">
+    <header class="support-header w-full px-4 sm:px-6">
+      <h1 class="text-4xl md:text-5xl font-bold glow-text mb-4">Support Center</h1>
+      <p class="text-lg text-gray-400 max-w-2xl mx-auto">
+        Find answers to common questions and learn how to get help with Fromsupply products.
+      </p>
+    </header>
+
+    <main id="faq-section" class="faq-section w-full mb-16 px-4 sm:px-6">
+      <h2 class="text-3xl font-semibold text-white text-center mb-10">Frequently Asked Questions</h2>
+
+      <div class="space-y-4 faq-item">
+        <details>
+          <summary>
+            <span>How do I get started with a Fromsupply product (like Chim Code)?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Getting started is simple! After clicking "Get" on the homepage for the product you want, you'll be directed to its application page (e.g., `chimcode.html`). If it's your first time using that specific product, follow any on-screen prompts to initialize or set it up. The core functionality should be available immediately.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>What is included in the "fs Membership"?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>The fs Membership provides monthly access to premium features across all Fromsupply products you've 'gotten'. This includes advanced analytics in Chim Code, personalized training modules in Chim Type, exclusive environments in Chim Maze, priority support in Chim Clinic, and more. It's the best way to experience the full power of Fromsupply.</p>
+             <p>Note: The "Upgrade ?" purchase is separate and covers major version updates and new feature bundles released periodically.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>How does the "Cheat Code" (10k Reserves) work?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>The "Cheat Code" is a one-time purchase that grants you 10,000 "Reserves" (our in-app currency, represented by stars ⭐️). Reserves can be used for various actions within the applications, such as running complex simulations, unlocking specific content, or accessing certain premium features on a pay-per-use basis if you don't have an active membership.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>I found a bug or have a feature request. Where can I report it?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>We appreciate your feedback! The best place to report bugs, suggest features, or discuss technical issues is our official GitHub repository.</p>
+            <p>Please check existing issues first to see if your topic is already being discussed. If not, feel free to open a new issue with detailed information.</p>
+            <p>You can find the repository here: <a href="https://github.com/chimwopara/fromsupply/issues" target="_blank" rel="noopener noreferrer">Fromsupply GitHub Issues</a>.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>What happens when I click "Get" vs "Open"?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Clicking "Get" for the first time on a product card signifies your initial acquisition of the base product. This changes the button to "Open" and may unlock related purchase options (like the 'Max' version) in the star dropdown.</p>
+            <p>Clicking "Open" (or the card itself after it shows "Open") navigates you to that specific product's application page (e.g., `chimcode.html`).</p>
+          </div>
+        </details>
+         <details>
+          <summary>
+            <span>How do product updates work? Do I need to pay again?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Minor updates and bug fixes within the current major version (e.g., v0.5.x) are generally included for free for anyone who has 'gotten' the product or has an active membership.</p>
+            <p>Major version upgrades (e.g., moving from v0.x to v1.x) that introduce significant new features or architectural changes may be included in the "Upgrade ?" bundle, which is a separate purchase available to users who have purchased at least one 'Max' product previously.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>Do I need an account to use Fromsupply products?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Currently, basic access to the core features after clicking "Get" does not require a mandatory account signup. However, features like purchasing memberships, reserves, tracking progress across sessions, or participating in Chim Team might require you to sign in (e.g., via Google).</p>
+            <p>We utilize local storage in your browser to remember which products you've 'gotten' and basic state information for anonymous use.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>What are the system requirements for Fromsupply tools?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Fromsupply products are web-based and designed to run in modern web browsers (Chrome, Firefox, Safari, Edge) on desktop computers. Performance may vary depending on your computer's specifications, especially for more demanding tools like Chim Maze or complex Chim Code simulations.</p>
+            <p>A stable internet connection is recommended for optimal performance and for accessing features that require server communication.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>Can I use Fromsupply products on mobile devices?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>While the website itself is responsive, the core applications (Chim Code, Type, Maze, etc.) are primarily designed and optimized for desktop use due to the complexity of their interfaces and interactions (e.g., keyboard input, detailed visuals). Some features might work on tablets, but mobile phone usage is generally not recommended or fully supported for the main tools at this time.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>What is "Chim Team" and how does it work?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Chim Team provides a platform for collaborative, risk-free challenges and exercises. Teams can work together on simulated projects, debugging scenarios, or competitive tasks designed to improve teamwork and technical skills without impacting real-world systems. Access typically requires team members to sign in and join a specific team instance.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>Is my data safe with Fromsupply?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>We take data privacy seriously. For anonymous usage, data like which products you've 'gotten' is stored locally in your browser. If you sign in (e.g., via Google), we handle your account information according to standard privacy practices. Specific data generated within tools (like code snippets in Chim Code or typing stats in Chim Type) might be processed to provide the service but are handled with security in mind. For detailed information, please refer to our (future) Privacy Policy.</p>
+          </div>
+        </details>
+        <details>
+          <summary>
+            <span>What happens if a product video isn't loading?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>The videos on the product cards and the background video are hosted externally (e.g., YouTube via a proxy). If a video fails to load, you might see a "Video Unavailable" placeholder. This could be due to network issues, browser settings (like ad blockers or privacy extensions), or temporary problems with the video hosting service.</p>
+            <p>The core functionality of the product (accessed via the "Get"/"Open" button) is independent of the video preview and should still work.</p>
+          </div>
+        </details>
+
+         <details>
+          <summary>
+            <span>How do I manage or cancel my "fs Membership"?</span>
+            <i class="fas fa-chevron-down chevron"></i>
+          </summary>
+          <div class="faq-answer">
+            <p>Membership management, including viewing history, cancellation, and refund requests, is handled through our Billing page. You'll need to be signed in to access your specific billing details.</p>
+            <a href="billing.html" class="action-button">
+              <i class="fas fa-credit-card mr-2"></i>Go to Billing
+            </a>
+          </div>
+        </details>
+
+      </div>
+    </main>
+
+    <section class="github-link-section max-w-4xl w-full mb-16 px-4 sm:px-6 mx-auto">
+        <h2 class="text-2xl font-semibold text-white mb-3">Need Technical Help or Found a Bug?</h2>
+        <p class="text-gray-400 mb-6">
+            Our GitHub repository is the primary place for technical support, bug reports, and feature discussions.
+        </p>
+        <a href="https://github.com/chimwopara/fromsupply/issues" target="_blank" rel="noopener noreferrer" class="github-button">
+            <i class="fab fa-github"></i>
+            <span>Go to GitHub Issues</span>
+        </a>
+    </section>
+
+  </div>
+
+  <footer class="w-full bg-gray-900/80 backdrop-blur-md border-t border-gray-800 pt-12 pb-6 relative z-10">
+    <div class="mx-auto px-6 max-w-7xl">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-8 mb-8 items-start md:justify-items-stretch">
+        <div class="md:text-left">
+            <h3 class="text-white font-semibold mb-4">Resources</h3>
+            <ul class="space-y-2 text-sm">
+                <li><a href="https://www.youtube.com/playlist?list=PLaXy2djTTbXh0hlOvARCHAiGFo2n-EdyT&playnext=1&index=1" target="_blank" rel="noopener noreferrer" class="text-gray-400 footer-link">Tutorials</a></li>
+                <li><a href="terms.html" class="text-gray-400 footer-link">Terms</a></li>
+            </ul>
+        </div>
+
+        <div class="flex flex-col items-center">
+            <h3 class="text-xl font-bold text-white mb-4 flex items-center gap-2 justify-center">
+                <img src="../../assets/logos/logo.jpg" alt="Fromsupply Logo" class="h-6 w-6 rounded-sm inline-block" onerror="this.onerror=null; this.style.display='none'; const newImg = document.createElement('span'); newImg.textContent='FS'; newImg.classList.add('w-6', 'h-6', 'rounded-sm', 'bg-gray-700', 'text-white', 'flex', 'items-center', 'justify-center', 'font-bold'); this.parentNode.insertBefore(newImg, this); this.remove();"> Fromsupply <span id="app-version-display" class="text-xs font-normal text-gray-500 opacity-75">fs v</span>
+            </h3>
+            <p class="text-gray-400 text-sm mb-6 text-center">Building the future of developer tools and experiences through innovative solutions.</p>
+            <div class="flex space-x-3 justify-center">
+                <a href="https://github.com/chimwopara/fromsupply" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 social-icon"><i class="fab fa-github"></i></a>
+                <a href="https://instagram.com/fromsupply" target="_blank" rel="noopener noreferrer" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 social-icon"><i class="fab fa-instagram"></i></a>
+                <a href="#" class="w-8 h-8 rounded-full bg-gray-800 hover:bg-gray-700 flex items-center justify-center text-gray-400 social-icon"><i class="fab fa-linkedin-in"></i></a>
+            </div>
+            <div class="mt-6 text-gray-500 text-xs text-center">© 2025 Fromsupply. All rights reserved.</div>
+        </div>
+
+        <div class="md:text-right">
+            <h3 class="text-white font-semibold mb-4">Contact</h3>
+            <ul class="space-y-2 text-sm mb-6">
+                <li class="flex items-center md:justify-end gap-2 text-gray-400"><i class="fa-regular fa-envelope w-4 text-center"></i><a href="mailto:support@fromsupply.com" class="footer-link">support@fromsupply.com</a></li>
+                <li class="flex items-center md:justify-end gap-2 text-gray-400"><i class="fa-solid fa-location-dot w-4 text-center"></i><span>Alberta, Canada</span></li>
+                <li><a href="support.html" class="text-gray-400 footer-link flex items-center md:justify-end gap-2"><i class="fa-regular fa-life-ring w-4 text-center"></i>Support Center</a></li>
+            </ul>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Basic JS for blobs, particles, image errors - same as before
+    document.addEventListener('DOMContentLoaded', () => {
+      const blobsContainer = document.getElementById('blobs-container');
+      const blobs = blobsContainer ? blobsContainer.querySelectorAll('.interactive-blob') : [];
+      const appVersionDisplay = document.getElementById('app-version-display');
+      const APP_VERSION = "0.5";
+      if (appVersionDisplay) appVersionDisplay.textContent = `fs v${APP_VERSION}`;
+      let blobHues = [270, 220, 170, 250];
+      let animationFrameId = null;
+      let mouseX = window.innerWidth / 2, mouseY = window.innerHeight / 2;
+
+      document.addEventListener('mousemove', (e) => {
+        mouseX = e.clientX; mouseY = e.clientY;
+        if (Math.random() > 0.97) createParticle(e.clientX, e.clientY);
+      });
+
+      function animateBackgroundBlobs() {
+         if (blobsContainer && blobs.length > 0) {
+            blobs.forEach((blob, index) => {
+                 blobHues[index] = (blobHues[index] + 0.1) % 360;
+                 blob.style.backgroundColor = `hsl(${blobHues[index]}, 70%, 60%)`;
+            });
+         }
+         animationFrameId = requestAnimationFrame(animateBackgroundBlobs);
+      }
+      if (blobsContainer && blobs.length > 0) animateBackgroundBlobs();
+
+      function createParticle(x, y) {
+        const particle = document.createElement('div'); particle.className = 'particle';
+        const size = Math.random() * 2.5 + 1; particle.style.width = `${size}px`; particle.style.height = `${size}px`;
+        const colors = ['#FFFFFF', '#E5E7EB', '#D1D5DB', '#9CA3AF']; particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+        particle.style.position = 'fixed'; particle.style.left = `${x}px`; particle.style.top = `${y}px`;
+        const tx = (Math.random() - 0.5) * 60, ty = (Math.random() - 0.5) * 60;
+        particle.style.setProperty('--tx', `${tx}px`); particle.style.setProperty('--ty', `${ty}px`);
+        document.body.appendChild(particle);
+        setTimeout(() => { if (particle.parentNode) particle.parentNode.removeChild(particle); }, 3000);
+      }
+
+      document.querySelectorAll('img').forEach(img => {
+        if (((img.complete && img.naturalWidth === 0) || !img.src) && !img.getAttribute('data-error-handled')) handleImageError(img);
+        else if (!img.getAttribute('data-error-handled')) img.onerror = function() { if (!this.getAttribute('data-error-handled')) handleImageError(this); };
+      });
+
+      function handleImageError(img) {
+          img.setAttribute('data-error-handled', 'true');
+          const w = img.getAttribute('width')||img.offsetWidth||40, h = img.getAttribute('height')||img.offsetHeight||40;
+          const alt = img.alt || 'Err';
+          const placeholder = `https://placehold.co/${w}x${h}/1f2937/6B7280?text=${encodeURIComponent(alt)}`;
+          img.src = placeholder; img.style.objectFit='contain'; img.style.backgroundColor='#1f2937'; img.onerror=null;
+      }
+    });
+  </script>
+</body>
+</html>

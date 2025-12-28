@@ -1,0 +1,1842 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    <title>Supply - Local Products from Fromsupply</title>
+    <link rel="icon" href="logo.jpg" type="image/jpeg" onerror="this.onerror=null; this.href='https://placehold.co/32x32/030712/FFFFFF?text=FS';">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com"/>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css"
+      integrity="sha512-9usAa10IRO0HhonpyAIVpjrylPvoDwiPUiKdWk5t3PyolY1cOd4DSE0Ga+ri4AuTroPR5aQvXU9xC6qOPnzFeg=="
+      crossorigin="anonymous"
+      referrerpolicy="no-referrer"
+    />
+    <style>
+      /* Base body styling */
+      html {
+        font-size: 125%;
+        scroll-behavior: smooth;
+      }
+      body {
+        font-family: 'Space Grotesk', sans-serif;
+        background-color: #030712; /* gray-950 */
+        overflow-x: hidden;
+        position: relative;
+        color: #E5E7EB; 
+      }
+
+      
+
+      #blobs-container { position: fixed; top: 0; left: 0; width: 100%; height: 100%; overflow: hidden; pointer-events: none; z-index: -2; }
+      .interactive-blob { position: absolute; border-radius: 50%; filter: blur(120px); opacity: 0.35; mix-blend-mode: screen; transition: background-color 2s ease-in-out; pointer-events: none; }
+
+      #hero-video { height: 100vh; width: 100vw; position: relative; overflow: hidden; z-index: -1; background-color: #000; }
+      #hero-video video { position: absolute; top: 50%; left: 50%; width: 100%; height: 100%; transform: translate(-50%, -50%); min-width: 100%; min-height: 100%; object-fit: cover; pointer-events: none; opacity: 0; transition: opacity 0.5s ease-in-out; }
+      .video-error { background-color: #030712; background-image: url('https://placehold.co/1920x1080/030712/6B7280?text=Background+Video+Unavailable'); background-size: contain; background-repeat: no-repeat; background-position: center; }
+      .video-error video { display: none; }
+
+      
+
+      .card { background-color: rgba(15, 23, 42, 0.6); backdrop-filter: blur(12px); border: 1px solid rgba(71, 85, 105, 0.2); transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1); cursor: default; display: flex; flex-direction: column; height: 100%; border-radius: 0.75rem; overflow: hidden; position: relative; z-index: 2; }
+      .card:hover { transform: translateY(-4px) scale(1.01); box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.1), 0 15px 30px -15px rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.25); }
+      .card-image-container { position: relative; width: 100%; padding-top: 125%; /* Aspect ratio 4:5 */ overflow: hidden; background-color: #111827; border-top-left-radius: 0.75rem; border-top-right-radius: 0.75rem; cursor: pointer; }
+      .card-image-container img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: none; object-fit: cover; transition: opacity 0.3s ease, transform 0.3s ease; opacity: 0.9; }
+      .card:hover .card-image-container img { opacity: 1; transform: scale(1.03); }
+      .card-image-container.image-error { background-color: #111827; background-image: url('https://placehold.co/600x750/111827/6B7280?text=Image+Unavailable'); background-size: contain; background-repeat: no-repeat; background-position: center; }
+      .card-image-container.image-error img { display: none; }
+
+      .card-info-area { padding: 1rem; display: flex; flex-direction: column; flex-grow: 1; position: relative; }
+      .card-title-main-container { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 0.25rem; }
+      .card-title { font-size: 1.125rem; font-weight: 600; color: #F9FAFB; line-height: 1.3; transition: color 0.3s ease; flex-grow: 1; margin-right: 0.5rem; }
+      .card:hover .card-title { color: #ffffff; }
+      
+      .card-button-base { 
+        color: #ffffff; font-size: 0.8rem; 
+        font-weight: 500; 
+        padding: 0.4rem 0.8rem; 
+        border-radius: 9999px; transition: all 0.2s ease; white-space: nowrap; border: none; cursor: pointer;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1); display: inline-flex; align-items: center; justify-content: center; gap: 0.35rem; 
+      }
+      .card-button-base:hover { transform: scale(1.05); }
+      
+      .Share-button-card { 
+        background-color: #374151; 
+      }
+      .Share-button-card:hover { background-color: #1F2937; }
+
+      .share-feedback { font-size: 0.75rem; color: #34D399; margin-bottom: 0.5rem; height: 1em; }
+      .share-feedback.hidden { visibility: hidden; }
+
+      .card-creator { font-size: 0.875rem; color: #9CA3AF; margin-bottom: 0.5rem; }
+      .card-description { color: #9CA3AF; font-size: 0.875rem; line-height: 1.4; margin-bottom: 1rem; flex-grow: 1; }
+      
+      .card-actions-container { 
+        display: flex;
+        gap: 0.4rem; 
+        min-height: 34px; /* Ensure consistent height even if "Get" is hidden */
+        align-items: center; 
+        width: 100%; 
+      }
+      .card-action-button { 
+        background-color: #4A5568; 
+      }
+      .card-action-button:hover { background-color: #2D3748; }
+      .card-action-button.hidden { display: none; }
+
+      .gift-button-container { position: relative; display: inline-flex; flex-shrink: 0; }
+      .gift-button { 
+        background-color: #4A5568; 
+      }
+      .gift-button:hover { 
+        background-color: #2D3748; 
+      }
+      .gift-button img.suggested-recipient-avatar {
+        width: 18px; height: 18px; 
+        border-radius: 50%; object-fit: cover;
+        margin: 0 0.2rem; 
+        display: inline-block; vertical-align: middle;
+      }
+      .override-chim-suggestion { 
+        margin-left: 6px; 
+        cursor: pointer; 
+        display: inline-flex; 
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        padding: 0 0.2rem; 
+        border-radius: 50%;
+        line-height: 1;
+        font-size: 0.75rem; 
+      }
+      .override-chim-suggestion:hover {
+        background-color: rgba(255,255,255,0.1);
+      }
+      
+      .gift-input-wrapper {
+        display: none; 
+        align-items: center;
+        background-color: rgba(17, 24, 39, 0.8); 
+        border: 1px solid rgba(55, 65, 81, 0.6);
+        border-radius: 9999px;
+        padding: 0.3rem 0.3rem 0.3rem 0.8rem; 
+        max-width: 100%; 
+        box-sizing: border-box; 
+      }
+      .gift-input-wrapper.active { display: inline-flex; width: 100%; }
+      .gift-username-input {
+        background: transparent;
+        border: none;
+        color: #E5E7EB;
+        font-size: 0.8rem; 
+        flex-grow: 1; 
+        padding: 0.3rem 0.2rem;
+        min-width: 0; 
+      }
+      .gift-username-input:focus { outline: none; }
+      .gift-username-input::placeholder { color: #9CA3AF; opacity: 0.7; }
+      .clear-gift-suggestion { 
+        background: transparent;
+        color: #9CA3AF;
+        border: none;
+        border-radius: 50%;
+        width: 18px; height: 18px; 
+        display: inline-flex; align-items: center; justify-content: center;
+        margin-left: 0.3rem;
+        cursor: pointer;
+        font-size: 0.7rem; 
+        flex-shrink: 0; 
+      }
+      .clear-gift-suggestion:hover { color: #E5E7EB; background-color: rgba(255,255,255,0.1); }
+      .suggested-gift-recipient { display: flex; align-items: center; gap: 0.3rem; font-size: 0.8rem; }
+      .suggested-gift-recipient img { width: 18px; height: 18px; border-radius: 50%; object-fit: cover; }
+
+      #user-location {
+        cursor: pointer;
+        text-decoration: underline;
+        text-decoration-style: dotted;
+        text-underline-offset: 3px;
+      }
+      #user-location:hover {
+        color: #FBBF24; /* amber-400 */
+      }
+
+
+      .glow-text { color: #ffffff; text-shadow: 0 0 8px rgba(255, 255, 255, 0.2); }
+      .footer-link { transition: color 0.2s ease; }
+      .footer-link:hover { color: #ffffff; }
+      .social-icon { transition: all 0.3s ease; }
+      .social-icon:hover { background-color: #ffffff; color: #030712; transform: scale(1.1); }
+
+
+      #delivery-modal { transition: opacity 0.3s ease-in-out; }
+      #delivery-modal-content { opacity: 0; transform: scale(0.95); transition: opacity 0.3s ease-in-out, transform 0.3s ease-in-out; }
+      #delivery-modal.active #delivery-modal-content { opacity: 1; transform: scale(1); }
+      #delivery-modal input[type="text"],
+      #delivery-modal input[type="tel"],
+      #delivery-modal input[type="date"],
+      #delivery-modal input[type="time"],
+      #delivery-modal textarea {
+        background-color: #374151; 
+        border-color: #4B5563; 
+        color: #F3F4F6; 
+      }
+      #delivery-modal input:focus, #delivery-modal textarea:focus {
+        border-color: #6B7280; 
+        box-shadow: 0 0 0 1px #6B7280; 
+      }
+      #confirm-delivery-button {
+        background-color: #4A5568; 
+      }
+      #confirm-delivery-button:hover {
+        background-color: #2D3748; 
+      }
+
+/* Inline Location Selector Styles */
+#inline-location-selector {
+  transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+  transform: translateY(-10px) scaleY(0.95);
+  opacity: 0;
+  max-height: 0;
+  overflow: hidden;
+  margin-bottom: 0;
+  width: 100%;
+  transform-origin: top center;
+}
+
+#inline-location-selector:not(.hidden) {
+  opacity: 1;
+  transform: translateY(0) scaleY(1);
+  max-height: 2000px; /* Set a large enough value to accommodate all countries */
+  margin-bottom: 3rem;
+  overflow: visible;
+}
+
+#inline-country-list-container {
+  display: grid;
+  gap: 0.75rem;
+  padding: 1rem 0;
+  width: 100%;
+  transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.location-country-item {
+  display: flex;
+  align-items: center;
+  padding: 1rem 1.25rem;
+  background-color: rgba(15, 23, 42, 0.6);
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(71, 85, 105, 0.2);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #E5E7EB;
+  min-width: 0;
+  width: 100%;
+}
+
+.location-country-item:hover {
+  background-color: rgba(30, 41, 59, 0.8);
+  transform: translateY(-2px);
+  border-color: rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 20px -5px rgba(0, 0, 0, 0.3);
+}
+
+.location-country-item .flag-emoji {
+  margin-right: 1rem;
+  font-size: 1.5rem;
+  line-height: 1;
+  flex-shrink: 0;
+}
+
+.location-country-item span:last-child {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.location-current-button {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 1rem 1.25rem;
+  background-color: rgba(59, 130, 246, 0.1);
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 0.75rem;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  font-size: 0.95rem;
+  color: #93C5FD;
+  font-weight: 500;
+  margin-bottom: 1rem;
+  width: 100%;
+}
+
+.location-current-button:hover {
+  background-color: rgba(59, 130, 246, 0.2);
+  border-color: rgba(59, 130, 246, 0.5);
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px -5px rgba(59, 130, 246, 0.3);
+}
+
+.location-current-button .fa-location-crosshairs {
+  margin-right: 0.75rem;
+  font-size: 1.1rem;
+}
+
+/* Ultra wide screens - 8 columns */
+@media (min-width: 1920px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(8, 1fr);
+  }
+}
+
+/* Large desktop - 7 columns */
+@media (min-width: 1600px) and (max-width: 1919px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(7, 1fr);
+  }
+}
+
+/* Desktop - 6 columns */
+@media (min-width: 1400px) and (max-width: 1599px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(6, 1fr);
+  }
+}
+
+/* Medium desktop - 5 columns */
+@media (min-width: 1200px) and (max-width: 1399px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(5, 1fr);
+  }
+}
+
+/* Small desktop - 4 columns */
+@media (min-width: 1024px) and (max-width: 1199px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* Tablet - 3 columns */
+@media (min-width: 768px) and (max-width: 1023px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(3, 1fr);
+  }
+  
+  .location-country-item {
+    padding: 0.875rem 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+/* Green glow effect for successful gift input */
+.gift-input-success {
+  background-color: rgba(34, 197, 94, 0.1) !important;
+  border-color: rgba(34, 197, 94, 0.5) !important;
+  color: #22c55e !important;
+  box-shadow: 0 0 20px rgba(34, 197, 94, 0.3) !important;
+  animation: successPulse 2s ease-in-out;
+}
+
+@keyframes successPulse {
+  0%, 100% { 
+    box-shadow: 0 0 20px rgba(34, 197, 94, 0.3);
+  }
+  50% { 
+    box-shadow: 0 0 30px rgba(34, 197, 94, 0.6);
+  }
+}
+
+
+/* Mobile - 2 columns */
+@media (min-width: 480px) and (max-width: 767px) {
+  #inline-country-list-container {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.5rem;
+  }
+  
+  .location-country-item {
+    padding: 0.75rem 0.875rem;
+    font-size: 0.85rem;
+  }
+  
+  .location-country-item .flag-emoji {
+    font-size: 1.3rem;
+    margin-right: 0.75rem;
+  }
+}
+
+/* Small mobile - 1 column */
+@media (max-width: 479px) {
+  #inline-country-list-container {
+    grid-template-columns: 1fr;
+    gap: 0.5rem;
+  }
+  
+  .location-country-item,
+  .location-current-button {
+    padding: 1rem;
+    font-size: 0.9rem;
+  }
+}
+
+      .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      .hide-scrollbar::-webkit-scrollbar { display: none; }
+    </style>
+</head>
+<body class="text-gray-100 min-h-screen flex flex-col justify-between">
+  <div id="blobs-container">
+      <div class="interactive-blob blob-1 absolute top-[-10%] left-[-15%] w-[60vw] h-[60vw]"></div>
+      <div class="interactive-blob blob-2 absolute bottom-[-20%] right-[-15%] w-[55vw] h-[55vw]"></div>
+      <div class="interactive-blob blob-3 absolute top-[30%] right-[10%] w-[50vw] h-[50vw]"></div>
+      <div class="interactive-blob blob-4 absolute bottom-[5%] left-[20%] w-[45vw] h-[45vw]"></div>
+  </div>
+
+  <section id="hero-video">
+    <video
+        id="background-video"
+        src="supply.mp4" autoplay loop muted playsinline
+        preload="auto"
+        oncanplay="this.style.opacity=1"
+        onerror="this.parentElement.classList.add('video-error')"
+        style="opacity:0;"
+        aria-label="Background video loop of abstract visuals"
+    ></video>
+    
+  </section>
+
+ <div class="w-full flex-grow flex flex-col items-center py-6 relative z-10">
+    <main id="product-showcase" class="w-full max-w-7xl mb-16 px-4 sm:px-6">
+        <h1 class="text-3xl sm:text-4xl font-bold text-center text-white glow-text mb-10 sm:mb-12">
+            Made in <span id="user-location" title="Click to change location">Lagos</span>
+        </h1>
+        
+        <!-- Inline Location Selector -->
+        <div id="inline-location-selector" class="hidden w-full mb-12">
+            <div id="inline-country-list-container" class="max-h-96 overflow-y-auto hide-scrollbar">
+                <!-- Country list will be populated here -->
+            </div>
+        </div>
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 sm:gap-8">
+          <div class="card" id="product-wallet-card">
+            <a href="#product-wallet-details" class="card-image-container" aria-label="View details for Artisan Leather Wallet">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Leather+Wallet" alt="Handcrafted Leather Wallet" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Artisan Leather Wallet <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Alex Chen</p>
+              <p class="card-description">A durable and stylish wallet, handcrafted from locally sourced full-grain leather.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="wallet" data-product-title="Artisan Leather Wallet" data-product-creator="Alex Chen" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Leather+Wallet" data-product-price="45">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Artisan Leather Wallet" data-product-id="wallet" data-product-title="Artisan Leather Wallet" data-product-url="#product-wallet-details">
+                  Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="wallet" data-product-price="45">
+                        </button>
+                    <div class="gift-input-wrapper">
+                        <span class="suggested-gift-recipient hidden"></span>
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="product-honey-card">
+            <a href="#product-honey-details" class="card-image-container" aria-label="View details for Wildflower Organic Honey">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Organic+Honey" alt="Organic Honey Jar" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Wildflower Organic Honey <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Beatrice Miller</p>
+              <p class="card-description">Pure, raw organic honey harvested from local wildflowers. Rich in flavor and nutrients.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="honey" data-product-title="Wildflower Organic Honey" data-product-creator="Beatrice Miller" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Organic+Honey" data-product-price="15">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Wildflower Organic Honey" data-product-id="honey" data-product-title="Wildflower Organic Honey" data-product-url="#product-honey-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="honey" data-product-price="15">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card" id="product-portrait-card">
+            <a href="#product-portrait-details" class="card-image-container" aria-label="View details for Custom Digital Portraits">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Digital+Portrait" alt="Custom Digital Portrait Example" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                  <h2 class="card-title">Custom Digital Portraits <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Chris DigitalArts</p>
+              <p class="card-description">Unique, personalized digital portraits created from your photos. Perfect for gifts.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="portrait" data-product-title="Custom Digital Portraits" data-product-creator="Chris DigitalArts" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Digital+Portrait" data-product-price="75">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Custom Digital Portraits" data-product-id="portrait" data-product-title="Custom Digital Portraits" data-product-url="#product-portrait-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="portrait" data-product-price="75">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="product-vase-card">
+            <a href="#product-vase-details" class="card-image-container" aria-label="View details for Geometric 3D Printed Vase">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=3D+Printed+Vase" alt="3D Printed Vase" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Geometric 3D Printed Vase <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Diana Designs</p>
+              <p class="card-description">Modern and elegant vases, 3D printed with eco-friendly materials. Various colors available.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="vase" data-product-title="Geometric 3D Printed Vase" data-product-creator="Diana Designs" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=3D+Printed+Vase" data-product-price="30">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Geometric 3D Printed Vase" data-product-id="vase" data-product-title="Geometric 3D Printed Vase" data-product-url="#product-vase-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="vase" data-product-price="30">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card" id="product-coffee-card">
+            <a href="#product-coffee-details" class="card-image-container" aria-label="View details for Artisan Roast Coffee">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Artisan+Coffee" alt="Small Batch Roasted Coffee Beans" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Artisan Roast Coffee <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Emily's Brews</p>
+              <p class="card-description">Freshly roasted small-batch coffee beans, sourced ethically. Single origin and blends.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="coffee" data-product-title="Artisan Roast Coffee" data-product-creator="Emily's Brews" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Artisan+Coffee" data-product-price="22">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Artisan Roast Coffee" data-product-id="coffee" data-product-title="Artisan Roast Coffee" data-product-url="#product-coffee-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="coffee" data-product-price="22">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="product-mug-card">
+            <a href="#product-mug-details" class="card-image-container" aria-label="View details for Handmade Ceramic Mugs">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Ceramic+Mug" alt="Handmade Ceramic Mug" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Handmade Ceramic Mugs <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Fred's Pottery</p>
+              <p class="card-description">Beautifully crafted ceramic mugs, each piece unique. Dishwasher and microwave safe.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="mug" data-product-title="Handmade Ceramic Mugs" data-product-creator="Fred's Pottery" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Ceramic+Mug" data-product-price="28">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Handmade Ceramic Mugs" data-product-id="mug" data-product-title="Handmade Ceramic Mugs" data-product-url="#product-mug-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="mug" data-product-price="28">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card" id="product-jam-card">
+            <a href="#product-jam-details" class="card-image-container" aria-label="View details for Artisan Strawberry Jam">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Artisan+Jam" alt="Jar of locally sourced jam" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Artisan Strawberry Jam <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Gina's Pantry</p>
+              <p class="card-description">Delicious homemade strawberry jam made with locally sourced berries and natural ingredients.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="jam" data-product-title="Artisan Strawberry Jam" data-product-creator="Gina's Pantry" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Artisan+Jam" data-product-price="12">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Artisan Strawberry Jam" data-product-id="jam" data-product-title="Artisan Strawberry Jam" data-product-url="#product-jam-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="jam" data-product-price="12">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="product-toycar-card">
+            <a href="#product-toycar-details" class="card-image-container" aria-label="View details for Classic Wooden Toy Car">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Wooden+Toy+Car" alt="Handcrafted wooden toy car" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Classic Wooden Toy Car <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Henry's Woodcraft</p>
+              <p class="card-description">Timeless handcrafted wooden toy car, built to last with non-toxic finishes. Sparks imagination.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="toycar" data-product-title="Classic Wooden Toy Car" data-product-creator="Henry's Woodcraft" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Wooden+Toy+Car" data-product-price="35">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Classic Wooden Toy Car" data-product-id="toycar" data-product-title="Classic Wooden Toy Car" data-product-url="#product-toycar-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="toycar" data-product-price="35">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card" id="product-candle-card">
+            <a href="#product-candle-details" class="card-image-container" aria-label="View details for Lavender Soy Candle">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Scented+Candle" alt="Hand-poured scented candle" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Lavender Soy Candle <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Irene's Aromas</p>
+              <p class="card-description">Relaxing lavender scented soy candle, hand-poured with essential oils for a clean burn.</p>
+              <div class="card-actions-container">
+                <button class="card-action-button card-button-base" data-product-id="candle" data-product-title="Lavender Soy Candle" data-product-creator="Irene's Aromas" data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Scented+Candle" data-product-price="18">Get</button>
+                <button class="Share-button-card card-button-base" aria-label="Share link for Lavender Soy Candle" data-product-id="candle" data-product-title="Lavender Soy Candle" data-product-url="#product-candle-details">
+                    Share
+                </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="candle" data-product-price="18">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          <div class="card" id="product-scarf-card">
+            <a href="#product-scarf-details" class="card-image-container" aria-label="View details for Hand-Dyed Silk Scarf">
+              <img src="https://placehold.co/600x750/1a202c/cbd5e0?text=Silk+Scarf" alt="Hand-Dyed Silk Scarf" onerror="this.parentElement.classList.add('image-error')">
+            </a>
+            <div class="card-info-area">
+              <div class="card-title-main-container">
+                <h2 class="card-title">Hand-Dyed Silk Scarf <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></h2>
+              </div>
+              <span class="share-feedback hidden">Link Shared!</span>
+              <p class="card-creator">by Silken Hues Co.</p>
+              <p class="card-description">Luxurious silk scarf, individually hand-dyed with natural plant-based dyes. Unique patterns.</p>
+              <div class="card-actions-container">
+                  <button class="card-action-button card-button-base" data-product-id="scarf" data-product-title="Hand-Dyed Silk Scarf" data-product-creator="Silken Hues Co." data-product-image="https://placehold.co/600x750/1a202c/cbd5e0?text=Silk+Scarf" data-product-price="65">Get</button>
+                  <button class="Share-button-card card-button-base" aria-label="Share link for Hand-Dyed Silk Scarf" data-product-id="scarf" data-product-title="Hand-Dyed Silk Scarf" data-product-url="#product-scarf-details">
+                      Share
+                  </button>
+                <div class="gift-button-container">
+                    <button class="gift-button card-button-base" data-product-id="scarf" data-product-price="65">Gift</button>
+                    <div class="gift-input-wrapper">
+                        <input type="text" class="gift-username-input" placeholder="Enter username...">
+                        <button class="clear-gift-suggestion hidden" aria-label="Clear suggestion">×</button>
+                    </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          </div>
+      </main>
+  </div>
+  
+
+  <div id="delivery-modal" class="hidden fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center z-[70] p-4">
+    <div id="delivery-modal-content" class="bg-gray-800/95 backdrop-blur-lg rounded-xl shadow-2xl w-full max-w-lg flex flex-col">
+      <div class="flex justify-between items-center p-5 border-b border-gray-700">
+        <h2 class="text-xl font-semibold text-white">Delivery Details</h2>
+        <button id="close-delivery-modal" class="text-gray-400 hover:text-white text-3xl leading-none p-1">&times;</button>
+      </div>
+      <div class="p-6 space-y-4 max-h-[70vh] overflow-y-auto">
+        <div>
+          <label for="delivery-address" class="block text-sm font-medium text-gray-300 mb-1">Address</label>
+          <input type="text" id="delivery-address" class="w-full rounded-md p-2.5">
+        </div>
+        <div>
+          <label for="delivery-phone" class="block text-sm font-medium text-gray-300 mb-1">Phone Number</label>
+          <input type="tel" id="delivery-phone" class="w-full rounded-md p-2.5">
+        </div>
+        <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div>
+            <label for="delivery-date" class="block text-sm font-medium text-gray-300 mb-1">Preferred Date</label>
+            <input type="date" id="delivery-date" class="w-full rounded-md p-2.5">
+          </div>
+          <div>
+            <label for="delivery-time" class="block text-sm font-medium text-gray-300 mb-1">Preferred Time</label>
+            <input type="time" id="delivery-time" class="w-full rounded-md p-2.5">
+          </div>
+        </div>
+        <div>
+          <label for="delivery-note" class="block text-sm font-medium text-gray-300 mb-1">Custom Note (Optional)</label>
+          <textarea id="delivery-note" rows="3" class="w-full rounded-md p-2.5"></textarea>
+        </div>
+        <div class="flex items-center mt-2">
+          <input id="delivery-for-me" type="checkbox" checked class="h-4 w-4 text-gray-600 border-gray-500 rounded focus:ring-gray-500 focus:ring-offset-gray-800">
+          <label for="delivery-for-me" class="ml-2 block text-sm text-gray-300">This delivery is for me</label>
+        </div>
+        <button id="confirm-delivery-button" class="w-full text-white font-semibold py-2.5 px-4 rounded-md transition-colors mt-4">Confirm Delivery Details</button>
+      </div>
+    </div>
+  </div>
+
+  
+
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const LS_USER_LOCATION = 'supply_user_location';
+      const userLocationSpan = document.getElementById('user-location');
+
+      // --- Element Selectors ---
+      const blobsContainer = document.getElementById('blobs-container');
+      const productCards = document.querySelectorAll('#product-showcase .card'); 
+      const catalogButton = document.getElementById('catalog-button');
+      const catalogDropdown = document.getElementById('catalog-dropdown');
+      const catalogButtonText = document.getElementById('catalog-button-text');
+      const libraryButton = document.getElementById('library-button');
+      const libraryDropdown = document.getElementById('library-dropdown');
+      const libraryEmptyMessage = document.getElementById('library-empty-message');
+      const starButton = document.getElementById('star-button');
+      const starDropdown = document.getElementById('star-dropdown');
+      const appVersionDisplay = document.getElementById('app-version-display');
+      const heroSearchInput = document.getElementById('hero-search-input');
+      const heroSearchButton = document.getElementById('hero-search-button'); 
+      const productShowcaseSection = document.getElementById('product-showcase');
+      const topNav = document.querySelector('.top-nav');
+      const searchResultsOverlay = document.getElementById('search-results-overlay');
+      const searchResultsModal = document.getElementById('search-results-modal');
+      const searchResultsList = document.getElementById('search-results-list');
+      const noSearchResultsMessage = document.getElementById('no-search-results');
+      const closeSearchResultsButton = document.getElementById('close-search-results');
+      const deliveryModal = document.getElementById('delivery-modal');
+      const deliveryModalContent = document.getElementById('delivery-modal-content');
+      const closeDeliveryModalButton = document.getElementById('close-delivery-modal');
+      const confirmDeliveryButton = document.getElementById('confirm-delivery-button');
+      const deliveryAddressInput = document.getElementById('delivery-address');
+      const deliveryPhoneInput = document.getElementById('delivery-phone');
+      const deliveryDateInput = document.getElementById('delivery-date');
+      const deliveryTimeInput = document.getElementById('delivery-time');
+      const deliveryNoteInput = document.getElementById('delivery-note');
+      const deliveryForMeCheckbox = document.getElementById('delivery-for-me');
+      
+      // Inline Location Selector Elements
+const inlineLocationSelector = document.getElementById('inline-location-selector');
+const inlineCountryListContainer = document.getElementById('inline-country-list-container');
+
+      let libraryActionsContainer = null; 
+      let overallDeliveryButton = null; 
+      let shareAllLibraryButton = null;
+      const blobs = blobsContainer ? blobsContainer.querySelectorAll('.interactive-blob') : [];
+
+
+      const APP_VERSION = "0.9.9"; 
+      const LS_PRODUCT_GOTTEN_PREFIX = 'supply_gotten_'; 
+      const LS_LIBRARY_ITEMS = 'supply_library_items';
+      const LS_LIBRARY_ITEM_QTY_PREFIX = 'supply_library_qty_';
+      const LS_SELECTED_CATALOG = 'supply_selected_catalog';
+      const LS_STAR_BALANCE = 'supply_star_balance';
+      const GEOCODE_MAPS_CO_API_KEY = "688d48c922bc2536125037stb7891a8"; // API Key
+
+
+      const prefilledDeliveryData = {
+          address: "123 Willow Creek Rd, Edmonton, AB T5T 1T1",
+          phone: "780-555-0101",
+          date: new Date(Date.now() + 3 * 24 * 60 * 60 * 1000).toISOString().split('T')[0], 
+          time: "15:30",
+          note: "Please call upon arrival."
+      };
+
+      if (appVersionDisplay) appVersionDisplay.textContent = `fs v${APP_VERSION}`;
+      
+      // --- Location Logic ---
+      // Comprehensive list of countries with their emoji flags
+      const countriesData = [
+        { name: "Afghanistan", flag: "🇦🇫" }, { name: "Albania", flag: "🇦🇱" },
+        { name: "Algeria", flag: "🇩🇿" }, { name: "Andorra", flag: "🇦🇩" },
+        { name: "Angola", flag: "🇦🇴" }, { name: "Antigua and Barbuda", flag: "🇦🇬" },
+        { name: "Argentina", flag: "🇦🇷" }, { name: "Armenia", flag: "🇦🇲" },
+        { name: "Australia", flag: "🇦🇺" }, { name: "Austria", flag: "🇦🇹" },
+        { name: "Azerbaijan", flag: "🇦🇿" }, { name: "Bahamas", flag: "🇧🇸" },
+        { name: "Bahrain", flag: "🇧🇭" }, { name: "Bangladesh", flag: "🇧🇩" },
+        { name: "Barbados", flag: "🇧🇧" }, { name: "Belarus", flag: "🇧🇾" },
+        { name: "Belgium", flag: "🇧🇪" }, { name: "Belize", flag: "🇧🇿" },
+        { name: "Benin", flag: "🇧🇯" }, { name: "Bhutan", flag: "🇧🇹" },
+        { name: "Bolivia", flag: "🇧🇴" }, { name: "Bosnia and Herzegovina", flag: "🇧🇦" },
+        { name: "Botswana", flag: "🇧🇼" }, { name: "Brazil", flag: "🇧🇷" },
+        { name: "Brunei", flag: "🇧🇳" }, { name: "Bulgaria", flag: "🇧🇬" },
+        { name: "Burkina Faso", flag: "🇧🇫" }, { name: "Burundi", flag: "🇧🇮" },
+        { name: "Cabo Verde", flag: "🇨🇻" }, { name: "Cambodia", flag: "🇰🇭" },
+        { name: "Cameroon", flag: "🇨🇲" }, { name: "Canada", flag: "🇨🇦" },
+        { name: "Central African Republic", flag: "🇨🇫" }, { name: "Chad", flag: "🇹🇩" },
+        { name: "Chile", flag: "🇨🇱" }, { name: "China", flag: "🇨🇳" },
+        { name: "Colombia", flag: "🇨🇴" }, { name: "Comoros", flag: "🇰🇲" },
+        { name: "Congo, Democratic Republic of the", flag: "🇨🇩" }, { name: "Congo, Republic of the", flag: "🇨🇬" },
+        { name: "Costa Rica", flag: "🇨🇷" }, { name: "Croatia", flag: "🇭🇷" },
+        { name: "Cuba", flag: "🇨🇺" }, { name: "Cyprus", flag: "🇨🇾" },
+        { name: "Czech Republic", flag: "🇨🇿" }, { name: "Denmark", flag: "🇩🇰" },
+        { name: "Djibouti", flag: "🇩🇯" }, { name: "Dominica", flag: "🇩🇲" },
+        { name: "Dominican Republic", flag: "🇩🇴" }, { name: "Ecuador", flag: "🇪🇨" },
+        { name: "Egypt", flag: "🇪🇬" }, { name: "El Salvador", flag: "🇸🇻" },
+        { name: "Equatorial Guinea", flag: "🇬🇶" }, { name: "Eritrea", flag: "🇪🇷" },
+        { name: "Estonia", flag: "🇪🇪" }, { name: "Eswatini", flag: "🇸🇿" },
+        { name: "Ethiopia", flag: "🇪🇹" }, { name: "Fiji", flag: "🇫🇯" },
+        { name: "Finland", flag: "🇫🇮" }, { name: "France", flag: "🇫🇷" },
+        { name: "Gabon", flag: "🇬🇦" }, { name: "Gambia", flag: "🇬🇲" },
+        { name: "Georgia", flag: "🇬🇪" }, { name: "Germany", flag: "🇩🇪" },
+        { name: "Ghana", flag: "🇬🇭" }, { name: "Greece", flag: "🇬🇷" },
+        { name: "Grenada", flag: "🇬🇩" }, { name: "Guatemala", flag: "🇬🇹" },
+        { name: "Guinea", flag: "🇬🇳" }, { name: "Guinea-Bissau", flag: "🇬🇼" },
+        { name: "Guyana", flag: "🇬🇾" }, { name: "Haiti", flag: "🇭🇹" },
+        { name: "Honduras", flag: "🇭🇳" }, { name: "Hungary", flag: "🇭🇺" },
+        { name: "Iceland", flag: "🇮🇸" }, { name: "India", flag: "🇮🇳" },
+        { name: "Indonesia", flag: "🇮🇩" }, { name: "Iran", flag: "🇮🇷" },
+        { name: "Iraq", flag: "🇮🇶" }, { name: "Ireland", flag: "🇮🇪" },
+        { name: "Israel", flag: "🇮🇱" }, { name: "Italy", flag: "🇮🇹" },
+        { name: "Jamaica", flag: "🇯🇲" }, { name: "Japan", flag: "🇯🇵" },
+        { name: "Jordan", flag: "🇯🇴" }, { name: "Kazakhstan", flag: "🇰🇿" },
+        { name: "Kenya", flag: "🇰🇪" }, { name: "Kiribati", flag: "🇰🇮" },
+        { name: "Kuwait", flag: "🇰🇼" }, { name: "Kyrgyzstan", flag: "🇰🇬" },
+        { name: "Laos", flag: "🇱🇦" }, { name: "Latvia", flag: "🇱🇻" },
+        { name: "Lebanon", flag: "🇱🇧" }, { name: "Lesotho", flag: "🇱🇸" },
+        { name: "Liberia", flag: "🇱🇷" }, { name: "Libya", flag: "🇱🇾" },
+        { name: "Liechtenstein", flag: "🇱🇮" }, { name: "Lithuania", flag: "🇱🇹" },
+        { name: "Luxembourg", flag: "🇱🇺" }, { name: "Madagascar", flag: "🇲🇬" },
+        { name: "Malawi", flag: "🇲🇼" }, { name: "Malaysia", flag: "🇲🇾" },
+        { name: "Maldives", flag: "🇲🇻" }, { name: "Mali", flag: "🇲🇱" },
+        { name: "Malta", flag: "🇲🇹" }, { name: "Marshall Islands", flag: "🇲🇭" },
+        { name: "Mauritania", flag: "🇲🇷" }, { name: "Mauritius", flag: "🇲🇺" },
+        { name: "Mexico", flag: "🇲🇽" }, { name: "Micronesia", flag: "🇫🇲" },
+        { name: "Moldova", flag: "🇲🇩" }, { name: "Monaco", flag: "🇲🇨" },
+        { name: "Mongolia", flag: "🇲🇳" }, { name: "Montenegro", flag: "🇲🇪" },
+        { name: "Morocco", flag: "🇲🇦" }, { name: "Mozambique", flag: "🇲🇿" },
+        { name: "Myanmar", flag: "🇲🇲" }, { name: "Namibia", flag: "🇳🇦" },
+        { name: "Nauru", flag: "🇳🇷" }, { name: "Nepal", flag: "🇳🇵" },
+        { name: "Netherlands", flag: "🇳🇱" }, { name: "New Zealand", flag: "🇳🇿" },
+        { name: "Nicaragua", flag: "🇳🇮" }, { name: "Niger", flag: "🇳🇪" },
+        { name: "Nigeria", flag: "🇳🇬" }, { name: "North Korea", flag: "🇰🇵" },
+        { name: "North Macedonia", flag: "🇲🇰" }, { name: "Norway", flag: "🇳🇴" },
+        { name: "Oman", flag: "🇴🇲" }, { name: "Pakistan", flag: "🇵🇰" },
+        { name: "Palau", flag: "🇵🇼" }, { name: "Palestine", flag: "🇵🇸" },
+        { name: "Panama", flag: "🇵🇦" }, { name: "Papua New Guinea", flag: "🇵🇬" },
+        { name: "Paraguay", flag: "🇵🇾" }, { name: "Peru", flag: "🇵🇪" },
+        { name: "Philippines", flag: "🇵🇭" }, { name: "Poland", flag: "🇵🇱" },
+        { name: "Portugal", flag: "🇵🇹" }, { name: "Qatar", flag: "🇶🇦" },
+        { name: "Romania", flag: "🇷🇴" }, { name: "Russia", flag: "🇷🇺" },
+        { name: "Rwanda", flag: "🇷🇼" }, { name: "Saint Kitts and Nevis", flag: "🇰🇳" },
+        { name: "Saint Lucia", flag: "🇱🇨" }, { name: "Saint Vincent and the Grenadines", flag: "🇻🇨" },
+        { name: "Samoa", flag: "🇼🇸" }, { name: "San Marino", flag: "🇸🇲" },
+        { name: "Sao Tome and Principe", flag: "🇸🇹" }, { name: "Saudi Arabia", flag: "🇸🇦" },
+        { name: "Senegal", flag: "🇸🇳" }, { name: "Serbia", flag: "🇷🇸" },
+        { name: "Seychelles", flag: "🇸🇨" }, { name: "Sierra Leone", flag: "🇸🇱" },
+        { name: "Singapore", flag: "🇸🇬" }, { name: "Slovakia", flag: "🇸🇰" },
+        { name: "Slovenia", flag: "🇸🇮" }, { name: "Solomon Islands", flag: "🇸🇧" },
+        { name: "Somalia", flag: "🇸🇴" }, { name: "South Africa", flag: "🇿🇦" },
+        { name: "South Korea", flag: "🇰🇷" }, { name: "South Sudan", flag: "🇸🇸" },
+        { name: "Spain", flag: "🇪🇸" }, { name: "Sri Lanka", flag: "🇱🇰" },
+        { name: "Sudan", flag: "🇸🇩" }, { name: "Suriname", flag: "🇸🇷" },
+        { name: "Sweden", flag: "🇸🇪" }, { name: "Switzerland", flag: "🇨🇭" },
+        { name: "Syria", flag: "🇸🇾" }, { name: "Taiwan", flag: "🇹🇼" },
+        { name: "Tajikistan", flag: "🇹🇯" }, { name: "Tanzania", flag: "🇹🇿" },
+        { name: "Thailand", flag: "🇹🇭" }, { name: "Timor-Leste", flag: "🇹🇱" },
+        { name: "Togo", flag: "🇹🇬" }, { name: "Tonga", flag: "🇹🇴" },
+        { name: "Trinidad and Tobago", flag: "🇹🇹" }, { name: "Tunisia", flag: "🇹🇳" },
+        { name: "Turkey", flag: "🇹🇷" }, { name: "Turkmenistan", flag: "🇹🇲" },
+        { name: "Tuvalu", flag: "🇹🇻" }, { name: "Uganda", flag: "🇺🇬" },
+        { name: "Ukraine", flag: "🇺🇦" }, { name: "United Arab Emirates", flag: "🇦🇪" },
+        { name: "United Kingdom", flag: "🇬🇧" }, { name: "United States", flag: "🇺🇸" },
+        { name: "Uruguay", flag: "🇺🇾" }, { name: "Uzbekistan", flag: "🇺🇿" },
+        { name: "Vanuatu", flag: "🇻🇺" }, { name: "Vatican City", flag: "🇻🇦" },
+        { name: "Venezuela", flag: "🇻🇪" }, { name: "Vietnam", flag: "🇻🇳" },
+        { name: "Yemen", flag: "🇾🇪" }, { name: "Zambia", flag: "🇿🇲" },
+        { name: "Zimbabwe", flag: "🇿🇼" }
+      ];
+
+
+      function updateUserLocationDisplay(location) {
+        if (userLocationSpan) {
+            userLocationSpan.textContent = location;
+        }
+      }
+
+function showInlineLocationSelector() {
+    if (!inlineLocationSelector || !inlineCountryListContainer) return;
+
+    inlineCountryListContainer.innerHTML = ''; // Clear previous list and button
+
+    // Create and add "Use Current Location" button
+    const currentLocationButton = document.createElement('button');
+    currentLocationButton.className = 'location-current-button';
+    currentLocationButton.innerHTML = `<i class="fas fa-location-crosshairs"></i> Use Current Location`;
+    currentLocationButton.addEventListener('click', () => {
+        localStorage.setItem('supply_force_geolocate', 'true');
+        initializeLocation();
+        hideInlineLocationSelector();
+    });
+    inlineCountryListContainer.appendChild(currentLocationButton);
+
+    // Sort countries alphabetically and create grid
+    countriesData.sort((a, b) => a.name.localeCompare(b.name));
+
+    countriesData.forEach(country => {
+        const itemDiv = document.createElement('div');
+        itemDiv.className = 'location-country-item';
+        itemDiv.innerHTML = `<span class="flag-emoji">${country.flag}</span> <span title="${country.name}">${country.name}</span>`;
+        itemDiv.addEventListener('click', () => {
+            localStorage.setItem(LS_USER_LOCATION, country.name);
+            updateUserLocationDisplay(country.name);
+            localStorage.removeItem('supply_force_geolocate');
+            hideInlineLocationSelector();
+        });
+        inlineCountryListContainer.appendChild(itemDiv);
+    });
+
+    // Show the selector with smooth animation (no automatic scrolling)
+    inlineLocationSelector.classList.remove('hidden');
+}
+
+function hideInlineLocationSelector() {
+    if (!inlineLocationSelector) return;
+    
+    // Add the hidden class to trigger the smooth collapse animation
+    inlineLocationSelector.classList.add('hidden');
+}
+
+// Add scroll listener to hide location selector only when scrolled out of view
+window.addEventListener('scroll', () => {
+    if (inlineLocationSelector && !inlineLocationSelector.classList.contains('hidden')) {
+        const rect = inlineLocationSelector.getBoundingClientRect();
+        const viewportHeight = window.innerHeight;
+        
+        // Hide only if the entire selector is completely out of view (above or below viewport)
+        if (rect.bottom < 0 || rect.top > viewportHeight) {
+            hideInlineLocationSelector();
+        }
+    }
+});
+
+// Close when clicking outside
+document.addEventListener('click', (event) => {
+    if (inlineLocationSelector && !inlineLocationSelector.classList.contains('hidden') && 
+        !inlineLocationSelector.contains(event.target) && 
+        !userLocationSpan.contains(event.target)) {
+        hideInlineLocationSelector();
+    }
+});
+      
+      function setLocationManually(reason, bypassAlert = false) {
+        console.warn(reason);
+        const defaultLocation = "Lagos"; 
+        const placeholderLocation = "Your Area";
+        
+        let finalLocation = defaultLocation;
+        let alertMessage = `Could not automatically determine your location (${reason}). Defaulting to ${defaultLocation}. Click the location to select from a list.`;
+
+        if (reason.includes("API") || reason.includes("Parse")) {
+            finalLocation = placeholderLocation;
+            alertMessage = `Could not fetch city/country from coordinates. Displaying as '${finalLocation}'. Click the location to select from a list.`;
+        } else if (reason.includes("Denied")) {
+            alertMessage = `Location access was denied. Defaulting to ${defaultLocation}. Click the location to select from a list.`;
+        } else if (reason.includes("Unavailable") || reason.includes("Timeout")) {
+            alertMessage = `Geolocation is currently unavailable. Defaulting to ${defaultLocation}. Click the location to select from a list.`;
+        }
+        
+        if (!bypassAlert) { // Only show alert if not bypassed (e.g. after "Use Current Location" click)
+            alert(alertMessage);
+        }
+        localStorage.setItem(LS_USER_LOCATION, finalLocation); 
+        updateUserLocationDisplay(finalLocation);
+        localStorage.removeItem('supply_force_geolocate'); // Clear the flag
+      }
+
+      function initializeLocation(forceGeolocate = false) {
+        const storedLocation = localStorage.getItem(LS_USER_LOCATION);
+        const shouldForceGeolocate = localStorage.getItem('supply_force_geolocate') === 'true';
+
+        if (storedLocation && !shouldForceGeolocate && storedLocation !== "Your Area (Auto-Detected)" && storedLocation !== "Your Area") {
+            updateUserLocationDisplay(storedLocation);
+        } else {
+            if (navigator.geolocation) {
+                navigator.geolocation.getCurrentPosition(
+                    async (position) => { 
+                        const { latitude, longitude } = position.coords;
+                        console.log("Geolocation permission granted. Coordinates:", latitude, longitude);
+
+                        if (GEOCODE_MAPS_CO_API_KEY === "YOUR_API_KEY_HERE" || GEOCODE_MAPS_CO_API_KEY === "681b1c274ddc6654628463eag32adad") {
+                            console.warn("geocode.maps.co API key is not set or is a dummy. Using placeholder location.");
+                            setLocationManually("API key missing/dummy", shouldForceGeolocate); // Pass bypass flag
+                            if (!shouldForceGeolocate) { // Only show this specific alert if not forced
+                                alert("Developer Note: geocode.maps.co API key is not set or is a dummy. Automatic city/country lookup disabled. Click the location to select from a list.");
+                            }
+                            return;
+                        }
+                        
+                        try {
+                            const response = await fetch(`https://geocode.maps.co/reverse?lat=${latitude}&lon=${longitude}&api_key=${GEOCODE_MAPS_CO_API_KEY}`);
+                            if (!response.ok) {
+                                throw new Error(`API request failed with status ${response.status}`);
+                            }
+                            const data = await response.json();
+                            console.log("Geocoding API Response:", data);
+
+                            let fetchedLocation = "";
+                            if (data.address) {
+                                if (data.address.city) fetchedLocation = data.address.city;
+                                else if (data.address.town) fetchedLocation = data.address.town;
+                                else if (data.address.village) fetchedLocation = data.address.village;
+                                else if (data.address.hamlet) fetchedLocation = data.address.hamlet;
+                                else if (data.address.county) fetchedLocation = data.address.county;
+
+                                if (data.address.country && fetchedLocation && fetchedLocation !== data.address.country) { // Avoid "Country, Country"
+                                    fetchedLocation += `, ${data.address.country}`;
+                                } else if (data.address.country && !fetchedLocation) {
+                                    fetchedLocation = data.address.country;
+                                } else if (!fetchedLocation && data.address.country) { // Fallback to just country if no city parts
+                                     fetchedLocation = data.address.country;
+                                }
+                            }
+
+                            if (fetchedLocation) {
+                                localStorage.setItem(LS_USER_LOCATION, fetchedLocation);
+                                updateUserLocationDisplay(fetchedLocation);
+                                if (shouldForceGeolocate) { // More direct feedback if user clicked "Use Current Location"
+                                     alert(`Location updated to: ${fetchedLocation}.`);
+                                } else {
+                                     alert(`Location automatically set to: ${fetchedLocation}. You can click it to change if needed.`);
+                                }
+                            } else {
+                                setLocationManually("Parse API response for address parts", shouldForceGeolocate);
+                            }
+                        } catch (apiError) {
+                            console.error("Error fetching location from geocode.maps.co API:", apiError);
+                            setLocationManually("API call failed", shouldForceGeolocate);
+                        } finally {
+                             localStorage.removeItem('supply_force_geolocate'); // Always clear the flag
+                        }
+                    },
+                    (error) => {
+                        console.warn(`Geolocation error: ${error.message} (Code: ${error.code})`);
+                        let reason = "Unknown geolocation error";
+                        if (error.code === error.PERMISSION_DENIED) reason = "Denied";
+                        else if (error.code === error.POSITION_UNAVAILABLE) reason = "Unavailable";
+                        else if (error.code === error.TIMEOUT) reason = "Timeout";
+                        setLocationManually(reason, shouldForceGeolocate);
+                    }
+                );
+            } else {
+                console.warn("Geolocation not supported by this browser.");
+                setLocationManually("Geolocation not supported", shouldForceGeolocate);
+            }
+        }
+      }
+
+      if (userLocationSpan) {
+    userLocationSpan.addEventListener('click', (event) => {
+        event.stopPropagation();
+        if (inlineLocationSelector.classList.contains('hidden')) {
+            showInlineLocationSelector();
+        } else {
+            hideInlineLocationSelector();
+        }
+    });
+}
+      initializeLocation(); // Initial call on page load
+
+
+      const starBalanceDisplay = starButton ? starButton.querySelector('span') : null;
+      function updateStarBalanceDisplay() {
+          if (starBalanceDisplay) {
+              const currentBalance = parseInt(localStorage.getItem(LS_STAR_BALANCE) || '0');
+              starBalanceDisplay.textContent = `⭐️ ${currentBalance}`;
+          }
+      }
+      updateStarBalanceDisplay();
+
+      let blobHues = [270, 220, 170, 250, 300, 120]; 
+
+      function animateBackgroundBlobs() {
+        if (blobsContainer && blobs.length > 0) {
+            blobs.forEach((blob, index) => {
+                blobHues[index] = (blobHues[index] + (Math.random() * 0.2 + 0.05)) % 360; 
+                blob.style.backgroundColor = `hsl(${blobHues[index]}, 70%, 60%)`;
+            });
+        }
+        requestAnimationFrame(animateBackgroundBlobs);
+      }
+      if (blobsContainer && blobs.length > 0) animateBackgroundBlobs();
+
+      function getLibraryItems() {
+          return JSON.parse(localStorage.getItem(LS_LIBRARY_ITEMS) || '[]');
+      }
+
+      function saveLibraryItems(items) {
+          localStorage.setItem(LS_LIBRARY_ITEMS, JSON.stringify(items));
+          updateLibraryDropdown(); 
+      }
+
+      function removeFromLibrary(productId) {
+        let items = getLibraryItems();
+        items = items.filter(item => item.id !== productId);
+        localStorage.removeItem(LS_LIBRARY_ITEM_QTY_PREFIX + productId);
+        localStorage.removeItem(LS_PRODUCT_GOTTEN_PREFIX + productId); 
+        saveLibraryItems(items); 
+
+        const productCard = document.getElementById(`product-${productId}-card`);
+        if (productCard) {
+            const getButton = productCard.querySelector('.card-action-button');
+            if (getButton) {
+                getButton.classList.remove('hidden');
+                const buttonContainer = getButton.closest('.card-actions-container');
+                if (buttonContainer) buttonContainer.style.minHeight = '34px'; 
+            }
+        }
+      }
+
+      function addToLibrary(product) {
+          const items = getLibraryItems();
+          if (!items.find(item => item.id === product.id)) {
+              items.push(product);
+              localStorage.setItem(LS_LIBRARY_ITEM_QTY_PREFIX + product.id, '1'); 
+              localStorage.setItem(LS_PRODUCT_GOTTEN_PREFIX + product.id, 'true');
+              saveLibraryItems(items);
+          }
+      }
+      
+      function updateLibraryDropdown() {
+          if (!libraryDropdown || !libraryEmptyMessage) return;
+          const items = getLibraryItems();
+          
+          const existingItemElements = libraryDropdown.querySelectorAll('.nav-dropdown-item');
+          existingItemElements.forEach(itemEl => itemEl.remove());
+
+          if (libraryActionsContainer) libraryActionsContainer.remove();
+
+          if (items.length === 0) {
+              libraryEmptyMessage.classList.remove('hidden');
+          } else {
+              libraryEmptyMessage.classList.add('hidden');
+
+              libraryActionsContainer = document.createElement('div');
+              libraryActionsContainer.className = 'library-top-actions';
+
+              overallDeliveryButton = document.createElement('button');
+              overallDeliveryButton.id = 'begin-overall-delivery-button';
+              overallDeliveryButton.className = 'nav-dropdown-action-button';
+              overallDeliveryButton.textContent = 'Begin Delivery';
+              overallDeliveryButton.addEventListener('click', () => openDeliveryModal());
+              libraryActionsContainer.appendChild(overallDeliveryButton);
+
+              shareAllLibraryButton = document.createElement('button');
+              shareAllLibraryButton.id = 'share-all-library-button';
+              shareAllLibraryButton.className = 'nav-dropdown-action-button';
+              shareAllLibraryButton.textContent = 'Share All';
+              shareAllLibraryButton.addEventListener('click', shareAllLibraryItems);
+              libraryActionsContainer.appendChild(shareAllLibraryButton);
+              
+              libraryDropdown.insertBefore(libraryActionsContainer, libraryEmptyMessage);
+
+              items.forEach(item => {
+                  const currentQty = localStorage.getItem(LS_LIBRARY_ITEM_QTY_PREFIX + item.id) || '1';
+                  const div = document.createElement('div');
+                  div.className = 'nav-dropdown-item';
+                  div.setAttribute('role', 'menuitem');
+                  div.dataset.productId = item.id; 
+                  div.innerHTML = `
+                      <img src="${item.image || 'https://placehold.co/40x40/374151/9CA3AF?text=P'}" alt="${item.title}" class="nav-dropdown-item-icon" onerror="this.onerror=null; this.src='https://placehold.co/40x40/374151/9CA3AF?text=P'; this.alt='Product';">
+                      <div class="nav-dropdown-item-content">
+                          <div class="nav-dropdown-item-title">${item.title} <i class="fas fa-globe text-gray-400 text-xs ml-1.5"></i></div>
+                          <div class="nav-dropdown-item-desc">by ${item.creator || 'Unknown Creator'}</div>
+                          <div class="library-item-controls">
+                              <div class="library-item-qty-preview">
+                                  <input type="number" value="${currentQty}" min="0" class="library-item-qty-input" data-product-id="${item.id}" aria-label="Quantity for ${item.title}">
+                                  <a href="#product-${item.id}-card" class="nav-dropdown-action-button library-preview-button">Preview</a>
+                              </div>
+                          </div>
+                      </div>
+                  `;
+                  libraryDropdown.insertBefore(div, libraryEmptyMessage); 
+                  
+                  const qtyInput = div.querySelector('.library-item-qty-input');
+                  qtyInput.addEventListener('change', (e) => {
+                      let newQty = parseInt(e.target.value);
+                      const productId = e.target.dataset.productId;
+
+                      if (isNaN(newQty) || newQty < 0) newQty = 0; 
+                      e.target.value = newQty; 
+                      
+                      if (newQty === 0) {
+                          removeFromLibrary(productId); 
+                      } else {
+                          localStorage.setItem(LS_LIBRARY_ITEM_QTY_PREFIX + productId, newQty.toString());
+                      }
+                  });
+
+                  const previewButton = div.querySelector('.library-preview-button');
+                  if (previewButton) {
+                      previewButton.addEventListener('click', () => {
+                          if (libraryDropdown.classList.contains('active')) {
+                              libraryDropdown.classList.remove('active');
+                              if(libraryButton) libraryButton.setAttribute('aria-expanded', 'false');
+                          }
+                      });
+                  }
+              });
+          }
+      }
+      updateLibraryDropdown();
+
+      function shareAllLibraryItems() {
+        const items = getLibraryItems();
+        if (items.length === 0) {
+            alert("Your library is empty. Add some items to share!");
+            return;
+        }
+        let shareText = "Check out my Supply library items:\n";
+        items.forEach(item => {
+            const qty = localStorage.getItem(LS_LIBRARY_ITEM_QTY_PREFIX + item.id) || 1;
+            shareText += `- ${item.title} (Qty: ${qty})\n`;
+        });
+        shareText += `\nView them on Fromsupply: ${window.location.href.split('#')[0]}`;
+
+        try {
+            if (navigator.share) {
+                navigator.share({
+                    title: 'My Fromsupply Library',
+                    text: shareText,
+                    url: window.location.href.split('#')[0] 
+                });
+            } else {
+                navigator.clipboard.writeText(shareText);
+                alert('Library details Shared to clipboard!');
+            }
+        } catch (err) {
+            navigator.clipboard.writeText(shareText);
+            alert('Library details Shared to clipboard (share failed).');
+        }
+        if (libraryDropdown.classList.contains('active')) {
+            libraryDropdown.classList.remove('active');
+            if(libraryButton) libraryButton.setAttribute('aria-expanded', 'false');
+        }
+      }
+
+      function populateDeliveryForm() {
+        if (!deliveryAddressInput || !deliveryPhoneInput || !deliveryDateInput || !deliveryTimeInput || !deliveryNoteInput || !deliveryForMeCheckbox) return;
+        if (deliveryForMeCheckbox.checked) {
+            deliveryAddressInput.value = prefilledDeliveryData.address;
+            deliveryPhoneInput.value = prefilledDeliveryData.phone;
+            deliveryDateInput.value = prefilledDeliveryData.date;
+            deliveryTimeInput.value = prefilledDeliveryData.time;
+            deliveryNoteInput.value = prefilledDeliveryData.note;
+        } else {
+            deliveryAddressInput.value = '';
+            deliveryPhoneInput.value = '';
+            deliveryDateInput.value = '';
+            deliveryTimeInput.value = '';
+            deliveryNoteInput.value = '';
+        }
+      }
+
+      function openDeliveryModal(productTitle = null) {
+        if (!deliveryModal || !deliveryModalContent) return;
+        populateDeliveryForm(); 
+        
+        const modalTitleEl = deliveryModalContent.querySelector('h2');
+        if (productTitle) { 
+            modalTitleEl.textContent = `Delivery for: ${productTitle}`;
+        } else {
+            modalTitleEl.textContent = 'Delivery for Library Items';
+        }
+
+        deliveryModal.classList.remove('hidden');
+        deliveryModal.style.opacity = '0'; 
+        deliveryModalContent.style.opacity = '0';
+        deliveryModalContent.style.transform = 'scale(0.95)';
+
+        requestAnimationFrame(() => {
+            deliveryModal.style.opacity = '1';
+            deliveryModalContent.style.opacity = '1';
+            deliveryModalContent.style.transform = 'scale(1)';
+        });
+      }
+
+      function closeDeliveryModal() {
+        if (!deliveryModal || !deliveryModalContent) return;
+        deliveryModal.style.opacity = '0';
+        deliveryModalContent.style.opacity = '0';
+        deliveryModalContent.style.transform = 'scale(0.95)';
+        setTimeout(() => {
+            deliveryModal.classList.add('hidden');
+        }, 300); 
+      }
+
+      if (deliveryForMeCheckbox) {
+        deliveryForMeCheckbox.addEventListener('change', populateDeliveryForm);
+      }
+      if (closeDeliveryModalButton) {
+        closeDeliveryModalButton.addEventListener('click', closeDeliveryModal);
+      }
+      if (confirmDeliveryButton) {
+        confirmDeliveryButton.addEventListener('click', () => {
+            if (!deliveryAddressInput || !deliveryPhoneInput || !deliveryDateInput || !deliveryTimeInput ) return;
+            if (!deliveryAddressInput.value || !deliveryPhoneInput.value || !deliveryDateInput.value || !deliveryTimeInput.value) {
+                alert('Please fill in all required delivery fields (Address, Phone, Date, Time).');
+                return;
+            }
+            alert(`Delivery confirmed!\nAddress: ${deliveryAddressInput.value}\nPhone: ${deliveryPhoneInput.value}\nDate: ${deliveryDateInput.value} ${deliveryTimeInput.value}`);
+            closeDeliveryModal();
+        });
+      }
+      if (deliveryModal) {
+        deliveryModal.addEventListener('click', (event) => {
+            if (event.target === deliveryModal) {
+                closeDeliveryModal();
+            }
+        });
+      }
+
+      productCards.forEach(card => {
+          const getButton = card.querySelector('.card-action-button');
+          const ShareButton = card.querySelector('.Share-button-card'); 
+          const shareFeedback = card.querySelector('.share-feedback');
+          const giftButtonContainer = card.querySelector('.gift-button-container');
+          const giftButton = giftButtonContainer ? giftButtonContainer.querySelector('.gift-button') : null;
+          const giftInputWrapper = giftButtonContainer ? giftButtonContainer.querySelector('.gift-input-wrapper') : null;
+          const giftUsernameInput = giftInputWrapper ? giftInputWrapper.querySelector('.gift-username-input') : null;
+          const clearGiftSuggestionButton = giftInputWrapper ? giftInputWrapper.querySelector('.clear-gift-suggestion') : null;
+          
+          const productImageContainer = card.querySelector('.card-image-container');
+          const img = productImageContainer ? productImageContainer.querySelector('img') : null;
+          const productTitleElement = card.querySelector('.card-title'); 
+
+          if (img) {
+              img.onerror = function() {
+                  if (productImageContainer) productImageContainer.classList.add('image-error');
+              }
+          }
+          
+          if (getButton) {
+              const productId = getButton.dataset.productId;
+              const productTitle = getButton.dataset.productTitle;
+              const productCreator = getButton.dataset.productCreator;
+              const productImage = getButton.dataset.productImage;
+              const productPrice = getButton.dataset.productPrice;
+
+              if (localStorage.getItem(LS_PRODUCT_GOTTEN_PREFIX + productId) === 'true') {
+                  getButton.classList.add('hidden'); 
+                  const buttonContainer = getButton.closest('.card-actions-container'); 
+                  if (buttonContainer) buttonContainer.style.minHeight = 'auto'; 
+              }
+
+              getButton.addEventListener('click', (event) => {
+                  event.preventDefault(); 
+                  getButton.classList.add('hidden'); 
+                  const buttonContainer = getButton.closest('.card-actions-container');
+                  if (buttonContainer) buttonContainer.style.minHeight = 'auto'; 
+
+                  localStorage.setItem(LS_PRODUCT_GOTTEN_PREFIX + productId, 'true');
+                  addToLibrary({ id: productId, title: productTitle, creator: productCreator, image: productImage, price: productPrice });
+              });
+          }
+
+          if (ShareButton && shareFeedback) { 
+              const productUrl = ShareButton.dataset.productUrl;
+              ShareButton.addEventListener('click', async () => {
+                  const fullUrl = window.location.href.split('#')[0] + productUrl;
+                  try {
+                      await navigator.clipboard.writeText(fullUrl);
+                      shareFeedback.textContent = 'Link Shared!';
+                  } catch (ShareError) { 
+                      shareFeedback.textContent = 'Share Failed'; 
+                  }
+                  shareFeedback.classList.remove('hidden');
+                  setTimeout(() => shareFeedback.classList.add('hidden'), 2000);
+              });
+          }
+
+        if (giftButton && giftInputWrapper && giftUsernameInput && clearGiftSuggestionButton) {
+    const productId = giftButton.dataset.productId;
+    const productPrice = giftButton.dataset.productPrice;
+    const productTitleText = productTitleElement ? productTitleElement.textContent.replace(/ <i class="fas fa-globe.+?<\/i>$/, '').trim() : "this item";
+    let isFriendGiftSuggested = productId === 'wallet'; 
+    const friendName = "Chim"; 
+    const friendAvatar = "https://placehold.co/20x20/6B7280/FFFFFF?text=C";
+    let hasGiftedSuggestion = false; // Track if suggestion was already used
+
+    // Function to add item to invisible cart
+    const addToInvisibleCart = (recipientName) => {
+        const cartItems = JSON.parse(localStorage.getItem('supply_gift_cart') || '[]');
+        const cartItem = {
+            id: Date.now(), // Simple unique ID
+            productId: productId,
+            productTitle: productTitleText,
+            productPrice: productPrice,
+            recipient: recipientName,
+            timestamp: new Date().toISOString()
+        };
+        cartItems.push(cartItem);
+        localStorage.setItem('supply_gift_cart', JSON.stringify(cartItems));
+        
+        return cartItem;
+    };
+
+    // Reusable function for green glow effect on input
+    const showInputSuccessGlow = (callback) => {
+        // Add green glow effect to input
+        giftUsernameInput.classList.add('gift-input-success');
+        
+        // Remove glow and execute callback after animation
+        setTimeout(() => {
+            giftUsernameInput.classList.remove('gift-input-success');
+            if (callback) callback();
+        }, 2000);
+    };
+
+    const showSuccessAndConvertToRegular = () => {
+        // Remove suggestion functionality
+        hasGiftedSuggestion = true;
+        isFriendGiftSuggested = false;
+        
+        // Change to regular gift button
+        giftButton.innerHTML = 'Gift';
+    };
+
+    const showGiftInputUI = (isOverride = false) => {
+        giftButton.classList.add('hidden');
+        giftInputWrapper.classList.add('active');
+        giftUsernameInput.value = ''; 
+        clearGiftSuggestionButton.classList.add('hidden'); 
+
+        if (isFriendGiftSuggested && !isOverride && !hasGiftedSuggestion) {
+            giftUsernameInput.placeholder = `Gift to ${friendName} or enter...`;
+            giftUsernameInput.value = friendName; 
+            clearGiftSuggestionButton.classList.remove('hidden'); 
+        } else {
+            giftUsernameInput.placeholder = 'Enter username...';
+        }
+        giftUsernameInput.focus();
+    };
+    
+    // Initial button setup
+    if (isFriendGiftSuggested && !hasGiftedSuggestion) {
+        giftButton.innerHTML = `Gift <img src="${friendAvatar}" alt="${friendName}" class="suggested-recipient-avatar"> ${friendName} <span class="override-chim-suggestion">&times;</span>`;
+        const overrideChimSpan = giftButton.querySelector('.override-chim-suggestion');
+        if (overrideChimSpan) {
+            overrideChimSpan.addEventListener('click', (ev) => {
+                ev.stopPropagation(); 
+                showGiftInputUI(true); 
+            });
+        }
+    } else {
+        giftButton.textContent = 'Gift';
+    }
+
+    giftButton.addEventListener('click', (e) => {
+        if (e.target.classList.contains('override-chim-suggestion') || (e.target.parentElement && e.target.parentElement.classList.contains('override-chim-suggestion'))) {
+            return; // Let the override handler deal with this
+        }
+        
+        if (isFriendGiftSuggested && !hasGiftedSuggestion) {
+            // Add suggested gift directly to cart
+            addToInvisibleCart(friendName);
+            alert(`${productTitleText} added to gift cart for ${friendName}!`);
+            showSuccessAndConvertToRegular();
+        } else {
+            // Show input for regular gift buttons
+            showGiftInputUI(false); 
+        }
+    });
+
+    if (clearGiftSuggestionButton) {
+        clearGiftSuggestionButton.addEventListener('click', () => {
+            giftUsernameInput.value = '';
+            giftUsernameInput.placeholder = 'Enter username...';
+            clearGiftSuggestionButton.classList.add('hidden');
+            giftUsernameInput.focus();
+        });
+    }
+
+    giftUsernameInput.addEventListener('input', () => {
+        if (giftUsernameInput.value.trim() !== '') {
+            if (!isFriendGiftSuggested || giftUsernameInput.value !== friendName || hasGiftedSuggestion) {
+                 clearGiftSuggestionButton.classList.remove('hidden');
+            } else if (isFriendGiftSuggested && giftUsernameInput.value === friendName && !hasGiftedSuggestion) {
+                clearGiftSuggestionButton.classList.remove('hidden');
+            }
+        } else {
+             clearGiftSuggestionButton.classList.add('hidden');
+        }
+    });
+    
+    giftUsernameInput.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter') {
+            const username = giftUsernameInput.value.trim();
+            if (username) {
+                addToInvisibleCart(username);
+                alert(`${productTitleText} added to gift cart for ${username}!`);
+                
+                // Show green glow on input field
+                showInputSuccessGlow(() => {
+                    // Hide input and show button after glow
+                    giftInputWrapper.classList.remove('active');
+                    giftButton.classList.remove('hidden');
+                    giftUsernameInput.value = '';
+                    giftButton.textContent = 'Gift';
+                });
+                
+            } else {
+                alert("Please enter a username.");
+            }
+        }
+    });
+
+    document.addEventListener('click', (e) => {
+        if (giftButtonContainer && !giftButtonContainer.contains(e.target) && giftInputWrapper.classList.contains('active')) {
+            giftInputWrapper.classList.remove('active');
+            giftButton.classList.remove('hidden');
+            
+            // Restore appropriate button state
+            if (isFriendGiftSuggested && !hasGiftedSuggestion) {
+                 giftButton.innerHTML = `Gift <img src="${friendAvatar}" alt="${friendName}" class="suggested-recipient-avatar"> ${friendName} <span class="override-chim-suggestion">&times;</span>`;
+                 const newOverrideChimSpan = giftButton.querySelector('.override-chim-suggestion');
+                 if (newOverrideChimSpan) { 
+                     newOverrideChimSpan.addEventListener('click', (ev) => {
+                         ev.stopPropagation();
+                         showGiftInputUI(true);
+                     });
+                 }
+            } else {
+                giftButton.textContent = 'Gift';
+            }
+        }
+    });
+}
+      });
+      
+      function setupDropdown(button, dropdown) {
+        if (button && dropdown) {
+            button.addEventListener('click', (event) => {
+                event.stopPropagation();
+                [starDropdown, libraryDropdown, catalogDropdown, locationModalOverlay].forEach(dd => {
+                    if (dd && dd !== dropdown && dd.classList.contains('active')) {
+                        dd.classList.remove('active');
+                        const correspondingButton = dd.id.includes('star') ? starButton : 
+                                                  (dd.id.includes('library') ? libraryButton : 
+                                                  (dd.id.includes('catalog') ? catalogButton : null));
+                        if(correspondingButton) correspondingButton.setAttribute('aria-expanded', 'false');
+                    } else if (dd && dd !== dropdown && !dd.classList.contains('hidden') && dd.id.includes('location-modal')) {
+                        if (typeof closeLocationModal === 'function') closeLocationModal();
+                    }
+                });
+                const isActive = dropdown.classList.toggle('active');
+                button.setAttribute('aria-expanded', isActive.toString());
+            });
+        }
+      }
+
+      setupDropdown(starButton, starDropdown);
+      setupDropdown(libraryButton, libraryDropdown);
+      setupDropdown(catalogButton, catalogDropdown);
+
+      document.addEventListener('click', (event) => {
+          [starDropdown, libraryDropdown, catalogDropdown].forEach(dd => {
+              if (dd && dd.classList.contains('active')) {
+                  const button = dd.id.includes('star') ? starButton : (dd.id.includes('library') ? libraryButton : catalogButton);
+                  if (button && !button.contains(event.target) && !dd.contains(event.target)) {
+                      dd.classList.remove('active');
+                      button.setAttribute('aria-expanded', 'false');
+                  }
+              }
+          });
+      });
+        document.addEventListener('keydown', (event) => {
+          if (event.key === 'Escape') {
+              if (inlineLocationSelector && !inlineLocationSelector.classList.contains('hidden')) {
+    hideInlineLocationSelector();
+} else if (deliveryModal && !deliveryModal.classList.contains('hidden')) {
+                  closeDeliveryModal();
+              } else if (searchResultsOverlay && !searchResultsOverlay.classList.contains('hidden')) {
+                  if (typeof closeSearchModal === 'function') closeSearchModal();
+              } else {
+                  [starDropdown, libraryDropdown, catalogDropdown].forEach(el => {
+                      if (el && el.classList.contains('nav-dropdown') && el.classList.contains('active')) {
+                          el.classList.remove('active');
+                          const button = el.id.includes('star') ? starButton : (el.id.includes('library') ? libraryButton : catalogButton);
+                          if (button) button.setAttribute('aria-expanded', 'false');
+                      }
+                  });
+              }
+          }
+      });
+
+      if (catalogDropdown && catalogButtonText) {
+          const savedCatalog = localStorage.getItem(LS_SELECTED_CATALOG);
+          if (savedCatalog) {
+              const selectedItem = catalogDropdown.querySelector(`.nav-dropdown-item[data-catalog-value="${savedCatalog}"]`);
+              if (selectedItem) catalogButtonText.textContent = selectedItem.querySelector('.nav-dropdown-item-title').textContent;
+          }
+          catalogDropdown.querySelectorAll('.nav-dropdown-item').forEach(item => {
+              item.addEventListener('click', () => {
+                  const value = item.dataset.catalogValue;
+                  const text = item.querySelector('.nav-dropdown-item-title').textContent;
+                  catalogButtonText.textContent = text;
+                  localStorage.setItem(LS_SELECTED_CATALOG, value);
+                  catalogDropdown.classList.remove('active');
+                  if(catalogButton) catalogButton.setAttribute('aria-expanded', 'false');
+              });
+          });
+      }
+      
+      if (starDropdown) {
+          starDropdown.querySelectorAll('.nav-dropdown-item').forEach(item => {
+              const actionButton = item.querySelector('.nav-dropdown-action-button');
+              const action = item.dataset.action;
+              if (actionButton) { 
+                  actionButton.addEventListener('click', (event) => {
+                      event.stopPropagation(); 
+                      const price = parseInt(actionButton.dataset.price);
+                      alert(`Action: ${action}, Price: $${price}. (Star balance logic not implemented)`);
+                      starDropdown.classList.remove('active');
+                      if(starButton) starButton.setAttribute('aria-expanded', 'false');
+                  });
+              } else { 
+                  item.addEventListener('click', () => {
+                      alert(`Action: ${action}. (Star balance logic not implemented)`);
+                      starDropdown.classList.remove('active');
+                      if(starButton) starButton.setAttribute('aria-expanded', 'false');
+                  });
+              }
+          });
+      }
+
+      document.querySelectorAll('img').forEach(img => {
+        if (((img.complete && img.naturalWidth === 0) || !img.src) && !img.getAttribute('data-error-handled')) {
+            handleImageError(img);
+        }
+        else if (!img.getAttribute('data-error-handled')) { 
+            img.onerror = function() {
+                if (!this.getAttribute('data-error-handled')) handleImageError(this);
+            };
+        }
+      });
+      function handleImageError(img) {
+          img.setAttribute('data-error-handled', 'true'); 
+          const w = img.getAttribute('width') || img.offsetWidth || (img.closest('.nav-dropdown-item-icon') ? 40 : (img.closest('.popup-icon') ? 32 : 100));
+          const h = img.getAttribute('height') || img.offsetHeight || (img.closest('.nav-dropdown-item-icon') ? 40 : (img.closest('.popup-icon') ? 32 : (img.closest('.card-image-container') ? 750 : 100) )); 
+          const alt = img.alt || 'Err';
+          let placeholderText = alt.substring(0,10); 
+          if (img.id === 'logo-image' || (img.alt && img.alt.toLowerCase().includes('logo'))) placeholderText = 'FS';
+          else if (img.closest('.nav-dropdown-item-icon')) placeholderText = img.alt.substring(0,3).toUpperCase() || 'Icon';
+          const placeholder = `https://placehold.co/${w}x${h}/1f2937/6B7280?text=${encodeURIComponent(placeholderText)}`;
+          img.src = placeholder; img.style.objectFit='contain'; img.style.backgroundColor='#1f2937'; img.onerror=null; 
+      }
+
+      let closeSearchModal; 
+
+      if (closeSearchResultsButton && searchResultsOverlay && searchResultsModal) {
+          function openSearchModalLocal() { 
+              if (!searchResultsOverlay || !searchResultsModal) return;
+              searchResultsOverlay.classList.remove('hidden');
+              searchResultsOverlay.style.opacity = '0';
+              searchResultsModal.style.opacity = '0';
+              searchResultsModal.style.transform = 'scale(0.95)';
+              requestAnimationFrame(() => { 
+                  searchResultsOverlay.style.opacity = '1';
+                  searchResultsModal.style.opacity = '1';
+                  searchResultsModal.style.transform = 'scale(1)';
+              });
+          }
+          closeSearchModal = function() { 
+              if (!searchResultsOverlay || !searchResultsModal) return;
+              searchResultsOverlay.style.opacity = '0';
+              searchResultsModal.style.opacity = '0';
+              searchResultsModal.style.transform = 'scale(0.95)';
+              setTimeout(() => searchResultsOverlay.classList.add('hidden'), 300); 
+          }
+          closeSearchResultsButton.addEventListener('click', closeSearchModal);
+          searchResultsOverlay.addEventListener('click', (event) => { if (event.target === searchResultsOverlay) closeSearchModal(); });
+          if(searchResultsOverlay) searchResultsOverlay.openSearchModalLocal = openSearchModalLocal;
+      }
+
+
+      if (heroSearchInput && heroSearchButton) { 
+          const suggestions = [ "handmade leather wallets", "organic honey", "custom portraits", "3d printed vases", "artisan coffee", "ceramic mugs", "silk scarves", "local jams", "wooden toys", "scented candles", "shop local", "gifts by Fromsupply creators" ];
+          let suggestionIndex = 0, charIndex = 0, isDeleting = false, typingTimeout, blinkTimeout, isPaused = false;
+          const typeSpeed = 100, deleteSpeed = 60, pauseBeforeDelete = 1800, pauseBeforeType = 250, blinkInterval = 500;
+          function setCursorVisibility(visible) { let currentPlaceholder = heroSearchInput.placeholder.replace('|', ''); heroSearchInput.placeholder = visible ? currentPlaceholder + '|' : currentPlaceholder; }
+          function blinkCursor(count, callback) { let isVisible = true, currentCount = 0; function blink() { setCursorVisibility(isVisible); isVisible = !isVisible; currentCount++; if (currentCount < count * 2) blinkTimeout = setTimeout(blink, blinkInterval / 2); else { setCursorVisibility(false); if (callback) callback(); } } blink(); }
+          function animatePlaceholder() {
+              clearTimeout(typingTimeout); clearTimeout(blinkTimeout);
+              if (document.activeElement === heroSearchInput || isPaused) {
+                  if (document.activeElement === heroSearchInput && heroSearchInput.value === '') heroSearchInput.placeholder = 'Search local products, creators...';
+                  else if (document.activeElement === heroSearchInput) heroSearchInput.placeholder = ''; 
+                  heroSearchInput.placeholder = heroSearchInput.placeholder.replace('|',''); return;
+              }
+              const currentSuggestion = suggestions[suggestionIndex]; let textWithoutCursor = heroSearchInput.placeholder.replace('|', '');
+              if (isDeleting) {
+                  textWithoutCursor = currentSuggestion.substring(0, charIndex - 1); heroSearchInput.placeholder = textWithoutCursor; setCursorVisibility(true); charIndex--;
+                  if (charIndex === 0) { isDeleting = false; suggestionIndex = (suggestionIndex + 1) % suggestions.length; setCursorVisibility(false); typingTimeout = setTimeout(animatePlaceholder, pauseBeforeType); } 
+                  else typingTimeout = setTimeout(animatePlaceholder, deleteSpeed);
+              } else {
+                  textWithoutCursor = currentSuggestion.substring(0, charIndex + 1); heroSearchInput.placeholder = textWithoutCursor; setCursorVisibility(true); charIndex++;
+                  if (charIndex === currentSuggestion.length) { isDeleting = true; isPaused = true; blinkCursor(3, () => { isPaused = false; typingTimeout = setTimeout(animatePlaceholder, deleteSpeed); }); } 
+                  else typingTimeout = setTimeout(animatePlaceholder, typeSpeed);
+              }
+          }
+          const productPageData = { 
+                "wallet": { id: "wallet", title: "Artisan Leather Wallet", creator: "Alex Chen", description: "Durable, stylish, full-grain leather.", iconClass: "fa-solid fa-wallet", link: "#product-wallet-card", price: 45, keywords: ["wallet", "leather", "artisan", "alex chen", "accessory"] },
+                "honey": { id: "honey", title: "Wildflower Organic Honey", creator: "Beatrice Miller", description: "Pure, raw honey from local wildflowers.", iconClass: "fa-solid fa-jar", link: "#product-honey-card", price: 15, keywords: ["honey", "organic", "wildflower", "beatrice miller", "food", "sweet"] },
+                "portrait": { id: "portrait", title: "Custom Digital Portraits", creator: "Chris DigitalArts", description: "Personalized digital art from photos.", iconClass: "fa-solid fa-palette", link: "#product-portrait-card", price: 75, keywords: ["portrait", "digital art", "custom", "chris digitalarts", "gift", "art"] },
+                "vase": { id: "vase", title: "Geometric 3D Printed Vase", creator: "Diana Designs", description: "Modern, eco-friendly 3D printed vases.", iconClass: "fa-solid fa-shapes", link: "#product-vase-card", price: 30, keywords: ["vase", "3d printed", "geometric", "diana designs", "decor", "home"] },
+                "coffee": { id: "coffee", title: "Artisan Roast Coffee", creator: "Emily's Brews", description: "Freshly roasted small-batch coffee beans.", iconClass: "fa-solid fa-mug-hot", link: "#product-coffee-card", price: 22, keywords: ["coffee", "artisan roast", "beans", "emily's brews", "drink", "beverage"] },
+                "mug": { id: "mug", title: "Handmade Ceramic Mugs", creator: "Fred's Pottery", description: "Unique, handcrafted ceramic mugs.", iconClass: "fa-solid fa-mug-saucer", link: "#product-mug-card", price: 28, keywords: ["mug", "ceramic", "handmade", "fred's pottery", "pottery", "kitchen"] },
+                "jam": { id: "jam", title: "Artisan Strawberry Jam", creator: "Gina's Pantry", description: "Homemade jam with local strawberries.", iconClass: "fa-solid fa-stroopwafel", link: "#product-jam-card", price: 12, keywords: ["jam", "strawberry", "artisan", "gina's pantry", "food", "preserve"] },
+                "toycar": { id: "toycar", title: "Classic Wooden Toy Car", creator: "Henry's Woodcraft", description: "Timeless handcrafted wooden toy car.", iconClass: "fa-solid fa-car-side", link: "#product-toycar-card", price: 35, keywords: ["toy", "wooden car", "classic", "henry's woodcraft", "kids", "play"] },
+                "candle": { id: "candle", title: "Lavender Soy Candle", creator: "Irene's Aromas", description: "Relaxing hand-poured soy candle.", iconClass: "fa-solid fa-fire-flame-simple", link: "#product-candle-card", price: 18, keywords: ["candle", "soy", "lavender", "irene's aromas", "home", "scented", "aroma"] },
+                "scarf": { id: "scarf", title: "Hand-Dyed Silk Scarf", creator: "Silken Hues Co.", description: "Luxurious hand-dyed silk scarves.", iconClass: "fa-solid fa-shirt", link: "#product-scarf-card", price: 65, keywords: ["scarf", "silk", "clothing", "fashion", "hand-dyed", "accessory", "silken hues co"] },
+                "terms": { id: "terms", title: "Terms of Service", description: "Read our terms and conditions.", iconClass: "fa-solid fa-file-contract", link: "terms.html", keywords: ["terms", "service", "legal", "conditions", "policy"] },
+                "support": { id: "support", title: "Support Center", description: "Get help and support with Fromsupply.", iconClass: "fa-solid fa-life-ring", link: "support.html", keywords: ["support", "help", "contact", "faq", "assistance"] }
+          };
+          function performSearch(query) {
+              if (!searchResultsList || !noSearchResultsMessage) return;
+              const trimmedQuery = query.trim().toLowerCase();
+              if (trimmedQuery === '') {
+                  heroSearchInput.focus(); 
+                  const searchContainer = document.getElementById('hero-search-container');
+                  if(searchContainer) { searchContainer.style.borderColor = 'rgba(239, 68, 68, 0.7)'; setTimeout(() => { searchContainer.style.borderColor = ''; }, 1500); }
+                  return;
+              }
+              searchResultsList.innerHTML = ''; noSearchResultsMessage.classList.add('hidden'); let foundResults = [];
+              for (const productId in productPageData) {
+                  const product = productPageData[productId];
+                  let match = product.title.toLowerCase().includes(trimmedQuery) || product.description.toLowerCase().includes(trimmedQuery) || (product.creator && product.creator.toLowerCase().includes(trimmedQuery));
+                  if (!match && product.keywords) match = product.keywords.some(kw => kw.toLowerCase().includes(trimmedQuery));
+                  if (match) foundResults.push(product);
+              }
+              if (foundResults.length > 0) {
+                  foundResults.forEach(result => {
+                      const item = document.createElement('div');
+                      item.className = "search-result-item flex items-center p-3 bg-gray-700/60 rounded-md hover:bg-gray-600/80 transition-colors cursor-pointer border border-transparent hover:border-gray-500/70";
+                      item.addEventListener('click', () => { window.location.href = result.link; if (typeof closeSearchModal === 'function') closeSearchModal(); });
+                      item.innerHTML = `<span class="w-10 h-10 rounded-md mr-3 flex-shrink-0 border border-gray-600 bg-gray-700 flex items-center justify-center"><i class="${result.iconClass} text-gray-300 text-lg"></i></span><div class="flex-grow mr-2 overflow-hidden"><h3 class="text-md font-medium text-gray-100 truncate">${result.title}</h3><p class="text-xs text-gray-400 truncate">${result.creator ? 'By ' + result.creator + ' - ' : ''}${result.description}</p></div><a href="${result.link}" class="search-result-action-button text-xs font-semibold text-white px-3 py-1.5 rounded-full transition-colors whitespace-nowrap">View</a>`;
+                      searchResultsList.appendChild(item);
+                  });
+              } else noSearchResultsMessage.classList.remove('hidden');
+              
+              const localOpenSearchModal = searchResultsOverlay ? searchResultsOverlay.openSearchModalLocal : null;
+              if (typeof localOpenSearchModal === 'function') {
+                  localOpenSearchModal();
+              } else if (typeof openSearchModal === 'function' && searchResultsOverlay && searchResultsOverlay.id !== 'delivery-modal') { 
+                  openSearchModal(); 
+              } else {
+                  if(searchResultsOverlay) searchResultsOverlay.classList.remove('hidden');
+              }
+          }
+          
+
+          if (heroSearchInput) {
+                heroSearchInput.addEventListener('touchstart', () => heroSearchInput.focus(), { passive: true });
+                heroSearchInput.addEventListener('click', () => heroSearchInput.focus()); 
+
+                heroSearchInput.addEventListener('focus', () => {
+                    clearTimeout(typingTimeout); clearTimeout(blinkTimeout); isPaused = true;
+                    if(heroSearchInput.value === '') heroSearchInput.placeholder = 'Search local products, creators...';
+                    else heroSearchInput.placeholder = ''; 
+                    heroSearchInput.placeholder = heroSearchInput.placeholder.replace('|',''); 
+                    if (productShowcaseSection && topNav) {
+                        const navHeight = topNav.offsetHeight || 80; 
+                        const targetScrollPosition = productShowcaseSection.offsetTop - navHeight - 20; 
+                        window.scrollTo({ top: Math.max(0, targetScrollPosition), behavior: 'smooth' });
+                    }
+                });
+                heroSearchInput.addEventListener('blur', () => {
+                    isPaused = false;
+                    if (heroSearchInput.value === '') { heroSearchInput.placeholder = ''; charIndex = 0; isDeleting = false; animatePlaceholder(); }
+                });
+                heroSearchInput.addEventListener('keydown', (event) => { if (event.key === 'Enter') { event.preventDefault(); performSearch(heroSearchInput.value); } });
+          }
+          if (heroSearchButton) heroSearchButton.addEventListener('click', () => performSearch(heroSearchInput.value));
+          if(heroSearchInput) heroSearchInput.placeholder = ''; 
+          animatePlaceholder(); 
+        }
+
+        let userHasScrolledThisPageLoad = (window.scrollY !== 0); 
+        const handleUserInteractionToPreventAutoScroll = () => { if (!userHasScrolledThisPageLoad) userHasScrolledThisPageLoad = true; window.removeEventListener('scroll', handleUserInteractionToPreventAutoScroll); window.removeEventListener('touchstart', handleUserInteractionToPreventAutoScroll); };
+        window.addEventListener('scroll', handleUserInteractionToPreventAutoScroll, { once: true, passive: true });
+        window.addEventListener('touchstart', handleUserInteractionToPreventAutoScroll, { once: true, passive: true });
+        setTimeout(() => {
+            if (!userHasScrolledThisPageLoad && window.scrollY === 0 && productShowcaseSection && topNav) {
+                const navHeight = topNav.offsetHeight || 80;
+                const titleElement = productShowcaseSection.querySelector('h1');
+                let targetOffset = titleElement ? titleElement.offsetTop - navHeight - 40 : productShowcaseSection.offsetTop - navHeight - 20; 
+                window.scrollTo({ top: Math.max(0, targetOffset), behavior: 'smooth' });
+                userHasScrolledThisPageLoad = true; 
+            }
+        }, 4000); 
+
+        
+
+    }); // End DOMContentLoaded
+  </script>
+</body>
+</html>

@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Vibe Coding Clinic</title>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        /* Global Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Roboto', Arial, sans-serif;
+        }
+        
+        /* Variables - 150% scale applied to base sizes */
+        :root {
+            --scale: 1.5; /* Scale factor for all measurements */
+            --base-font: calc(16px * var(--scale));
+            --small-font: calc(12px * var(--scale));
+            --medium-font: calc(14px * var(--scale));
+            --large-font: calc(18px * var(--scale));
+            --xlarge-font: calc(24px * var(--scale));
+            --sidebar-width: calc(72px * var(--scale));
+            --header-height: calc(56px * var(--scale));
+            --standard-padding: calc(16px * var(--scale));
+            --small-padding: calc(8px * var(--scale));
+            --standard-radius: calc(8px * var(--scale));
+            --button-radius: calc(18px * var(--scale));
+            
+            /* Colors */
+            --dark-bg: #0f0f0f;
+            --darker-bg: #0a0a0a;
+            --card-bg: #161616;
+            --hover-bg: #272727;
+            --text-primary: #ffffff;
+            --text-secondary: #aaaaaa;
+            --button-bg: #272727;
+            --divider: #303030;
+        }
+        
+        /* Base Elements */
+        body {
+            background-color: var(--dark-bg);
+            color: var(--text-primary);
+            min-height: 100vh;
+            overflow-x: hidden;
+            font-size: var(--base-font);
+            line-height: 1.5;
+        }
+        
+        .container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar Navigation */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--darker-bg);
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: calc(12px * var(--scale)) 0;
+            overflow-y: auto;
+            position: fixed;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        
+        .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            color: var(--text-secondary);
+            text-decoration: none;
+            padding: calc(16px * var(--scale)) 0;
+            width: 100%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .nav-item:hover {
+            background-color: var(--hover-bg);
+            color: var(--text-primary);
+        }
+        
+        .nav-icon {
+            font-size: calc(18px * var(--scale));
+            margin-bottom: calc(6px * var(--scale));
+        }
+        
+        .nav-item.active {
+            color: var(--text-primary);
+        }
+        
+        .nav-item span {
+            font-size: calc(10px * var(--scale));
+            font-weight: 400;
+            letter-spacing: 0.2px;
+        }
+        
+        .nav-section {
+            width: 100%;
+            margin-top: calc(16px * var(--scale));
+            padding-top: calc(16px * var(--scale));
+            border-top: 1px solid var(--divider);
+        }
+        
+        .section-label {
+            color: var(--text-secondary);
+            font-size: calc(10px * var(--scale));
+            width: 100%;
+            text-align: center;
+            margin-bottom: calc(8px * var(--scale));
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+        
+        /* Main Content Area */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            flex: 1;
+            padding-top: var(--header-height);
+        }
+        
+        /* Header */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 var(--standard-padding);
+            height: var(--header-height);
+            background-color: var(--darker-bg);
+            position: fixed;
+            top: 0;
+            left: var(--sidebar-width);
+            right: 0;
+            z-index: 99;
+        }
+        
+        .logo-container {
+            display: flex;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: calc(20px * var(--scale));
+            font-weight: 700;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+        
+        /* Search */
+        .search-container {
+            display: flex;
+            max-width: calc(640px * var(--scale));
+            width: 50%;
+            position: relative;
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: calc(8px * var(--scale)) calc(12px * var(--scale));
+            border: 1px solid var(--divider);
+            background-color: var(--darker-bg);
+            border-radius: calc(20px * var(--scale)) 0 0 calc(20px * var(--scale));
+            color: var(--text-primary);
+            font-size: var(--medium-font);
+            outline: none;
+        }
+        
+        .search-button {
+            background-color: var(--button-bg);
+            border: 1px solid var(--divider);
+            border-left: none;
+            border-radius: 0 calc(20px * var(--scale)) calc(20px * var(--scale)) 0;
+            padding: 0 calc(20px * var(--scale));
+            cursor: pointer;
+            color: var(--text-secondary);
+            font-size: var(--medium-font);
+        }
+        
+        /* User Actions */
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: calc(8px * var(--scale));
+        }
+        
+        .action-icon {
+            width: calc(40px * var(--scale));
+            height: calc(40px * var(--scale));
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: background-color 0.2s;
+            color: var(--text-primary);
+            font-size: var(--medium-font);
+        }
+        
+        .action-icon:hover {
+            background-color: var(--hover-bg);
+        }
+        
+        .balance {
+            font-weight: 500;
+            color: var(--text-primary);
+            background: var(--button-bg);
+            padding: calc(6px * var(--scale)) calc(12px * var(--scale));
+            border-radius: calc(16px * var(--scale));
+            border: 1px solid var(--divider);
+            font-size: var(--medium-font);
+        }
+        
+        /* History Panel */
+        .history-panel {
+            width: calc(280px * var(--scale));
+            background-color: var(--darker-bg);
+            height: calc(100vh - var(--header-height));
+            overflow-y: auto;
+            border-right: 1px solid var(--divider);
+            padding: var(--standard-padding);
+            position: fixed;
+            left: var(--sidebar-width);
+            top: var(--header-height);
+            z-index: 97;
+        }
+        
+        .panel-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: var(--standard-padding);
+            padding-bottom: calc(12px * var(--scale));
+            border-bottom: 1px solid var(--divider);
+        }
+        
+        .panel-title {
+            font-size: var(--large-font);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .close-panel {
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-size: var(--large-font);
+            width: calc(32px * var(--scale));
+            height: calc(32px * var(--scale));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        
+        .history-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc(12px * var(--scale));
+        }
+        
+        .history-item {
+            display: flex;
+            gap: calc(12px * var(--scale));
+            cursor: pointer;
+            padding: calc(8px * var(--scale));
+            border-radius: var(--standard-radius);
+            transition: background-color 0.2s;
+        }
+        
+        .history-thumbnail {
+            width: calc(90px * var(--scale));
+            height: calc(50px * var(--scale));
+            border-radius: calc(4px * var(--scale));
+            overflow: hidden;
+            background-color: var(--card-bg);
+            flex-shrink: 0;
+        }
+        
+        .history-title {
+            font-size: var(--medium-font);
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: calc(4px * var(--scale));
+            line-height: 1.2;
+        }
+        
+        .history-author {
+            font-size: var(--small-font);
+            color: var(--text-secondary);
+        }
+        
+        /* Content Area */
+        .content-area {
+            padding: calc(24px * var(--scale));
+            padding-left: 0;
+            max-width: calc(1200px * var(--scale));
+            margin: 0 auto;
+        }
+        
+        .content-area.with-history {
+            padding-left: calc(280px * var(--scale));
+        }
+        
+        /* Video Post */
+        .video-post {
+            margin-bottom: calc(32px * var(--scale));
+            max-width: calc(1200px * var(--scale));
+            margin: 0 auto;
+        }
+        
+        .video-container {
+            width: 100%;
+            margin-bottom: calc(12px * var(--scale));
+        }
+        
+        /* Creator row matching YouTube layout - moved to top */
+        .action-row {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: calc(15px * var(--scale));
+            margin-bottom: 0;
+            padding: calc(15px * var(--scale)) 0;
+            border-bottom: 1px solid var(--divider);
+            background-color: var(--darker-bg);
+            border-radius: calc(12px * var(--scale)) calc(12px * var(--scale)) 0 0;
+            border: 1px solid var(--divider);
+            border-bottom: none;
+        }
+        
+        .video-player {
+            width: 100%;
+            aspect-ratio: 16 / 9;
+            background-color: black;
+            margin-bottom: calc(8px * var(--scale));
+            border-radius: 0 0 calc(12px * var(--scale)) calc(12px * var(--scale));
+            overflow: hidden;
+            border: 1px solid var(--divider);
+            border-top: none;
+        }
+        
+        .video-player iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Main Grid Layout */
+        .main-content-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: calc(20px * var(--scale));
+        }
+        
+        .content-left {
+            grid-column: 1;
+        }
+        
+        .content-right {
+            grid-column: 2;
+            padding-top: calc(4px * var(--scale));
+        }
+        
+        /* App Title and Info */
+        .app-title-container {
+            display: flex;
+            align-items: center;
+            gap: calc(12px * var(--scale));
+            margin-bottom: calc(16px * var(--scale));
+        }
+        
+        .app-icon {
+            width: calc(48px * var(--scale));
+            height: calc(48px * var(--scale));
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            grid-template-rows: repeat(2, 1fr);
+            gap: calc(2px * var(--scale));
+            background: #272727;
+            border-radius: calc(8px * var(--scale));
+            overflow: hidden;
+            padding: calc(4px * var(--scale));
+            flex-shrink: 0;
+        }
+        
+        .app-icon-grid {
+            background: rgba(110, 0, 255, 0.5);
+            border-radius: calc(1px * var(--scale));
+        }
+        
+        .app-title {
+            font-size: calc(28px * var(--scale));
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .video-stats-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: calc(16px * var(--scale));
+            margin-top: calc(10px * var(--scale));
+        }
+        
+        .views-date {
+            font-size: var(--base-font);
+            color: var(--text-secondary);
+        }
+        
+        /* Links */
+        .links-list {
+            margin-bottom: calc(12px * var(--scale));
+        }
+        
+        .links-list a {
+            display: block;
+            color: #3ea6ff;
+            text-decoration: none;
+            font-size: var(--base-font);
+            margin-bottom: calc(4px * var(--scale));
+            word-break: break-all;
+        }
+        
+        .show-more-link {
+            color: var(--text-secondary);
+            background: none;
+            border: none;
+            font-size: var(--medium-font);
+            cursor: pointer;
+            padding: 0;
+        }
+        
+        /* Comments Section */
+        .comments-section {
+            padding: calc(12px * var(--scale));
+            background: var(--card-bg);
+            border-radius: calc(12px * var(--scale));
+            border: 1px solid var(--divider);
+            height: calc(100% - calc(16px * var(--scale)));
+            overflow-y: auto;
+            margin-bottom: calc(20px * var(--scale));
+        }
+        
+        .comments-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: calc(20px * var(--scale));
+        }
+        
+        .comments-count {
+            font-size: var(--large-font);
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .sort-comments {
+            display: flex;
+            align-items: center;
+            color: var(--text-primary);
+            font-size: var(--medium-font);
+            cursor: pointer;
+            gap: calc(8px * var(--scale));
+        }
+        
+        .comment-form {
+            display: flex;
+            gap: calc(16px * var(--scale));
+            margin-bottom: calc(24px * var(--scale));
+        }
+        
+        .comment-avatar {
+            width: calc(32px * var(--scale));
+            height: calc(32px * var(--scale));
+            border-radius: 50%;
+            overflow: hidden;
+            flex-shrink: 0;
+        }
+        
+        .comment-avatar img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        
+        .comment-input-container {
+            flex: 1;
+            position: relative;
+        }
+        
+        .comment-input {
+            width: 100%;
+            border: none;
+            border-bottom: 1px solid var(--divider);
+            background: transparent;
+            color: var(--text-primary);
+            padding: calc(8px * var(--scale)) 0;
+            font-size: var(--medium-font);
+            outline: none;
+        }
+        
+        .comments-list {
+            display: flex;
+            flex-direction: column;
+            gap: calc(16px * var(--scale));
+        }
+        
+        .comment-item {
+            display: flex;
+            gap: calc(12px * var(--scale));
+        }
+        
+        .comment-content {
+            flex: 1;
+        }
+        
+        .commenter-info {
+            display: flex;
+            align-items: center;
+            gap: calc(8px * var(--scale));
+            margin-bottom: calc(4px * var(--scale));
+        }
+        
+        .commenter-name {
+            font-size: calc(13px * var(--scale));
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+        
+        .comment-time {
+            font-size: var(--small-font);
+            color: var(--text-secondary);
+        }
+        
+        .comment-text {
+            font-size: calc(15px * var(--scale));
+            color: var(--text-primary);
+            margin-bottom: calc(8px * var(--scale));
+            line-height: 1.4;
+        }
+        
+        .comment-actions {
+            display: flex;
+            align-items: center;
+            gap: calc(16px * var(--scale));
+        }
+        
+        .comment-reply {
+            background: none;
+            border: none;
+            color: #3ea6ff;
+            font-size: var(--small-font);
+            font-weight: 500;
+            cursor: pointer;
+        }
+        
+        .more-comments {
+            text-align: center;
+            margin-top: calc(16px * var(--scale));
+        }
+        
+        .load-more-btn {
+            background-color: var(--button-bg);
+            color: #3ea6ff;
+            border: none;
+            border-radius: var(--button-radius);
+            padding: calc(8px * var(--scale)) calc(16px * var(--scale));
+            font-size: var(--medium-font);
+            cursor: pointer;
+            font-weight: 500;
+        }
+        
+        .creator-column {
+            display: flex;
+            align-items: center;
+            gap: calc(15px * var(--scale));
+            padding-left: calc(16px * var(--scale));
+        }
+        
+        .actions-column {
+            display: flex;
+            flex: 1;
+            justify-content: flex-end;
+            gap: calc(8px * var(--scale));
+            padding-right: calc(16px * var(--scale));
+        }
+        
+        .creator-avatar {
+            width: calc(48px * var(--scale));
+            height: calc(48px * var(--scale));
+            border-radius: 50%;
+            overflow: hidden;
+        }
+        
+        .creator-details {
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .creator-name {
+            font-size: calc(16px * var(--scale));
+            font-weight: 500;
+            color: var(--text-primary);
+            margin-bottom: calc(2px * var(--scale));
+            display: flex;
+            align-items: center;
+            gap: calc(8px * var(--scale));
+        }
+        
+        .verified-badge {
+            color: var(--text-secondary);
+            font-size: var(--medium-font);
+        }
+        
+        .subscriber-count {
+            font-size: var(--small-font);
+            color: var(--text-secondary);
+        }
+        
+        /* Action Buttons */
+        .action-btn, .visit-btn, .heal-btn, .invest-btn {
+            background-color: var(--button-bg);
+            border: none;
+            border-radius: var(--button-radius);
+            padding: calc(10px * var(--scale)) calc(18px * var(--scale));
+            color: var(--text-primary);
+            font-size: var(--base-font);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: calc(6px * var(--scale));
+            height: calc(36px * var(--scale));
+        }
+        
+        /* YouTube-style Subscribe Button */
+        .subscribe-button {
+            background-color: var(--button-bg);
+            color: var(--text-primary);
+            border: none;
+            border-radius: var(--button-radius);
+            padding: calc(10px * var(--scale)) calc(16px * var(--scale));
+            font-size: var(--medium-font);
+            font-weight: 500;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: calc(8px * var(--scale));
+            height: calc(36px * var(--scale));
+            min-width: calc(100px * var(--scale));
+            justify-content: center;
+        }
+        
+        .subscribe-button.subscribed {
+            background-color: var(--button-bg);
+            color: var(--text-primary);
+        }
+        
+        /* Floating History Button */
+        .floating-history-button {
+            position: fixed;
+            left: calc(82px * var(--scale));
+            top: calc(70px * var(--scale));
+            width: calc(40px * var(--scale));
+            height: calc(40px * var(--scale));
+            background: rgba(30, 30, 60, 0.7);
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: var(--text-primary);
+            cursor: pointer;
+            z-index: 98;
+            box-shadow: 0 calc(4px * var(--scale)) calc(10px * var(--scale)) rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+            opacity: 0;
+            transform: translateX(calc(-60px * var(--scale)));
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: var(--medium-font);
+        }
+        
+        .floating-history-button.visible {
+            opacity: 1;
+            transform: translateX(0);
+        }
+        
+        /* Modal Styles */
+        .post-modal, .comments-modal {
+            display: none;
+            position: fixed;
+            z-index: 1000;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.7);
+            overflow: auto;
+        }
+        
+        .post-modal-content, .comments-modal-content {
+            background-color: var(--card-bg);
+            margin: 5% auto;
+            max-width: calc(800px * var(--scale));
+            border-radius: var(--standard-radius);
+            box-shadow: 0 calc(4px * var(--scale)) calc(20px * var(--scale)) rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: modalFadeIn 0.3s ease;
+        }
+        
+        .post-modal-header, .comments-modal-header {
+            padding: calc(16px * var(--scale)) calc(20px * var(--scale));
+            border-bottom: 1px solid var(--divider);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .post-modal-body, .comments-modal-body {
+            padding: calc(20px * var(--scale));
+        }
+        
+        .close-modal {
+            color: var(--text-secondary);
+            font-size: calc(24px * var(--scale));
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        
+        /* Animation */
+        @keyframes modalFadeIn {
+            from { opacity: 0; transform: translateY(calc(-20px * var(--scale))); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .loading-animation {
+            width: calc(48px * var(--scale));
+            height: calc(48px * var(--scale));
+            margin: 0 auto;
+            border: calc(5px * var(--scale)) solid var(--divider);
+            border-bottom-color: #00d9ff;
+            border-radius: 50%;
+            display: inline-block;
+            box-sizing: border-box;
+            animation: rotation 1s linear infinite;
+        }
+        
+        @keyframes rotation {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Mobile Responsiveness */
+        @media (max-width: 768px) {
+            .sidebar {
+                display: none;
+            }
+            
+            .main-content, header {
+                margin-left: 0;
+                left: 0;
+            }
+            
+            .content-area.with-history {
+                padding-left: 0;
+            }
+            
+            .history-panel, .hashtag-panel {
+                left: 0;
+            }
+            
+            .floating-history-button {
+                left: calc(10px * var(--scale));
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Floating history button -->
+    <div class="floating-history-button" id="showHistoryButton">
+        <i class="fas fa-history"></i>
+    </div>
+    
+    <div class="container">
+        <div class="sidebar">
+            <div class="nav-item active">
+                <div class="nav-icon">
+                    <i class="fas fa-gamepad"></i>
+                </div>
+                <span>Games</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-chart-line"></i>
+                </div>
+                <span>Business</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-users"></i>
+                </div>
+                <span>Social</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                </div>
+                <span>Shopping</span>
+            </div>
+            <div class="nav-item">
+                <div class="nav-icon">
+                    <i class="fas fa-tools"></i>
+                </div>
+                <span>Tools</span>
+            </div>
+            <div class="nav-item" id="hashtagButton">
+                <div class="nav-icon">
+                    <i class="fas fa-hashtag"></i>
+                </div>
+                <span>Hashtags</span>
+            </div>
+            <div class="nav-section">
+                <div class="section-label">Library</div>
+                <div class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-thumbs-up"></i>
+                    </div>
+                    <span>Liked</span>
+                </div>
+                <div class="nav-item">
+                    <div class="nav-icon">
+                        <i class="fas fa-user-check"></i>
+                    </div>
+                    <span>Subscriptions</span>
+                </div>
+            </div>
+        </div>
+        
+        <header>
+            <div class="logo-container">
+                <div class="logo">Vibe Coding Clinic</div>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" placeholder="Search">
+                <button class="search-button">
+                    <i class="fas fa-search"></i>
+                </button>
+            </div>
+            
+            <div class="user-actions">
+                <div class="action-icon post-button" id="postButton">
+                    <i class="fas fa-plus"></i>
+                </div>
+                <div class="action-icon">
+                    <i class="fas fa-bell"></i>
+                </div>
+                <div class="action-icon" id="profileButton">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="balance">$3,621</div>
+            </div>
+        </header>
+        
+        <!-- History Panel -->
+        <div class="history-panel" id="historyPanel">
+            <div class="panel-header">
+                <div class="panel-title">History</div>
+                <div class="close-panel" id="closeHistoryPanel">
+                    <i class="fas fa-times"></i>
+                </div>
+            </div>
+            <div class="history-list">
+                <div class="history-item">
+                    <div class="history-thumbnail">
+                        <img src="/api/placeholder/90/50" alt="FireAuth thumbnail">
+                    </div>
+                    <div class="history-details">
+                        <div class="history-title">FireAuth</div>
+                        <div class="history-author">Vibe Coder</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-thumbnail">
+                        <img src="/api/placeholder/90/50" alt="DataVizPro thumbnail">
+                    </div>
+                    <div class="history-details">
+                        <div class="history-title">DataVizPro</div>
+                        <div class="history-author">Tech Helper</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-thumbnail">
+                        <img src="/api/placeholder/90/50" alt="ReactNotes thumbnail">
+                    </div>
+                    <div class="history-details">
+                        <div class="history-title">ReactNotes</div>
+                        <div class="history-author">Portfolio Pro</div>
+                    </div>
+                </div>
+                <div class="history-item">
+                    <div class="history-thumbnail">
+                        <img src="/api/placeholder/90/50" alt="CodeSnippet thumbnail">
+                    </div>
+                    <div class="history-details">
+                        <div class="history-title">CodeSnippet</div>
+                        <div class="history-author">Code Master</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <div class="main-content">
+            <div class="content-area with-history" id="contentArea">
+                <div class="posts-feed">
+                    <!-- First Post -->
+                    <div class="video-post">
+                        <div class="video-container">
+                            <!-- Creator row moved to the top -->
+                            <div class="action-row">
+                                <div class="creator-column">
+                                    <div class="creator-avatar">
+                                        <img src="/api/placeholder/48/48" alt="Ryan Trahan avatar">
+                                    </div>
+                                    <div class="creator-details">
+                                        <div class="creator-name">
+                                            Ryan Trahan
+                                            <span class="verified-badge">
+                                                <i class="fas fa-check-circle"></i>
+                                            </span>
+                                        </div>
+                                        <div class="subscriber-count">19.4M subscribers</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Actions column (right side) -->
+                                <div class="actions-column">
+                                    <button class="subscribe-button subscribed">
+                                        <i class="fas fa-bell"></i>
+                                        Subscribed
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-share"></i>
+                                        Share
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-bookmark"></i>
+                                        Save
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Visit
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-code-branch"></i>
+                                        Heal
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-chart-line"></i>
+                                        Invest
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Video player -->
+                            <div class="video-player">
+                                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allowfullscreen></iframe>
+                            </div>
+                            
+                            <!-- Main content grid with description and comments side by side -->
+                            <div class="main-content-grid">
+                                <!-- Left side - App title and description -->
+                                <div class="content-left">
+                                    <!-- App title and icon as the main title -->
+                                    <div class="app-title-container">
+                                        <div class="app-icon">
+                                            <div class="app-icon-grid"></div>
+                                            <div class="app-icon-grid"></div>
+                                            <div class="app-icon-grid"></div>
+                                            <div class="app-icon-grid"></div>
+                                        </div>
+                                        <h1 class="app-title">FireAuth</h1>
+                                    </div>
+                                    
+                                    <!-- Views count only -->
+                                    <div class="video-stats-bar">
+                                        <div class="views-date">
+                                            293,355 visits
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Links -->
+                                    <div class="links-list">
+                                        <a href="https://www.joyridesweets.com/">https://www.joyridesweets.com/</a>
+                                        <a href="https://www.joyridesweets.com/">https://www.joyridesweets.com/</a>
+                                        <a href="https://www.joyridesweets.com/">https://www.joyridesweets.com/</a>
+                                    </div>
+                                    <button class="show-more-link">...more</button>
+                                </div>
+                                
+                                <!-- Right side - Comments section -->
+                                <div class="content-right">
+                                    <div class="comments-section">
+                                        <div class="comments-header">
+                                            <div class="comments-count">6,341 Comments</div>
+                                            <div class="sort-comments">
+                                                <i class="fas fa-sort-amount-down"></i>
+                                                Sort by
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Comment form - simplified -->
+                                        <div class="comment-form">
+                                            <div class="comment-avatar">
+                                                <img src="/api/placeholder/32/32" alt="Your avatar">
+                                            </div>
+                                            <div class="comment-input-container">
+                                                <input type="text" class="comment-input" placeholder="Add a comment...">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Comments list -->
+                                        <div class="comments-list">
+                                            <!-- Comment item -->
+                                            <div class="comment-item">
+                                                <div class="comment-avatar">
+                                                    <img src="/api/placeholder/32/32" alt="MasterBuilders avatar">
+                                                </div>
+                                                <div class="comment-content">
+                                                    <div class="commenter-info">
+                                                        <div class="commenter-name">@MasterBuilders</div>
+                                                        <div class="comment-time">38 minutes ago</div>
+                                                    </div>
+                                                    <div class="comment-text">
+                                                        Bro just casually drops a cinematic masterpiece out of nowhere 🔥 Marvel take notes 😂
+                                                    </div>
+                                                    <div class="comment-actions">
+                                                        <button class="comment-reply">Reply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Load more comments button -->
+                                        <div class="more-comments">
+                                            <button class="load-more-btn" id="loadMoreCommentsBtn">Load more comments</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Second Post (shown when scrolling down) -->
+                    <div class="video-post">
+                        <div class="video-container">
+                            <!-- Creator row moved to the top -->
+                            <div class="action-row">
+                                <div class="creator-column">
+                                    <div class="creator-avatar">
+                                        <img src="/api/placeholder/48/48" alt="Tech Helper avatar">
+                                    </div>
+                                    <div class="creator-details">
+                                        <div class="creator-name">
+                                            Tech Helper
+                                            <span class="verified-badge">
+                                                <i class="fas fa-check-circle"></i>
+                                            </span>
+                                        </div>
+                                        <div class="subscriber-count">3.2M subscribers</div>
+                                    </div>
+                                </div>
+                                
+                                <!-- Actions column (right side) -->
+                                <div class="actions-column">
+                                    <button class="subscribe-button">
+                                        Subscribe
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-share"></i>
+                                        Share
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-bookmark"></i>
+                                        Save
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-external-link-alt"></i>
+                                        Visit
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-code-branch"></i>
+                                        Heal
+                                    </button>
+                                    
+                                    <button class="action-btn">
+                                        <i class="fas fa-chart-line"></i>
+                                        Invest
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Video player -->
+                            <div class="video-player">
+                                <iframe src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="YouTube video player" allowfullscreen></iframe>
+                            </div>
+                            
+                            <!-- Main content grid with description and comments side by side -->
+                            <div class="main-content-grid">
+                                <!-- Left side - App title and description -->
+                                <div class="content-left">
+                                    <!-- App title and icon as the main title -->
+                                    <div class="app-title-container">
+                                        <div class="app-icon">
+                                            <div class="app-icon-grid"></div>
+                                            <div class="app-icon-grid"></div>
+                                            <div class="app-icon-grid"></div>
+                                            <div class="app-icon-grid"></div>
+                                        </div>
+                                        <h1 class="app-title">DataVizPro</h1>
+                                    </div>
+                                    
+                                    <!-- Views count only -->
+                                    <div class="video-stats-bar">
+                                        <div class="views-date">
+                                            156,721 visits
+                                        </div>
+                                    </div>
+                                    
+                                    <!-- Links -->
+                                    <div class="links-list">
+                                        <a href="https://github.com/datavizpro">https://github.com/datavizpro</a>
+                                        <a href="https://datavizpro.demo.com">https://datavizpro.demo.com</a>
+                                    </div>
+                                    <button class="show-more-link">...more</button>
+                                </div>
+                                
+                                <!-- Right side - Comments section -->
+                                <div class="content-right">
+                                    <div class="comments-section">
+                                        <div class="comments-header">
+                                            <div class="comments-count">3,278 Comments</div>
+                                            <div class="sort-comments">
+                                                <i class="fas fa-sort-amount-down"></i>
+                                                Sort by
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Comment form -->
+                                        <div class="comment-form">
+                                            <div class="comment-avatar">
+                                                <img src="/api/placeholder/32/32" alt="Your avatar">
+                                            </div>
+                                            <div class="comment-input-container">
+                                                <input type="text" class="comment-input" placeholder="Add a comment...">
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Comments list -->
+                                        <div class="comments-list">
+                                            <!-- Comment item -->
+                                            <div class="comment-item">
+                                                <div class="comment-avatar">
+                                                    <img src="/api/placeholder/32/32" alt="DataNerd avatar">
+                                                </div>
+                                                <div class="comment-content">
+                                                    <div class="commenter-info">
+                                                        <div class="commenter-name">@DataNerd</div>
+                                                        <div class="comment-time">1 day ago</div>
+                                                    </div>
+                                                    <div class="comment-text">
+                                                        This is exactly what I've been looking for! The chart animations are incredibly smooth and the API is so intuitive. 10/10 would recommend.
+                                                    </div>
+                                                    <div class="comment-actions">
+                                                        <button class="comment-reply">Reply</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        
+                                        <!-- Load more comments button -->
+                                        <div class="more-comments">
+                                            <button class="load-more-btn">Load more comments</button>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Loading indicator for infinite scroll -->
+                    <div class="loading-animation"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Comments Modal -->
+    <div id="commentsModal" class="comments-modal">
+        <div class="comments-modal-content">
+            <div class="comments-modal-header">
+                <h2>All Comments (6,341)</h2>
+                <span class="close-modal" id="closeCommentsModal">&times;</span>
+            </div>
+            <div class="comments-modal-body">
+                <!-- Comment form -->
+                <div class="comment-form">
+                    <div class="comment-avatar">
+                        <img src="/api/placeholder/32/32" alt="Your avatar">
+                    </div>
+                    <div class="comment-input-container">
+                        <input type="text" class="comment-input" placeholder="Add a comment...">
+                    </div>
+                </div>
+                
+                <!-- Modal comments list -->
+                <div class="comments-list" id="modalCommentsList">
+                    <!-- Comments will be loaded here dynamically -->
+                </div>
+                
+                <!-- Loading indicator for comments -->
+                <div class="loading-animation" id="commentsLoading" style="display: none;"></div>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Add event listeners after DOM is fully loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            // YouTube-like subscribe button behavior
+            const subscribeButtons = document.querySelectorAll('.subscribe-button');
+            
+            subscribeButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    if (!this.classList.contains('subscribed')) {
+                        // Not subscribed -> Subscribe
+                        this.innerHTML = '<i class="fas fa-bell"></i> Subscribed';
+                        this.classList.add('subscribed');
+                    } else {
+                        // Show unsubscribe confirmation (simplified)
+                        if (confirm('Unsubscribe from this channel?')) {
+                            this.textContent = 'Subscribe';
+                            this.classList.remove('subscribed');
+                        }
+                    }
+                });
+            });
+            
+            // History panel toggle
+            const historyPanel = document.getElementById('historyPanel');
+            const contentArea = document.getElementById('contentArea');
+            const closeHistoryPanel = document.getElementById('closeHistoryPanel');
+            const showHistoryButton = document.getElementById('showHistoryButton');
+            
+            if (closeHistoryPanel && showHistoryButton) {
+                closeHistoryPanel.addEventListener('click', function() {
+                    historyPanel.style.display = 'none';
+                    contentArea.classList.remove('with-history');
+                    showHistoryButton.classList.add('visible');
+                });
+                
+                showHistoryButton.addEventListener('click', function() {
+                    historyPanel.style.display = 'block';
+                    contentArea.classList.add('with-history');
+                    this.classList.remove('visible');
+                });
+            }
+            
+            // Comments Modal
+            const commentsModal = document.getElementById('commentsModal');
+            const modalCommentsList = document.getElementById('modalCommentsList');
+            const closeCommentsModal = document.getElementById('closeCommentsModal');
+            const commentsLoading = document.getElementById('commentsLoading');
+            
+            // Load more comments functionality - opens modal
+            const loadMoreBtns = document.querySelectorAll('.load-more-btn');
+            
+            loadMoreBtns.forEach(btn => {
+                btn.addEventListener('click', function() {
+                    // Open comments modal
+                    commentsModal.style.display = 'block';
+                    document.body.style.overflow = 'hidden'; // Prevent scrolling
+                    
+                    // Clear previous comments
+                    modalCommentsList.innerHTML = '';
+                    
+                    // Show loading
+                    commentsLoading.style.display = 'block';
+                    
+                    // Simulate loading delay
+                    setTimeout(() => {
+                        // Hide loading
+                        commentsLoading.style.display = 'none';
+                        
+                        // Create and add comments to modal
+                        for (let i = 0; i < 20; i++) {
+                            const newComment = document.createElement('div');
+                            newComment.className = 'comment-item';
+                            newComment.innerHTML = `
+                                <div class="comment-avatar">
+                                    <img src="/api/placeholder/32/32" alt="User avatar">
+                                </div>
+                                <div class="comment-content">
+                                    <div class="commenter-info">
+                                        <div class="commenter-name">@User${Math.floor(Math.random() * 1000)}</div>
+                                        <div class="comment-time">${Math.floor(Math.random() * 24) + 1} hours ago</div>
+                                    </div>
+                                    <div class="comment-text">
+                                        ${i === 0 ? 'Bro just casually drops a cinematic masterpiece out of nowhere 🔥 Marvel take notes 😂' : 'This is amazing! I\'ve been looking for something like this for a while. Great job!'}
+                                    </div>
+                                    <div class="comment-actions">
+                                        <button class="comment-reply">Reply</button>
+                                    </div>
+                                </div>
+                            `;
+                            modalCommentsList.appendChild(newComment);
+                        }
+                    }, 1000);
+                });
+            });
+            
+            // Close comments modal
+            if (closeCommentsModal) {
+                closeCommentsModal.addEventListener('click', function() {
+                    commentsModal.style.display = 'none';
+                    document.body.style.overflow = 'auto'; // Enable scrolling again
+                });
+                
+                // Close modal when clicking outside
+                window.addEventListener('click', function(e) {
+                    if (e.target === commentsModal) {
+                        commentsModal.style.display = 'none';
+                        document.body.style.overflow = 'auto';
+                    }
+                });
+            }
+        });
+    </script>
+</body>
+</html>
