@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
-    <title>Fromsupply</title>
+    <title>Chimos</title>
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
    <!-- Programming Languages -->
@@ -55,7 +55,7 @@
     <div class="header">
    <div class="logo-section" onclick="toggleLogoDropdown(event)">
     <div class="logo"></div>
-    <div class="logo-text">Fromsupply</div>
+    <div class="logo-text">Chimos</div>
 </div>
 
 <!-- Add this new section -->
@@ -159,7 +159,7 @@
     </div>
 </div>
         <div class="directory-nav hidden" id="directoryNav">
-        <div class="directory-path" id="directoryPath">/Fromsupply</div>
+        <div class="directory-path" id="directoryPath">/Chimos</div>
     </div>
 
     <!-- Search Icon Button -->
@@ -253,14 +253,14 @@
         <div class="fs-console-header" onmousedown="DragManager.start('console', document.getElementById('fsConsole'), event)">
             <div class="fs-console-title">
                 <span>⚡</span>
-                <span>Fromsupply Console</span>
+                <span>Chimos Console</span>
                 <span id="fsConsoleContext" class="fs-console-path"></span>
             </div>
         </div>
         <input type="text" class="fs-console-input" id="fsConsoleInput" placeholder="Type command or 'help' for assistance..." />
         <div class="fs-console-output" id="fsConsoleOutput">
             <div class="fs-console-line">
-                <span class="fs-console-success">Fromsupply Console v2.0 - Ready</span>
+                <span class="fs-console-success">Chimos Console v2.0 - Ready</span>
             </div>
             <div class="fs-console-line">
                 <span class="fs-console-output-text">Type 'help' for commands or 'h' for shortcuts</span>

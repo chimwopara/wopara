@@ -4685,7 +4685,7 @@ function saveNotesSettings() {
         notesSettings.currentTool = notesCurrentTool;
         notesSettings.lastTab = notesCurrentTab;
         
-        localStorage.setItem('fromsupply_notes_settings', JSON.stringify(notesSettings));
+        localStorage.setItem('chimos_notes_settings', JSON.stringify(notesSettings));
         
         // Save current drawing if on drawn tab
         if (notesCurrentTab === 'drawn' && notesCanvas) {
@@ -4693,7 +4693,7 @@ function saveNotesSettings() {
                 imageData: notesCanvas.toDataURL(),
                 timestamp: Date.now()
             };
-            localStorage.setItem('fromsupply_notes_drawing', JSON.stringify(drawingData));
+            localStorage.setItem('chimos_notes_drawing', JSON.stringify(drawingData));
         }
         
         console.log('Notes settings saved');
@@ -4704,7 +4704,7 @@ function saveNotesSettings() {
 
 function loadNotesSettings() {
     try {
-        const savedSettings = localStorage.getItem('fromsupply_notes_settings');
+        const savedSettings = localStorage.getItem('chimos_notes_settings');
         if (savedSettings) {
             notesSettings = { ...notesSettings, ...JSON.parse(savedSettings) };
             
@@ -4723,7 +4723,7 @@ function loadNotesSettings() {
         }
         
         // Load saved drawing
-        const savedDrawing = localStorage.getItem('fromsupply_notes_drawing');
+        const savedDrawing = localStorage.getItem('chimos_notes_drawing');
         if (savedDrawing && notesCurrentTab === 'drawn') {
             const drawingData = JSON.parse(savedDrawing);
             setTimeout(() => restoreNotesDrawing(drawingData.imageData), 100);

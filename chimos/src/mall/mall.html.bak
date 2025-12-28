@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>Supply - Local Products from Fromsupply</title>
+    <title>Supply - Local Products from Chimos</title>
     <link rel="icon" href="logo.jpg" type="image/jpeg" onerror="this.onerror=null; this.href='https://placehold.co/32x32/030712/FFFFFF?text=FS';">
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com"/>
@@ -1257,12 +1257,12 @@ document.addEventListener('click', (event) => {
             const qty = localStorage.getItem(LS_LIBRARY_ITEM_QTY_PREFIX + item.id) || 1;
             shareText += `- ${item.title} (Qty: ${qty})\n`;
         });
-        shareText += `\nView them on Fromsupply: ${window.location.href.split('#')[0]}`;
+        shareText += `\nView them on Chimos: ${window.location.href.split('#')[0]}`;
 
         try {
             if (navigator.share) {
                 navigator.share({
-                    title: 'My Fromsupply Library',
+                    title: 'My Chimos Library',
                     text: shareText,
                     url: window.location.href.split('#')[0] 
                 });
@@ -1720,7 +1720,7 @@ document.addEventListener('click', (event) => {
 
 
       if (heroSearchInput && heroSearchButton) { 
-          const suggestions = [ "handmade leather wallets", "organic honey", "custom portraits", "3d printed vases", "artisan coffee", "ceramic mugs", "silk scarves", "local jams", "wooden toys", "scented candles", "shop local", "gifts by Fromsupply creators" ];
+          const suggestions = [ "handmade leather wallets", "organic honey", "custom portraits", "3d printed vases", "artisan coffee", "ceramic mugs", "silk scarves", "local jams", "wooden toys", "scented candles", "shop local", "gifts by Chimos creators" ];
           let suggestionIndex = 0, charIndex = 0, isDeleting = false, typingTimeout, blinkTimeout, isPaused = false;
           const typeSpeed = 100, deleteSpeed = 60, pauseBeforeDelete = 1800, pauseBeforeType = 250, blinkInterval = 500;
           function setCursorVisibility(visible) { let currentPlaceholder = heroSearchInput.placeholder.replace('|', ''); heroSearchInput.placeholder = visible ? currentPlaceholder + '|' : currentPlaceholder; }
@@ -1755,7 +1755,7 @@ document.addEventListener('click', (event) => {
                 "candle": { id: "candle", title: "Lavender Soy Candle", creator: "Irene's Aromas", description: "Relaxing hand-poured soy candle.", iconClass: "fa-solid fa-fire-flame-simple", link: "#product-candle-card", price: 18, keywords: ["candle", "soy", "lavender", "irene's aromas", "home", "scented", "aroma"] },
                 "scarf": { id: "scarf", title: "Hand-Dyed Silk Scarf", creator: "Silken Hues Co.", description: "Luxurious hand-dyed silk scarves.", iconClass: "fa-solid fa-shirt", link: "#product-scarf-card", price: 65, keywords: ["scarf", "silk", "clothing", "fashion", "hand-dyed", "accessory", "silken hues co"] },
                 "terms": { id: "terms", title: "Terms of Service", description: "Read our terms and conditions.", iconClass: "fa-solid fa-file-contract", link: "terms.html", keywords: ["terms", "service", "legal", "conditions", "policy"] },
-                "support": { id: "support", title: "Support Center", description: "Get help and support with Fromsupply.", iconClass: "fa-solid fa-life-ring", link: "support.html", keywords: ["support", "help", "contact", "faq", "assistance"] }
+                "support": { id: "support", title: "Support Center", description: "Get help and support with Chimos.", iconClass: "fa-solid fa-life-ring", link: "support.html", keywords: ["support", "help", "contact", "faq", "assistance"] }
           };
           function performSearch(query) {
               if (!searchResultsList || !noSearchResultsMessage) return;

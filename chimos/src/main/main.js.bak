@@ -541,7 +541,7 @@ updatePath(windowId, newPath) {
     
     getPath(windowId) {
         const window = openWindows.find(w => w.id === windowId);
-        return window ? [...window.currentPath] : ['Fromsupply'];
+        return window ? [...window.currentPath] : ['Chimos'];
     },
     
     isActiveWindow(windowId) {
@@ -625,7 +625,7 @@ initializeGlobals();
 // CORE VARIABLES
 let openWindows = [];
 let windowZIndex = 500;
-let currentDirectory = ['Fromsupply'];
+let currentDirectory = ['Chimos'];
 let windowFocusOrder = [];
 let currentScore = 0;
 
@@ -1681,7 +1681,7 @@ if (languageIcons.includes(folderName)) {
 }
 
 const iconMap = {
-'Fromsupply': 'blackhome.png',
+'Chimos': 'blackhome.png',
 'Desktop': 'blackfile.png',
     'Desktop': 'blackfile.png',
     'Logic': 'blackfile.png',
@@ -1721,9 +1721,9 @@ function updateDirectoryDisplay() {
         if (logoText) logoText.classList.add('hidden');
     }
     
-    // ALWAYS filter out Fromsupply and Desktop - they should never appear
+    // ALWAYS filter out Chimos and Desktop - they should never appear
     const filteredDirectory = currentDirectory.filter(segment => 
-        segment !== 'Fromsupply' && segment !== 'Desktop'
+        segment !== 'Chimos' && segment !== 'Desktop'
     );
     
     // If nothing left after filtering, hide the nav
@@ -1845,8 +1845,8 @@ function createWindowFromDirectory(level) {
 const targetPath = currentDirectory.slice(0, level + 1);
 const folderName = targetPath[targetPath.length - 1];
 
-// Don't create window for Fromsupply - it should close instead
-if (folderName === 'Fromsupply') {
+// Don't create window for Chimos - it should close instead
+if (folderName === 'Chimos') {
     return;
 }
 
@@ -1857,7 +1857,7 @@ const windowX = Math.max(20, mouseX - 300);
 const windowY = Math.max(80, mouseY + 20);
 
 // Create new window
-const windowId = createWindow(`${folderName} - Fromsupply`, '', 650, 500, windowX, windowY);
+const windowId = createWindow(`${folderName} - Chimos`, '', 650, 500, windowX, windowY);
 
 // Force fullscreen on mobile
 if (window.innerWidth <= 768) {
@@ -2305,7 +2305,7 @@ function navigateToSaved(directoryPath) {
         const windowX = Math.max(20, mouseX - 300);
         const windowY = Math.max(80, mouseY + 50);
         
-        const newWindowId = createWindow(`${folderName} - Fromsupply`, '', 650, 500, windowX, windowY);
+        const newWindowId = createWindow(`${folderName} - Chimos`, '', 650, 500, windowX, windowY);
         PathManager.updatePath(newWindowId, pathParts);
         
         // Keep this one since it's a new window with a specific path
@@ -2547,7 +2547,7 @@ function handleLocalSearch(event) {
         const currentLocation = windowPath[windowPath.length - 1];
         
         // Create context based on current location
-        if (currentLocation && currentLocation !== 'Fromsupply') {
+        if (currentLocation && currentLocation !== 'Chimos') {
             searchContext = `Context: ${currentLocation}`;
         }
     }
@@ -2571,7 +2571,7 @@ function openBlobSearch() {
         const currentLocation = windowPath[windowPath.length - 1];
         
         // Create context based on current location
-        if (currentLocation && currentLocation !== 'Fromsupply') {
+        if (currentLocation && currentLocation !== 'Chimos') {
             searchContext = `Context: ${currentLocation}`;
         }
     }
@@ -2807,10 +2807,10 @@ function openNotesWindow() {
     const windowY = Math.max(80, mouseY - 200);
     
     // Create notes window
-    const windowId = createWindow('Notes - Fromsupply', '', 700, 500, windowX, windowY);
+    const windowId = createWindow('Notes - Chimos', '', 700, 500, windowX, windowY);
     
     // Set minimal path for notes (won't show in directory bar)
-const notesPath = ['Fromsupply'];
+const notesPath = ['Chimos'];
 PathManager.updatePath(windowId, notesPath);
     
     // Create iframe content for notes.html with drag overlay
@@ -3491,7 +3491,7 @@ if (pathArray.length === 2 && pathArray[1] === 'Desktop') return true; // Deskto
 
 let structure = folderStructure;
 
-// Start from the main folder (index 2, after Fromsupply/Desktop)
+// Start from the main folder (index 2, after Chimos/Desktop)
 for (let i = 2; i < pathArray.length; i++) {
     const segment = pathArray[i];
     console.log('Checking segment:', segment, 'in structure:', Object.keys(structure || {}));
@@ -3517,9 +3517,9 @@ if (windowId) {
     if (window && (!window.currentPath || window.currentPath.length < 2)) {
         let newPath;
         if (parentFolder) {
-            newPath = ['Fromsupply', 'Desktop', parentFolder, folderName];
+            newPath = ['Chimos', 'Desktop', parentFolder, folderName];
         } else {
-            newPath = ['Fromsupply', 'Desktop', folderName];
+            newPath = ['Chimos', 'Desktop', folderName];
         }
         PathManager.updatePath(windowId, newPath);
     }
@@ -4038,7 +4038,7 @@ if (windowPath.length === 2) {
             const desktopFolders = ['Logic', 'Mall', 'Farm', 'Prompts', 'Media', 'Browser', 'Store', 'Builder'];
             const desktopApps = [];
         // Replace current window content with the folder content
-        const newPath = ['Fromsupply', 'Desktop', itemName];
+        const newPath = ['Chimos', 'Desktop', itemName];
         PathManager.updatePath(windowId, newPath);
         
         const content = generateFolderContent(itemName, windowId);
@@ -4053,7 +4053,7 @@ if (windowPath.length === 2) {
     currentStructure = folderStructure[folderName];
     item = currentStructure[itemName];
 } else if (windowPath.length === 3) {
-    // Handle paths like ['Fromsupply', 'Desktop', 'Logic']
+    // Handle paths like ['Chimos', 'Desktop', 'Logic']
     const level1 = windowPath[1]; // 'Desktop'
     const level2 = windowPath[2]; // 'Logic'
     
@@ -4067,7 +4067,7 @@ if (windowPath.length === 2) {
         item = currentStructure[itemName];
     }
 } else if (windowPath.length === 4) {
-    // Handle paths like ['Fromsupply', 'Desktop', 'Logic', 'Programming']
+    // Handle paths like ['Chimos', 'Desktop', 'Logic', 'Programming']
     const level1 = windowPath[1]; // 'Desktop'
     const level2 = windowPath[2]; // 'Logic'
     const level3 = windowPath[3]; // 'Programming'
@@ -4178,7 +4178,7 @@ return;
     const windowX = Math.max(20, mouseX - 350);
     const windowY = Math.max(80, mouseY - 200);
     
-    const termsWindowId = createWindow('Terms - Fromsupply', '', 700, 500, windowX, windowY);
+    const termsWindowId = createWindow('Terms - Chimos', '', 700, 500, windowX, windowY);
     
     const termsContent = `
         <iframe src="../system/terms.html" 
@@ -4234,9 +4234,9 @@ function openFolder(folderName, mouseX = null, mouseY = null) {
 
     
     
-const windowId = createWindow(`${folderName} - Fromsupply`, '', 650, 500, windowX, windowY);
+const windowId = createWindow(`${folderName} - Chimos`, '', 650, 500, windowX, windowY);
 
-const newPath = ['Fromsupply', 'Desktop', folderName];
+const newPath = ['Chimos', 'Desktop', folderName];
 PathManager.updatePath(windowId, newPath);
 
 // Replace the old cleanup call with this more specific one:
@@ -4269,15 +4269,15 @@ if (focusedWindow) {
     windowId = focusedWindow.id;
 } else {
     // No window open, create a new one
-    windowId = createWindow(`${appName} - Fromsupply`, '', 800, 600);
+    windowId = createWindow(`${appName} - Chimos`, '', 800, 600);
 }
 
 // Update path to show we're now in the app
 let newPath;
 if (parentFolder) {
-    newPath = ['Fromsupply', parentFolder, appName];
+    newPath = ['Chimos', parentFolder, appName];
 } else {
-    newPath = ['Fromsupply', appName];
+    newPath = ['Chimos', appName];
 }
 PathManager.updatePath(windowId, newPath);
 
@@ -4309,10 +4309,10 @@ function openArcadeWindow() {
     const windowY = Math.max(80, mouseY - 200);
     
     // Create new window
-    const windowId = createWindow('Arcade - Fromsupply', '', 800, 600, windowX, windowY);
+    const windowId = createWindow('Arcade - Chimos', '', 800, 600, windowX, windowY);
     
     // Set path to show "Desktop/Arcade" in directory bar
-    const newPath = ['Fromsupply', 'Desktop', 'Arcade'];
+    const newPath = ['Chimos', 'Desktop', 'Arcade'];
     PathManager.updatePath(windowId, newPath);
     
     // Create iframe content for arcade.html with focus management
@@ -4419,9 +4419,9 @@ function openHiddenSystemWindow() {
         windowY = Math.max(80, Math.min(windowY, maxY));
     }
     
-    const windowId = createWindow('System - Fromsupply', '', 650, 500, windowX, windowY);
+    const windowId = createWindow('System - Chimos', '', 650, 500, windowX, windowY);
     
-    const newPath = ['Fromsupply', 'System'];
+    const newPath = ['Chimos', 'System'];
     PathManager.updatePath(windowId, newPath);
     
     const content = generateSystemContent(windowId);
@@ -5065,11 +5065,11 @@ window.addEventListener('load', function() {
         const constrainedX = Math.max(20, Math.min(windowX, maxX));
         const constrainedY = Math.max(80, Math.min(windowY, maxY));
         
-        consoleWindowId = createWindow('Shell - Fromsupply', '', 700, 450, constrainedX, constrainedY);
+        consoleWindowId = createWindow('Shell - Chimos', '', 700, 450, constrainedX, constrainedY);
     }
 
 		    // Use current path without adding Shell
-	    const currentPath = focusedWindow ? [...focusedWindow.currentPath] : ['Fromsupply', 'Desktop'];
+	    const currentPath = focusedWindow ? [...focusedWindow.currentPath] : ['Chimos', 'Desktop'];
 	    PathManager.updatePath(consoleWindowId, currentPath);
 
 		    // Create shell content WITHOUT header bar
@@ -5078,7 +5078,7 @@ window.addEventListener('load', function() {
 		            <!-- Output area -->
 		            <div style="flex: 1; padding: 16px; overflow-y: auto; color: rgba(255,255,255,0.9); font-size: 13px; line-height: 1.6;" 
 		                 id="shellOutput-${consoleWindowId}">
-		                <div style="margin-bottom: 4px; color: #10b981;">Fromsupply Console v2.0 - Ready</div>
+		                <div style="margin-bottom: 4px; color: #10b981;">Chimos Console v2.0 - Ready</div>
 		                <div style="margin-bottom: 4px; color: rgba(255,255,255,0.9);">Type 'help' for commands or 'h' for shortcuts</div>
 		            </div>
 		            
@@ -5222,7 +5222,7 @@ window.addEventListener('load', function() {
         return element && parseInt(element.style.zIndex) === windowZIndex;
     });
     
-    let currentPath = ['Fromsupply', 'Desktop'];
+    let currentPath = ['Chimos', 'Desktop'];
     if (focusedWindow && focusedWindow.currentPath) {
         currentPath = focusedWindow.currentPath;
     }
@@ -5290,7 +5290,7 @@ function showConsoleCurrentPath() {
         return element && parseInt(element.style.zIndex) === windowZIndex;
     });
     
-    let currentPath = ['Fromsupply', 'Desktop'];
+    let currentPath = ['Chimos', 'Desktop'];
     if (focusedWindow && focusedWindow.currentPath) {
         currentPath = focusedWindow.currentPath;
     }
@@ -5299,7 +5299,7 @@ function showConsoleCurrentPath() {
 }
 
 function showConsoleHelp() {
-    logToConsole('=== FROMSUPPLY KEYBOARD SHORTCUTS ===', 'success');
+    logToConsole('=== CHIMOS KEYBOARD SHORTCUTS ===', 'success');
     logToConsole('', 'output');
     logToConsole('WINDOW MANAGEMENT:', 'output');
     logToConsole('Q               - Close current window', 'output');
@@ -5749,7 +5749,7 @@ folder.addEventListener('touchend', function(e) {
         
         if (focusedWindow) {
             // Navigate back to C language levels view first
-            const newPath = ['Fromsupply', 'Desktop', 'Logic', 'Code', 'C'];
+            const newPath = ['Chimos', 'Desktop', 'Logic', 'Code', 'C'];
             PathManager.updatePath(focusedWindow.id, newPath);
             
             // Generate the C language levels content
@@ -5846,9 +5846,9 @@ case 'endDragFromIframe':
                 // Update the arcade window's path to show the current app
                 let newPath;
                 if (appPath) {
-                    newPath = ['Fromsupply', 'Arcade', ...appPath.split('/')];
+                    newPath = ['Chimos', 'Arcade', ...appPath.split('/')];
                 } else {
-                    newPath = ['Fromsupply', 'Arcade', appName];
+                    newPath = ['Chimos', 'Arcade', appName];
                 }
                 
                 PathManager.updatePath(arcadeWindow.id, newPath);
@@ -5985,7 +5985,7 @@ function executeShellCommand(command, windowId) {
         case 'clear':
         case 'cls':
             outputElement.innerHTML = `
-                <div style="margin-bottom: 4px; color: #10b981;">Fromsupply Console v2.0 - Ready</div>
+                <div style="margin-bottom: 4px; color: #10b981;">Chimos Console v2.0 - Ready</div>
                 <div style="margin-bottom: 4px; color: rgba(255,255,255,0.9);">Type 'help' for commands or 'h' for shortcuts</div>
             `;
             break;
@@ -6233,7 +6233,7 @@ function changeDirectory(targetDir, windowId) {
         }
     } else if (targetDir === '/' || targetDir === '~') {
         // Go to root
-        const newPath = ['Fromsupply', 'Desktop'];
+        const newPath = ['Chimos', 'Desktop'];
         PathManager.updatePath(windowId, newPath);
         
         const successLine = document.createElement('div');
@@ -6478,7 +6478,7 @@ function openCurrentDirectoryAsWindow(windowId) {
     
     // Create new window
     const folderName = directoryPath[directoryPath.length - 1] || 'Desktop';
-    const newWindowId = createWindow(`${folderName} - Fromsupply`, '', 650, 500, windowX, windowY);
+    const newWindowId = createWindow(`${folderName} - Chimos`, '', 650, 500, windowX, windowY);
     
     // Set path for new window
     PathManager.updatePath(newWindowId, directoryPath);
@@ -6581,7 +6581,7 @@ function showShellHelp(windowId) {
     const outputElement = document.getElementById(`shellOutput-${windowId}`);
     
     const helpLines = [
-        { text: '=== FROMSUPPLY SHELL HELP ===', color: '#10b981' },
+        { text: '=== CHIMOS SHELL HELP ===', color: '#10b981' },
         { text: '', color: 'rgba(255,255,255,0.9)' },
         { text: 'AVAILABLE COMMANDS:', color: 'rgba(255,255,255,0.9)' },
         { text: 'help, h         - Show this help', color: 'rgba(255,255,255,0.9)' },
@@ -6639,7 +6639,7 @@ function openVideoWindow(videoName, videoFile, sourceWindowId = null) {
     const windowX = Math.max(20, mouseX - 400);
     const windowY = Math.max(80, mouseY - 200);
     
-    const windowId = createWindow(`${videoName} - Fromsupply`, '', 800, 600, windowX, windowY);
+    const windowId = createWindow(`${videoName} - Chimos`, '', 800, 600, windowX, windowY);
     
     // Set proper path for directory bar
     if (sourceWindowId) {
@@ -6648,7 +6648,7 @@ function openVideoWindow(videoName, videoFile, sourceWindowId = null) {
         PathManager.updatePath(windowId, videoPath);
     } else {
         // Default path if no source window
-        PathManager.updatePath(windowId, ['Fromsupply', 'System', 'Tutorials', videoName]);
+        PathManager.updatePath(windowId, ['Chimos', 'System', 'Tutorials', videoName]);
     }
     
     // Create simple video content
@@ -6689,7 +6689,7 @@ function openYouTubeWindow(videoName, youtubeUrl, sourceWindowId = null) {
     const windowX = Math.max(20, mouseX - 400);
     const windowY = Math.max(80, mouseY - 200);
     
-    const windowId = createWindow(`${videoName} - Fromsupply`, '', 800, 600, windowX, windowY);
+    const windowId = createWindow(`${videoName} - Chimos`, '', 800, 600, windowX, windowY);
     
     // Set proper path for directory bar
     if (sourceWindowId) {
@@ -6698,7 +6698,7 @@ function openYouTubeWindow(videoName, youtubeUrl, sourceWindowId = null) {
         PathManager.updatePath(windowId, videoPath);
     } else {
         // Default path if no source window
-        PathManager.updatePath(windowId, ['Fromsupply', 'System', 'Tutorials', videoName]);
+        PathManager.updatePath(windowId, ['Chimos', 'System', 'Tutorials', videoName]);
     }
     
     // Convert YouTube URL to embed format if needed
@@ -6876,7 +6876,7 @@ function forceSigninFlow() {
     const logoText = document.querySelector('.logo-text');
     if (logoText && !logoText.classList.contains('signed-out-mode')) {
         logoText.classList.add('signed-out-mode');
-        logoText.innerHTML = 'Fromsupply <span style="color: #ef4444; font-size: 12px; margin-left: 8px;"> Click to Sign In</span>';
+        logoText.innerHTML = 'Chimos <span style="color: #ef4444; font-size: 12px; margin-left: 8px;"> Click to Sign In</span>';
     }
     
     // TEMPORARY DEV UNLOCK BUTTON - REMOVE or comment out BEFORE LAUNCH
@@ -6915,7 +6915,7 @@ function temporaryUnlock() {
     userData.isLoggedIn = true;
     userData.profile = {
         name: 'Developer Mode',
-        email: 'dev@fromsupply.com',
+        email: 'dev@chimos.com',
         picture: 'https://placehold.co/32x32/FFA500/FFFFFF?text=DEV'
     };
     
@@ -6968,7 +6968,7 @@ function openSupportSection() {
     const x = (window.innerWidth - windowWidth) / 2;
     const y = (window.innerHeight - windowHeight) / 2;
 
-    const supportWindowId = createWindow('Terms of Service - Fromsupply', '', windowWidth, windowHeight, x, y);
+    const supportWindowId = createWindow('Terms of Service - Chimos', '', windowWidth, windowHeight, x, y);
     const supportWindow = document.getElementById(supportWindowId);
     const supportContentElement = document.getElementById(supportWindowId + '-content');
 
@@ -7004,8 +7004,8 @@ function openSupportSection() {
         // Set path for directory bar
         const windowData = openWindows.find(w => w.id === supportWindowId);
         if (windowData) {
-            windowData.currentPath = ['Fromsupply', 'System', 'Terms'];
-            currentDirectory = ['Fromsupply', 'System', 'Terms'];
+            windowData.currentPath = ['Chimos', 'System', 'Terms'];
+            currentDirectory = ['Chimos', 'System', 'Terms'];
             updateDirectoryDisplay();
         }
     }
@@ -7045,7 +7045,7 @@ function enableUIAfterSignin() {
     const logoText = document.querySelector('.logo-text');
     if (logoText && logoText.classList.contains('signed-out-mode')) {
         logoText.classList.remove('signed-out-mode');
-        logoText.innerHTML = 'Fromsupply';
+        logoText.innerHTML = 'Chimos';
     }
     
     // Close logo dropdown
@@ -7125,15 +7125,15 @@ const windowHeight = window.innerHeight;
 const x = 0;
 const y = 0;
 
-const termsWindowId = createWindow('Terms of Service - Fromsupply', '', windowWidth, windowHeight, x, y);
+const termsWindowId = createWindow('Terms of Service - Chimos', '', windowWidth, windowHeight, x, y);
 const termsWindow = document.getElementById(termsWindowId);
 const contentElement = document.getElementById(termsWindowId + '-content');
 
 // Set path for terms window to show in directory bar
 const termsWindowData = openWindows.find(w => w.id === termsWindowId);
 if (termsWindowData) {
-    termsWindowData.currentPath = ['Fromsupply', 'System', 'Terms'];
-    currentDirectory = ['Fromsupply', 'System', 'Terms'];
+    termsWindowData.currentPath = ['Chimos', 'System', 'Terms'];
+    currentDirectory = ['Chimos', 'System', 'Terms'];
     updateDirectoryDisplay();
 }
 

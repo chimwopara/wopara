@@ -97,7 +97,7 @@ body::before {
     outline: none;
 }
 
-/* Fromsupply Console Styles */
+/* Chimos Console Styles */
 .fs-console {
     position: absolute;
     width: 700px;
@@ -553,7 +553,7 @@ body::before {
     color: rgba(255, 255, 255, 0.9);
 }
 
-.fromsupply-home-icon {
+.chimos-home-icon {
     transition: all 0.2s ease;
     transform: translateY(-2px);
 }

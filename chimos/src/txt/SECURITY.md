@@ -1,8 +1,8 @@
-# Security at Fromsupply 🚀
+# Security at Chimos 🚀
 
 *_"Stay vigilant, secure boldly, and innovate responsibly."_*
 
-At Fromsupply, **your insight is our superpower.** By reporting bugs and vulnerabilities, you help create a safer, more robust environment for every user. We’ve drawn inspiration from the great designers and tech innovators whose relentless pursuit of excellence fuels our commitment to security.
+At Chimos, **your insight is our superpower.** By reporting bugs and vulnerabilities, you help create a safer, more robust environment for every user. We’ve drawn inspiration from the great designers and tech innovators whose relentless pursuit of excellence fuels our commitment to security.
 
 ---
 
@@ -63,7 +63,7 @@ For a thorough report, please include the following details:
 
 We hold your trust in the highest regard. If you discover any **security vulnerability**, please follow our responsible disclosure process. This ensures that your report helps us protect the community effectively.
 
-<span style="color:blue; font-weight:bold;">**Email your comprehensive vulnerability report to: [support@fromsupply.com](mailto:support@fromsupply.com)**</span>
+<span style="color:blue; font-weight:bold;">**Email your comprehensive vulnerability report to: [support@chimos.com](mailto:support@chimos.com)**</span>
 
 Please include:
 
@@ -86,7 +86,7 @@ Please include:
 
 ## Our Security Promise
 
-At Fromsupply, we are committed to:
+At Chimos, we are committed to:
 
 - **User Protection:** Every user’s security is our top priority.
 - **Rapid Response:** Issues are investigated and resolved as quickly as possible.
@@ -114,7 +114,7 @@ We periodically update this document to reflect new protocols and improvements. 
 
 For any security-related inquiries or further discussion, please reach out directly via email at:
 
-**Email:** [support@fromsupply.com](mailto:support@fromsupply.com)
+**Email:** [support@chimos.com](mailto:support@chimos.com)
 
 *Thank you for your unwavering dedication, attention to detail, and commitment to a safer future.*
 
