@@ -167,6 +167,18 @@
             padding: 2rem;
             border-radius: 1rem;
         }
+        /* Hide scrollbar but keep functionality */
+        .scrollbar-hide {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
+        }
+        .scrollbar-hide::-webkit-scrollbar {
+            display: none;
+        }
+        .project-card-horizontal {
+            min-width: 300px;
+            max-width: 300px;
+        }
         /* About Section Collage Styles */
         .about-collage {
             position: relative;
@@ -300,14 +312,7 @@
         </div>
     </div>
 
-    <!-- Header -->
-    <header class="bg-[#1B2330]/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
-        <div class="container mx-auto px-6 py-3 flex justify-center items-center">
-            <a href="#"><img src="assets/portfolio/logo.png" alt="Chim Wopara Logo" class="h-10 w-auto" onerror="this.onerror=null; this.src='https://placehold.co/120x40/1B2330/FFFFFF?text=CW'"></a>
-        </div>
-    </header>
-
-    <main class="pt-16">
+    <main class="pt-0">
 
         <!-- Hero Section -->
         <section class="py-20 hero-image-bg overflow-hidden">
@@ -341,32 +346,45 @@
             </div>
         </section>
 
-        <!-- Projects Section -->
+        <!-- Projects Sections -->
         <section id="projects" class="py-20 hero-bg">
-            <div class="container mx-auto px-6">
-                <div class="text-center mb-12 fade-in-up">
-                    <h2 id="section-title" class="text-4xl font-bold mb-2">Business Partnerships</h2>
-                    <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
-                </div>
-                
-                <!-- Filter Buttons -->
-                <div id="filter-container" class="flex justify-center flex-wrap gap-3 mb-10 fade-in-up">
-                    <button class="filter-btn active py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="websites">Websites</button>
-                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="apps">Apps</button>
-                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="games">Games</button>
-                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="myprojects">My Projects</button>
-                </div>
+            <div class="mb-12 fade-in-up text-center px-6">
+                <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
+            </div>
 
-                <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                    <!-- Projects will be dynamically inserted here by JavaScript -->
-                </div>
-                <div class="text-center mt-12">
-                    <div id="see-more-container">
-                        <button id="see-more-btn" class="bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-3 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">See more disclosed works</button>
-                    </div>
-                    <p class="text-[#B7D1E1]/60 text-sm mt-4">Some of my works are confidential and arn't disclosed here</p>
+            <!-- Business Partnerships (Websites) -->
+            <div class="mb-16 fade-in-up">
+                <h2 class="text-3xl font-bold mb-6 px-6">Business Partnerships</h2>
+                <div id="websites-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
                 </div>
             </div>
+
+            <!-- Xcode iPhone Apps -->
+            <div class="mb-16 fade-in-up">
+                <h2 class="text-3xl font-bold mb-6 px-6">Xcode iPhone Apps</h2>
+                <div id="apps-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- HTML, CSS and JavaScript Games -->
+            <div class="mb-16 fade-in-up">
+                <h2 class="text-3xl font-bold mb-6 px-6">HTML, CSS and JavaScript Games</h2>
+                <div id="games-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <!-- My Companies -->
+            <div class="mb-8 fade-in-up">
+                <h2 class="text-3xl font-bold mb-6 px-6">My Companies</h2>
+                <div id="myprojects-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
+                </div>
+            </div>
+
+            <p class="text-[#B7D1E1]/60 text-sm mt-12 text-center px-6">Some of my works are confidential and aren't disclosed here</p>
         </section>
         
         <!-- Contact Overlay Modal -->
@@ -659,77 +677,44 @@
                 { name: "Goodsline", date: "Summer 2025", description: "Search for products sentiment and popularity graphs across the internet.", category: "myprojects", image: "assets/portfolio/goodsline.png", url: "https://goodsline.com" },
             ];
 
-            const projectGrid = document.getElementById('project-grid');
-            const filterContainer = document.getElementById('filter-container');
-            const seeMoreContainer = document.getElementById('see-more-container');
-            const seeMoreBtn = document.getElementById('see-more-btn');
-            
             // Cart system
             let cart = new Map();
             let pageCount = 1;
-            let showingAllProjects = false;
             
-            // --- RENDER PROJECTS ---
-            function renderProjects(filter = 'websites') {
-                projectGrid.innerHTML = '';
-                const filteredProjects = projects.filter(p => p.category === filter);
-
-                const projectsToDisplay = showingAllProjects ? filteredProjects : filteredProjects.slice(0, 6);
-
-                projectsToDisplay.forEach((project, index) => {
-                    const isLink = !!project.url;
-                    const card = isLink ? document.createElement('a') : document.createElement('div');
-                    if (isLink) {
-                        card.href = project.url;
-                        card.target = '_blank';
-                        card.rel = 'noopener noreferrer';
-                    }
-                    card.className = `project-card rounded-xl overflow-hidden fade-in-up a-delay-${index % 3} flex flex-col`;
-                    card.setAttribute('data-category', project.category);
-                    card.innerHTML = `
-    <img src="${project.image}" alt="${project.name}" class="w-full h-56 object-cover" loading="lazy" decoding="async">
-    <div class="p-6 flex flex-col flex-grow">
-        <h3 class="text-xl font-bold mb-1">${project.name}</h3>
-        <p class="text-sm text-[#B7D1E1]/80 mb-4 flex-grow">${project.description}</p>
-        <p class="text-sm text-[#B7D1E1] font-medium mt-auto">${project.date}</p>
-    </div>
-`;
-                    projectGrid.appendChild(card);
+            // --- RENDER ALL PROJECTS ---
+            function renderAllProjects() {
+                const categories = ['websites', 'apps', 'games', 'myprojects'];
+                
+                categories.forEach(category => {
+                    const grid = document.getElementById(`${category}-grid`);
+                    if (!grid) return;
+                    
+                    grid.innerHTML = '';
+                    const filteredProjects = projects.filter(p => p.category === category);
+                    
+                    filteredProjects.forEach((project, index) => {
+                        const isLink = !!project.url;
+                        const card = isLink ? document.createElement('a') : document.createElement('div');
+                        if (isLink) {
+                            card.href = project.url;
+                            card.target = '_blank';
+                            card.rel = 'noopener noreferrer';
+                        }
+                        card.className = `project-card project-card-horizontal rounded-xl overflow-hidden fade-in-up flex flex-col flex-shrink-0`;
+                        card.innerHTML = `
+                            <img src="${project.image}" alt="${project.name}" class="w-full h-44 object-cover" loading="lazy" decoding="async">
+                            <div class="p-5 flex flex-col flex-grow">
+                                <h3 class="text-lg font-bold mb-1">${project.name}</h3>
+                                <p class="text-xs text-[#B7D1E1]/80 mb-3 flex-grow">${project.description}</p>
+                                <p class="text-xs text-[#B7D1E1] font-medium mt-auto">${project.date}</p>
+                            </div>
+                        `;
+                        grid.appendChild(card);
+                    });
                 });
-
-                if (showingAllProjects || filteredProjects.length <= 6) {
-                    seeMoreContainer.style.display = 'none';
-                } else {
-                    seeMoreContainer.style.display = 'block';
-                }
-
+                
                 observeElements();
             }
-
-            // --- FILTERING LOGIC ---
-            const sectionTitles = {
-                'websites': 'Business Partnerships',
-                'apps': 'Xcode iPhone Apps',
-                'games': 'HTML, CSS and JavaScript Games',
-                'myprojects': 'My Companies'
-            };
-
-            filterContainer.addEventListener('click', (e) => {
-                if(e.target.classList.contains('filter-btn')) {
-                    document.querySelector('.filter-btn.active').classList.remove('active');
-                    e.target.classList.add('active');
-                    showingAllProjects = false; // Reset when filter changes
-                    const filter = e.target.dataset.filter;
-                    document.getElementById('section-title').textContent = sectionTitles[filter];
-                    renderProjects(filter);
-                }
-            });
-
-            seeMoreBtn.addEventListener('click', () => {
-                showingAllProjects = true;
-                const currentFilter = document.querySelector('.filter-btn.active').dataset.filter;
-                renderProjects(currentFilter);
-            });
 
             // --- PRICING MODAL FUNCTIONS ---
             window.openPricingModal = function() {
@@ -970,7 +955,7 @@
             const now = new Date();
             document.getElementById('last-updated-date').textContent = months[now.getMonth()] + ' ' + now.getFullYear();
             
-            renderProjects();
+            renderAllProjects();
             observeElements();
 
             // --- LAUNCH OVERLAY ---
