@@ -167,10 +167,12 @@
             padding: 2rem;
             border-radius: 1rem;
         }
-        /* Hide scrollbar but keep functionality */
+        /* Hide scrollbar but keep horizontal functionality only */
         .scrollbar-hide {
             -ms-overflow-style: none;
             scrollbar-width: none;
+            overflow-x: scroll;
+            overflow-y: hidden !important;
         }
         .scrollbar-hide::-webkit-scrollbar {
             display: none;
@@ -178,6 +180,17 @@
         .project-card-horizontal {
             min-width: 300px;
             max-width: 300px;
+            height: 320px;
+            overflow: hidden !important;
+        }
+        .project-card.project-card-horizontal:hover {
+            transform: scale(1.02);
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
         }
         /* About Section Collage Styles */
         .about-collage {
@@ -356,32 +369,40 @@
             <!-- Albertan Business Partnerships (Websites) -->
             <div class="mb-16 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">Albertan Business Partnerships</h2>
-                <div id="websites-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
-                    <!-- Projects will be dynamically inserted here -->
+                <div class="overflow-hidden" style="height: 336px;">
+                    <div id="websites-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
+                        <!-- Projects will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
 
             <!-- Xcode iPhone Apps -->
             <div class="mb-16 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">Xcode iPhone Apps</h2>
-                <div id="apps-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
-                    <!-- Projects will be dynamically inserted here -->
+                <div class="overflow-hidden" style="height: 336px;">
+                    <div id="apps-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
+                        <!-- Projects will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
 
             <!-- HTML, CSS and JavaScript Games -->
             <div class="mb-16 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">HTML, CSS and JavaScript Games</h2>
-                <div id="games-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
-                    <!-- Projects will be dynamically inserted here -->
+                <div class="overflow-hidden" style="height: 336px;">
+                    <div id="games-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
+                        <!-- Projects will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
 
             <!-- My Companies -->
             <div class="mb-8 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">My Companies</h2>
-                <div id="myprojects-grid" class="flex gap-6 overflow-x-auto pb-4 px-6 scrollbar-hide">
-                    <!-- Projects will be dynamically inserted here -->
+                <div class="overflow-hidden" style="height: 336px;">
+                    <div id="myprojects-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
+                        <!-- Projects will be dynamically inserted here -->
+                    </div>
                 </div>
             </div>
 
@@ -703,10 +724,10 @@
                         }
                         card.className = `project-card project-card-horizontal rounded-xl overflow-hidden fade-in-up flex flex-col flex-shrink-0`;
                         card.innerHTML = `
-                            <img src="${project.image}" alt="${project.name}" class="w-full h-44 object-cover" loading="lazy" decoding="async">
-                            <div class="p-5 flex flex-col flex-grow">
-                                <h3 class="text-lg font-bold mb-1">${project.name}</h3>
-                                <p class="text-xs text-[#B7D1E1]/80 mb-3 flex-grow">${project.description}</p>
+                            <img src="${project.image}" alt="${project.name}" class="w-full h-40 object-cover flex-shrink-0" loading="lazy" decoding="async">
+                            <div class="p-4 flex flex-col overflow-hidden" style="height: 160px;">
+                                <h3 class="text-base font-bold mb-1 truncate">${project.name}</h3>
+                                <p class="text-xs text-[#B7D1E1]/80 mb-2 line-clamp-3 overflow-hidden">${project.description}</p>
                                 <p class="text-xs text-[#B7D1E1] font-medium mt-auto">${project.date}</p>
                             </div>
                         `;
