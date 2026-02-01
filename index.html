@@ -264,6 +264,14 @@
 </head>
 <body class="text-[#B7D1E1]">
 
+    <!-- Launch Overlay -->
+    <div id="launch-overlay" class="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer" style="background: rgba(27, 35, 48, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+        <div class="text-center">
+            <p class="text-[#B7D1E1]/80 text-xl mb-2">Last updated</p>
+            <p class="text-[#B7D1E1] text-4xl font-bold">January 2026</p>
+        </div>
+    </div>
+
     <!-- Header -->
     <header class="bg-[#1B2330]/80 backdrop-blur-sm fixed top-0 left-0 right-0 z-50">
         <div class="container mx-auto px-6 py-3 flex justify-center items-center">
@@ -294,13 +302,10 @@
                     <!-- Glassy card on the right -->
                     <div class="glassy-card text-center md:text-left">
                         <h2 class="text-3xl font-bold mb-4 text-[#B7D1E1]">Hi,</h2>
-                        <p class="text-[#B7D1E1]/80 mb-4">I'm Chim Wopara, and i create enterprise solutions with my strong background in Computer Science and Economics.</p>
-                        <p class="text-[#B7D1E1]/80 mb-6"> My primary aim is for Artificial Intelligence to empower the next generation of Nigerians, helping us thrive in a future where AI will be relevant.</p>
+                        <p class="text-[#B7D1E1]/80 mb-6">I'm Chim Wopara, and i create enterprise solutions with my strong background in Economics, Business and Computer Science.</p>
                         <div class="mt-8 flex flex-col sm:flex-row gap-4 justify-center md:justify-start">
                             <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Learn from me</a>
-                            <a href="chimos/src/main/index.html" target="_blank" rel="noopener noreferrer" class="bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Personal Projects</a>
-                            <a href="#contact" class="bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Talk to me</a>
-                            <button onclick="openPricingModal()" class="bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Pricing estimate</button>
+                            <button onclick="openContactModal()" class="bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button inline-block text-lg transition-transform duration-300">Talk to me</button>
                         </div>
                     </div>
                 </div>
@@ -311,15 +316,16 @@
         <section id="projects" class="py-20 hero-bg">
             <div class="container mx-auto px-6">
                 <div class="text-center mb-12 fade-in-up">
-                    <h2 class="text-4xl font-bold mb-2">My Work</h2>
+                    <h2 class="text-4xl font-bold mb-2">Business Partnerships</h2>
                     <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
                 </div>
                 
                 <!-- Filter Buttons -->
                 <div id="filter-container" class="flex justify-center flex-wrap gap-3 mb-10 fade-in-up">
-                    <button class="filter-btn active py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="all">All</button>
-                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="websites">Websites</button>
-                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="mobile">Mobile apps</button>
+                    <button class="filter-btn active py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="websites">Websites</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="apps">Apps</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="games">Games</button>
+                    <button class="filter-btn py-2 px-5 bg-[#3f5268] rounded-full text-sm font-semibold transition-all" data-filter="myprojects">My Projects</button>
                 </div>
 
                 <div id="project-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -334,19 +340,24 @@
             </div>
         </section>
         
-        <!-- Contact Section -->
-        <section id="contact" class="pt-12 pb-0 md:py-20 bg-cover bg-center" style="background-image: url('assets/system/letstalk.png');">
-            <div class="container mx-auto px-6">
-                 <div class="max-w-4xl mx-auto fade-in-up text-center">
-                    <h2 class="text-4xl font-bold mb-8 text-[#1B2330]">Lets talk</h2>
-                    
-                    <!-- Calendly inline widget begin -->
-                   <div class="calendly-inline-widget" data-url="https://calendly.com/wopara?hide_landing_page_details=1&hide_gdpr_banner=1&background_color=1B2330&text_color=b7d1e1&primary_color=3f5268" style="min-width:320px;height:580px;"></div>
-                    <script type="text/javascript" src="https://assets.calendly.com/assets/external/widget.js" async></script>
-                    <!-- Calendly inline widget end -->
-                 </div>
+        <!-- Contact Overlay Modal -->
+        <div id="contact-modal" class="fixed inset-0 z-[90] hidden items-center justify-center" style="background: rgba(27, 35, 48, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
+            <div class="text-center p-6">
+                <h2 class="text-4xl font-bold mb-8 text-[#B7D1E1]">Let's talk</h2>
+                <div class="flex flex-col gap-4 max-w-md mx-auto">
+                    <a href="mailto:chim@wopara.com?subject=Hire%20Request%3A%20Project%20Inquiry&body=Hi%20Chim%2C%0A%0AI%20would%20like%20to%20hire%20you%20for%20a%20project.%0A%0AProject%20details%3A%0A%0A%0A%0AI%20understand%20you%20will%20get%20back%20to%20me%20within%2024%20hours.%0A%0AThank%20you!" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
+                        Hire me for a project
+                    </a>
+                    <a href="mailto:chim@wopara.com?subject=Partnership%20Inquiry&body=Hi%20Chim%2C%0A%0AI%20would%20like%20to%20partner%20with%20you%20on%20a%20project.%0A%0APartnership%20details%3A%0A%0A%0A%0AI%20understand%20you%20will%20get%20back%20to%20me%20within%2024%20hours.%0A%0AThank%20you!" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
+                        Partner with me on a project
+                    </a>
+                    <a href="mailto:chim@wopara.com?subject=General%20Inquiry&body=Hi%20Chim%2C%0A%0A%0A%0AI%20understand%20you%20will%20get%20back%20to%20me%20within%2024%20hours.%0A%0AThank%20you!" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
+                        Other inquiries
+                    </a>
+                </div>
+                <button onclick="closeContactModal()" class="mt-8 text-[#B7D1E1]/60 hover:text-[#B7D1E1] text-sm">Close</button>
             </div>
-        </section>
+        </div>
 
         <!-- Pricing Estimate Modal -->
         <div id="pricing-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden flex items-center justify-center p-4">
@@ -565,16 +576,16 @@
             <div class="text-center mb-8">
                 <h4 class="text-sm uppercase text-[#B7D1E1]/60 tracking-widest mb-4">A Chim Wopara Enterprises Company</h4>
                 <div class="flex justify-center items-center space-x-6 md:space-x-10">
-                    <a href="http://chimos.com" target="_blank" class="hover:opacity-80 transition-opacity">
-                        <img src="assets/portfolio/fs.png" alt="Chimos Logo" class="h-8 w-auto">
-                    </a>
-                    <span class="text-[#3f5268]">|</span>
-                    <a href="http://devgameshow.com" target="_blank" class="hover:opacity-80 transition-opacity">
-                        <img src="assets/portfolio/dgs.png" alt="Dev Game Show Logo" class="h-8 w-auto">
+                    <a href="http://fromsupply.com" target="_blank" class="hover:opacity-80 transition-opacity">
+                        <img src="assets/portfolio/fs.png" alt="FromSupply Logo" class="h-8 w-auto">
                     </a>
                     <span class="text-[#3f5268]">|</span>
                     <a href="http://pautacos.com" target="_blank" class="hover:opacity-80 transition-opacity">
                         <img src="assets/portfolio/pautacos.png" alt="Pautacos Logo" class="h-8 w-auto">
+                    </a>
+                    <span class="text-[#3f5268]">|</span>
+                    <a href="http://clubbelong.com" target="_blank" class="hover:opacity-80 transition-opacity">
+                        <img src="assets/portfolio/cb.png" alt="Club Belong Logo" class="h-8 w-auto">
                     </a>
                     <span class="text-[#3f5268]">|</span>
                     <a href="https://chimwopara.com" target="_blank" rel="noopener noreferrer" class="text-white hover:opacity-80 transition-opacity">
@@ -597,13 +608,25 @@
         document.addEventListener('DOMContentLoaded', function() {
             // --- DATA ---
             const projects = [
-                { name: "FlatPurse Business", date: "June 2025 - September 2025", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "web", image: "assets/portfolio/flatpurse.png" },
-                { name: "Prastfarms.com", date: "April 2023 - November 2023", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "business", image: "assets/portfolio/prast.png", url: "https://prastfarms.com" },
-                { name: "Lenslore.ca", date: "July 2025 - August 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "web", image: "assets/portfolio/lenslore.png", url: "https://lenslore.ca" },
-                { name: "culyeimmigrationservices.com", date: "September 2025 - October 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "web", image: "assets/portfolio/culye.png", url: "https://culyeimmigrationservices.com" },
-                { name: "bodidris.org", date: "August 2025 - September 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "web", image: "assets/portfolio/bod.png", url: "https://bodidris.org" },
-                { name: "God's Embassy Church App", date: "November 2024 - February 2025", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "web", image: "assets/portfolio/godsembassy.png" },
-                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "brand", image: "assets/portfolio/stones.png" },
+                { name: "Yege Learning", date: "February 2026", description: "Yege Learning is built for students who need more than worksheets and grades.", category: "websites", image: "assets/portfolio/yege.png", url: "https://yegeleaning.com" },
+                { name: "Daniel's Enterprise", date: "January 2026", description: "A kingdom-based platform raising, training and empowering individuals with the right set of tools for their next opportunities.", category: "websites", image: "assets/portfolio/dane.png", url: "https://danielsenterprise.com" },
+                { name: "FlatPurse Business", date: "June 2025 - September 2025", description: "Front-end development using HTML, CSS, and JavaScript for a business-focused web application.", category: "websites", image: "assets/portfolio/flatpurse.png" },
+                { name: "Prastfarms.com", date: "April 2023 - November 2023", description: "Full-stack platform for creating, editing, and monitoring investments using Google App Scripts, Sheets, HTML, CSS, and JavaScript.", category: "websites", image: "assets/portfolio/prast.png", url: "https://prastfarms.com" },
+                { name: "Lenslore.ca", date: "July 2025 - August 2025", description: "A personal portfolio and sales leads website with great SEO, mail presets, and a PDF generator.", category: "websites", image: "assets/portfolio/lenslore.png", url: "https://lenslore.ca" },
+                { name: "culyeimmigrationservices.com", date: "September 2025 - October 2025", description: "Complete website redesign for an immigration company, integrating a Stripe payment system with secure backend functions.", category: "websites", image: "assets/portfolio/culye.png", url: "https://culyeimmigrationservices.com" },
+                { name: "bodidris.org", date: "August 2025 - September 2025", description: "Personal portfolio and sales leads website with great SEO and mail presets.", category: "websites", image: "assets/portfolio/bod.png", url: "https://bodidris.org" },
+                { name: "God's Embassy Church App", date: "November 2024 - February 2025", description: "An innovative app for a more personal church experience, fostering community and engagement.", category: "apps", image: "assets/portfolio/godsembassy.png" },
+                { name: "234Stones", date: "Nov 2023 - Present", description: "Jewelry store for which I designed branding and led marketing campaigns to drive sales.", category: "apps", image: "assets/portfolio/stones.png" },
+                { name: "MinuteDash", date: "January 2026", description: "Story based 2d, 3d, pov maze multiplayer game.", category: "games", image: "assets/portfolio/md.png", url: "https://minutedash.org" },
+                { name: "Falling Cards", date: "2025", description: "Maths game for increasing arithmetics skills.", category: "games", image: "assets/portfolio/falling.png" },
+                { name: "Naija Whot", date: "July 2025", description: "Multiplayer nigerian whot styles game.", category: "games", image: "assets/portfolio/whot.png" },
+                { name: "Chim Type", date: "2025", description: "Typing game to increase speed of typing without looking at keyboard with guided gestures.", category: "games", image: "assets/portfolio/chimtype.png" },
+                { name: "Dev Game Show", date: "November 2025", description: "AI developers gameshow.", category: "myprojects", image: "assets/portfolio/dgs.png", url: "https://devgameshow.com" },
+                { name: "FromSupply", date: "January 2023", description: "AI Concierge service.", category: "myprojects", image: "assets/portfolio/fs.png", url: "https://fromsupply.com" },
+                { name: "Pautacos", date: "September 2025", description: "Health focused chef network.", category: "myprojects", image: "assets/portfolio/pautacos.png", url: "https://pautacos.com" },
+                { name: "Chim Wopara", date: "June 2025", description: "AI literacy company.", category: "myprojects", image: "assets/portfolio/logo.png", url: "https://chimwopara.com" },
+                { name: "Club Belong", date: "November 2025", description: "Interactive livestreams and interactive movies.", category: "myprojects", image: "assets/portfolio/cb.png", url: "https://clubbelong.com" },
+                { name: "Chimos", date: "May 2025", description: "Custom operating systems simulator.", category: "myprojects", image: "assets/portfolio/chimos.png", url: "https://wopara.com/chimos/src/main/index.html" },
             ];
 
             const projectGrid = document.getElementById('project-grid');
@@ -617,9 +640,9 @@
             let showingAllProjects = false;
             
             // --- RENDER PROJECTS ---
-            function renderProjects(filter = 'all') {
+            function renderProjects(filter = 'websites') {
                 projectGrid.innerHTML = '';
-                const filteredProjects = projects.filter(p => filter === 'all' || p.category === filter);
+                const filteredProjects = projects.filter(p => p.category === filter);
 
                 const projectsToDisplay = showingAllProjects ? filteredProjects : filteredProjects.slice(0, 6);
 
@@ -672,6 +695,17 @@
             // --- PRICING MODAL FUNCTIONS ---
             window.openPricingModal = function() {
                 document.getElementById('pricing-modal').classList.remove('hidden');
+            }
+
+            // --- CONTACT MODAL FUNCTIONS ---
+            window.openContactModal = function() {
+                document.getElementById('contact-modal').classList.remove('hidden');
+                document.getElementById('contact-modal').classList.add('flex');
+            }
+
+            window.closeContactModal = function() {
+                document.getElementById('contact-modal').classList.add('hidden');
+                document.getElementById('contact-modal').classList.remove('flex');
             }
 
             window.closePricingModal = function() {
@@ -872,6 +906,18 @@
             document.getElementById('year').textContent = new Date().getFullYear();
             renderProjects();
             observeElements();
+
+            // --- LAUNCH OVERLAY ---
+            const launchOverlay = document.getElementById('launch-overlay');
+            const dismissOverlay = () => {
+                launchOverlay.style.opacity = '0';
+                launchOverlay.style.transition = 'opacity 0.5s ease';
+                setTimeout(() => {
+                    launchOverlay.style.display = 'none';
+                }, 500);
+            };
+            launchOverlay.addEventListener('click', dismissOverlay);
+            setTimeout(dismissOverlay, 3000);
         });
     </script>
 </body>
