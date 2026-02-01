@@ -268,7 +268,7 @@
     <div id="launch-overlay" class="fixed inset-0 z-[100] flex items-center justify-center cursor-pointer" style="background: rgba(27, 35, 48, 0.4); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px);">
         <div class="text-center">
             <p class="text-[#B7D1E1]/80 text-xl mb-2">Last updated</p>
-            <p class="text-[#B7D1E1] text-4xl font-bold">January 2026</p>
+            <p id="last-updated-date" class="text-[#B7D1E1] text-4xl font-bold"></p>
         </div>
     </div>
 
@@ -345,15 +345,15 @@
             <div class="text-center p-6">
                 <h2 class="text-4xl font-bold mb-8 text-[#B7D1E1]">Let's talk</h2>
                 <div class="flex flex-col gap-4 max-w-md mx-auto">
-                    <a href="/cdn-cgi/l/email-protection#bbd8d3d2d6fbccd4cbdac9da95d8d4d684c8ced9d1ded8cf86f3d2c9de9e898be9decacedec8cf9e88fa9e898bebc9d4d1ded8cf9e898bf2d5caced2c9c29dd9d4dfc286f3d29e898bf8d3d2d69e89f89e8bfa9e8bfaf29e898bccd4ced7df9e898bd7d2d0de9e898bcfd49e898bd3d2c9de9e898bc2d4ce9e898bddd4c99e898bda9e898bcbc9d4d1ded8cf959e8bfa9e8bfaebc9d4d1ded8cf9e898bdfdecfdad2d7c89e88fa9e8bfa9e8bfa9e8bfa9e8bfaf29e898bced5dfdec9c8cfdad5df9e898bc2d4ce9e898bccd2d7d79e898bdcdecf9e898bd9dad8d09e898bcfd49e898bd6de9e898bccd2cfd3d2d59e898b898f9e898bd3d4cec9c8959e8bfa9e8bfaefd3dad5d09e898bc2d4ce9a" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
+                    <button onclick="sendHireEmail()" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
                         Hire me for a project
-                    </a>
-                    <a href="/cdn-cgi/l/email-protection#096a616064497e6679687b68276a6664367a7c6b636c6a7d3459687b7d676c7b7a6160792c3b394067787c607b702f6b666d703441602c3b394a6160642c3b4a2c39482c3948402c3b397e667c656d2c3b396560626c2c3b397d662c3b3979687b7d676c7b2c3b397e607d612c3b3970667c2c3b3966672c3b39682c3b39797b66636c6a7d272c39482c394859687b7d676c7b7a6160792c3b396d6c7d6860657a2c3a482c39482c39482c39482c3948402c3b397c676d6c7b7a7d68676d2c3b3970667c2c3b397e6065652c3b396e6c7d2c3b396b686a622c3b397d662c3b39646c2c3b397e607d6160672c3b393b3d2c3b3961667c7b7a272c39482c39485d616867622c3b3970667c28" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
+                    </button>
+                    <button onclick="sendPartnerEmail()" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
                         Partner with me on a project
-                    </a>
-                    <a href="/cdn-cgi/l/email-protection#9cfff4f5f1dcebf3ecfdeefdb2fff3f1a3efe9fef6f9ffe8a1dbf9f2f9eefdf0b9aeacd5f2ede9f5eee5bafef3f8e5a1d4f5b9aeacdff4f5f1b9aedfb9acddb9acddb9acddb9acddd5b9aeace9f2f8f9eeefe8fdf2f8b9aeace5f3e9b9aeacebf5f0f0b9aeacfbf9e8b9aeacfefdfff7b9aeace8f3b9aeacf1f9b9aeacebf5e8f4f5f2b9aeacaea8b9aeacf4f3e9eeefb2b9acddb9acddc8f4fdf2f7b9aeace5f3e9bd" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
+                    </button>
+                    <button onclick="sendOtherEmail()" class="bg-[#3f5268] hover:bg-[#B7D1E1] hover:text-[#1B2330] text-[#B7D1E1] font-bold py-4 px-8 rounded-lg text-lg transition-all duration-300">
                         Other inquiries
-                    </a>
+                    </button>
                 </div>
                 <button onclick="closeContactModal()" class="mt-8 text-[#B7D1E1]/60 hover:text-[#B7D1E1] text-sm">Close</button>
             </div>
@@ -710,6 +710,27 @@
                 document.getElementById('contact-modal').classList.remove('flex');
             }
 
+            window.sendHireEmail = function() {
+                const email = 'chim' + '@' + 'wopara.com';
+                const subject = encodeURIComponent('Hire Request: Project Inquiry');
+                const body = encodeURIComponent('Hi Chim,\n\nI would like to hire you for a project.\n\nProject details:\n\n\n\nI understand you will get back to me within 24 hours.\n\nThank you!');
+                window.location.href = 'mail' + 'to:' + email + '?subject=' + subject + '&body=' + body;
+            }
+
+            window.sendPartnerEmail = function() {
+                const email = 'chim' + '@' + 'wopara.com';
+                const subject = encodeURIComponent('Partnership Inquiry');
+                const body = encodeURIComponent('Hi Chim,\n\nI would like to partner with you on a project.\n\nPartnership details:\n\n\n\nI understand you will get back to me within 24 hours.\n\nThank you!');
+                window.location.href = 'mail' + 'to:' + email + '?subject=' + subject + '&body=' + body;
+            }
+
+            window.sendOtherEmail = function() {
+                const email = 'chim' + '@' + 'wopara.com';
+                const subject = encodeURIComponent('General Inquiry');
+                const body = encodeURIComponent('Hi Chim,\n\n\n\nI understand you will get back to me within 24 hours.\n\nThank you!');
+                window.location.href = 'mail' + 'to:' + email + '?subject=' + subject + '&body=' + body;
+            }
+
             window.closePricingModal = function() {
                 document.getElementById('pricing-modal').classList.add('hidden');
                 resetPricingForm();
@@ -906,6 +927,12 @@
 
             // --- INITIALIZATION ---
             document.getElementById('year').textContent = new Date().getFullYear();
+            
+            // Set last updated date dynamically
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const now = new Date();
+            document.getElementById('last-updated-date').textContent = months[now.getMonth()] + ' ' + now.getFullYear();
+            
             renderProjects();
             observeElements();
 
@@ -919,7 +946,7 @@
                 }, 500);
             };
             launchOverlay.addEventListener('click', dismissOverlay);
-            setTimeout(dismissOverlay, 3000);
+            setTimeout(dismissOverlay, 1000);
         });
     </script>
 </body>
