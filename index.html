@@ -180,7 +180,6 @@
         .project-card-horizontal {
             min-width: 300px;
             max-width: 300px;
-            height: 320px;
             overflow: hidden !important;
         }
         .project-card.project-card-horizontal:hover {
@@ -201,6 +200,20 @@
             display: flex;
             justify-content: center;
             align-items: center;
+        }
+        .curved-text-svg {
+            position: absolute;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+        }
+        .curved-text-svg-inner {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            pointer-events: none;
+            z-index: 5;
         }
 
         @keyframes spin {
@@ -335,6 +348,17 @@
                     <!-- Orbiting Icons on the left -->
                     <div class="about-collage">
                         <img src="assets/me/chim.png" alt="Profile photo of Chim Wopara" class="about-central-image">
+                        <!-- Curved text inside bottom of photo -->
+                        <svg class="curved-text-svg-inner" viewBox="0 0 256 256" width="256" height="256">
+                            <defs>
+                                <path id="inner-curve" d="M 35,180 Q 128,230 221,180" fill="transparent"/>
+                            </defs>
+                            <text fill="rgba(183, 209, 225, 0.8)" font-size="10" letter-spacing="0.5" font-weight="400">
+                                <textPath href="#inner-curve" startOffset="50%" text-anchor="middle">
+                                    Tap icons to discover more
+                                </textPath>
+                            </text>
+                        </svg>
                         <div class="about-orbit-container">
                             <a href="https://github.com/chimwopara" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-1"><img src="assets/links/github.png" alt="GitHub"></a>
                             <a href="https://www.instagram.com/chimwopara" target="_blank" rel="noopener noreferrer" class="about-surrounding-image about-surrounding-image-2"><img src="assets/links/instagram.png" alt="Instagram"></a>
@@ -350,7 +374,6 @@
                     <div class="glassy-card text-center md:text-left">
                         <h2 class="text-3xl font-bold mb-4 text-[#B7D1E1]">Hi,</h2>
                         <p class="text-[#B7D1E1]/80 mb-6">I'm Chim Wopara, and i create enterprise solutions with my strong background in Economics, Business and Computer Science.</p>
-                        <p class="text-[#B7D1E1]/50 text-sm mb-6">Tap the floating icons to discover more about me ←</p>
                         <div class="mt-8 flex flex-col sm:flex-row gap-4 w-full">
                             <a href="https://chimwopara.com/" target="_blank" rel="noopener noreferrer" class="flex-1 bg-[#3f5268] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button text-lg transition-transform duration-300 text-center">Learn from me</a>
                             <button onclick="openContactModal()" class="flex-1 bg-[#1B2330] hover:bg-opacity-80 text-[#B7D1E1] font-bold py-4 px-8 rounded-lg cta-button text-lg transition-transform duration-300 text-center">Talk to me</button>
@@ -362,47 +385,36 @@
 
         <!-- Projects Sections -->
         <section id="projects" class="py-20 hero-bg">
-            <div class="mb-12 fade-in-up text-center px-6">
-                <p class="text-[#B7D1E1]/80 max-w-2xl mx-auto">A selection of projects that demonstrate my passion for building with purpose.</p>
-            </div>
 
             <!-- Albertan Business Partnerships (Websites) -->
             <div class="mb-16 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">Albertan Business Partnerships</h2>
-                <div class="overflow-hidden" style="height: 336px;">
-                    <div id="websites-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
-                        <!-- Projects will be dynamically inserted here -->
-                    </div>
+                <div id="websites-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
                 </div>
             </div>
 
             <!-- Xcode iPhone Apps -->
             <div class="mb-16 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">Xcode iPhone Apps</h2>
-                <div class="overflow-hidden" style="height: 336px;">
-                    <div id="apps-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
-                        <!-- Projects will be dynamically inserted here -->
-                    </div>
+                <div id="apps-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
                 </div>
             </div>
 
             <!-- HTML, CSS and JavaScript Games -->
             <div class="mb-16 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">HTML, CSS and JavaScript Games</h2>
-                <div class="overflow-hidden" style="height: 336px;">
-                    <div id="games-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
-                        <!-- Projects will be dynamically inserted here -->
-                    </div>
+                <div id="games-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
                 </div>
             </div>
 
             <!-- My Companies -->
             <div class="mb-8 fade-in-up">
                 <h2 class="text-3xl font-bold mb-6 px-6">My Companies</h2>
-                <div class="overflow-hidden" style="height: 336px;">
-                    <div id="myprojects-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide" style="height: 336px;">
-                        <!-- Projects will be dynamically inserted here -->
-                    </div>
+                <div id="myprojects-grid" class="flex flex-nowrap gap-6 pb-4 px-6 scrollbar-hide">
+                    <!-- Projects will be dynamically inserted here -->
                 </div>
             </div>
 
@@ -724,10 +736,10 @@
                         }
                         card.className = `project-card project-card-horizontal rounded-xl overflow-hidden fade-in-up flex flex-col flex-shrink-0`;
                         card.innerHTML = `
-                            <img src="${project.image}" alt="${project.name}" class="w-full h-40 object-cover flex-shrink-0" loading="lazy" decoding="async">
-                            <div class="p-4 flex flex-col overflow-hidden" style="height: 160px;">
-                                <h3 class="text-base font-bold mb-1 truncate">${project.name}</h3>
-                                <p class="text-xs text-[#B7D1E1]/80 mb-2 line-clamp-3 overflow-hidden">${project.description}</p>
+                            <img src="${project.image}" alt="${project.name}" class="w-full h-40 object-cover" loading="lazy" decoding="async">
+                            <div class="p-4 flex flex-col">
+                                <h3 class="text-base font-bold mb-1">${project.name}</h3>
+                                <p class="text-xs text-[#B7D1E1]/80 mb-2 line-clamp-3">${project.description}</p>
                                 <p class="text-xs text-[#B7D1E1] font-medium mt-auto">${project.date}</p>
                             </div>
                         `;
